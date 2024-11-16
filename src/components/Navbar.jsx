@@ -168,7 +168,7 @@ export default function MiniDrawer() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography  noWrap component="div" color="White" sx={{fontFamily: "'Jersey 25', sans-serif", fontSize: "2.3rem"}}>
             ENGINAR
           </Typography>
 
