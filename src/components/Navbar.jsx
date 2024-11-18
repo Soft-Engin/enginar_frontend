@@ -36,9 +36,8 @@ import PostAddIcon from "@mui/icons-material/PostAdd";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 
-import SignupPopup from "./SignupPopop";
-import LoginPopup from "./LoginPopup";
 import AuthPopup from "./AuthPopup";
+import SearchBar from "./SearchBar";
 
 const drawerWidth = 280;
 const drawerIconStyle = { fontSize: { xs: 24, sm: 32, md: 32, lg: 32 } };
@@ -111,10 +110,6 @@ const Drawer = styled(MuiDrawer, {
   ],
 }));
 
-
-
-
-
 const navbarTitlesIcons = [
   { text: "Anasayfa", icon: <HomeIcon sx={drawerIconStyle} /> },
   {
@@ -139,6 +134,7 @@ const dialActions = [
 export default function Navbar() {
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   const [userLogged, setUserLogged] = useState(
     localStorage.getItem("userLogged") === "true"
   );
@@ -195,28 +191,29 @@ export default function Navbar() {
             edge="start"
             sx={[
               {
-                marginRight: 5,
+                marginRight: isMdUp ? 2 : isSmUp ? 1.5 : 1,
               },
             ]}
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            noWrap
-            component="div"
-            color="White"
-            sx={{ fontFamily: "'Jersey 25', sans-serif", fontSize: "2.3rem" }}
-          >
-            ENGINAR
-          </Typography>
+          {isMdUp && (
+            <Typography
+              noWrap
+              component="div"
+              color="White"
+              sx={{ fontFamily: "'Jersey 25', sans-serif", fontSize: "2.3rem" }}
+            >
+              ENGINAR
+            </Typography>
+          )}
+
+          <SearchBar />
 
           {userLogged ? (
             <>
               <Tooltip title="Open settings">
-                <IconButton
-                  onClick={handleOpenUserMenu}
-                  sx={{ position: "absolute", right: 2 }}
-                >
+                <IconButton onClick={handleOpenUserMenu}>
                   <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
                 </IconButton>
               </Tooltip>
@@ -255,7 +252,7 @@ export default function Navbar() {
               </Menu>
             </>
           ) : (
-            <AuthPopup/>
+            <AuthPopup setUserLogged={setUserLogged} setAnchorElUser={setAnchorElUser}/>
           )}
         </Toolbar>
       </AppBar>
