@@ -1,5 +1,6 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { styled, useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
@@ -7,11 +8,8 @@ import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -19,28 +17,31 @@ import ListItemText from "@mui/material/ListItemText";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
-import Tooltip from '@mui/material/Tooltip';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-
+import Tooltip from "@mui/material/Tooltip";
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 import HomeIcon from "@mui/icons-material/Home";
 import FilterAltSharpIcon from "@mui/icons-material/FilterAltSharp";
 import CasinoSharpIcon from "@mui/icons-material/CasinoSharp";
-import GroupIcon from '@mui/icons-material/Group';
+import GroupIcon from "@mui/icons-material/Group";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
-import LogoutIcon from '@mui/icons-material/Logout';
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 
+import SignupPopup from "./SignupPopop";
+import LoginPopup from "./LoginPopup";
+import AuthPopup from "./AuthPopup";
+
 const drawerWidth = 280;
+const drawerIconStyle = { fontSize: { xs: 24, sm: 32, md: 32, lg: 32 } };
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -57,16 +58,13 @@ const closedMixin = (theme) => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
+  width: `calc(${theme.spacing(6)} + 1px)`,
   [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(7)} + 1px)`,
+    width: `calc(${theme.spacing(8)} + 1px)`,
   },
 });
 
 const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
@@ -79,6 +77,13 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
 
 const ActionSpeedDial = styled(SpeedDial)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
+  position: "absolute",
+  bottom: 8,
+  right: 8,
+  [theme.breakpoints.up("sm")]: {
+    right: "auto",
+    left: 5,
+  },
 }));
 
 const Drawer = styled(MuiDrawer, {
@@ -106,19 +111,23 @@ const Drawer = styled(MuiDrawer, {
   ],
 }));
 
+
+
+
+
 const navbarTitlesIcons = [
-  { text: "Anasayfa", icon: <HomeIcon sx={{ fontSize: 36 }} /> },
+  { text: "Anasayfa", icon: <HomeIcon sx={drawerIconStyle} /> },
   {
     text: "Dolabımdan Yemek",
-    icon: <FilterAltSharpIcon sx={{ fontSize: 36 }} />,
+    icon: <FilterAltSharpIcon sx={drawerIconStyle} />,
   },
   {
     text: "Kendimi Aç Hissediyorum",
-    icon: <CasinoSharpIcon sx={{ fontSize: 36 }} />,
+    icon: <CasinoSharpIcon sx={drawerIconStyle} />,
   },
-  { text: "Etkinlik Merkezi", icon: <GroupIcon sx={{ fontSize: 36 }} /> },
-  { text: "Favorilerim", icon: <FavoriteIcon sx={{ fontSize: 36 }} /> },
-  { text: "Kaydettiklerim", icon: <BookmarkIcon sx={{ fontSize: 36 }} /> },
+  { text: "Etkinlik Merkezi", icon: <GroupIcon sx={drawerIconStyle} /> },
+  { text: "Favorilerim", icon: <FavoriteIcon sx={drawerIconStyle} /> },
+  { text: "Kaydettiklerim", icon: <BookmarkIcon sx={drawerIconStyle} /> },
 ];
 
 const dialActions = [
@@ -127,13 +136,16 @@ const dialActions = [
   { icon: <RestaurantMenuIcon />, name: "Tarif" },
 ];
 
-const userActions = [{text: "Profile", icon: <AccountCircleIcon/>}, {text: "Settings", icon: <SettingsApplicationsIcon/>}, {text: "Logout", icon: <LogoutIcon/>}];
-
-export default function MiniDrawer() {
+export default function Navbar() {
   const theme = useTheme();
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [speedDialOpen, setSpeedDialOpen] = React.useState(false);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
+  const [userLogged, setUserLogged] = useState(
+    localStorage.getItem("userLogged") === "true"
+  );
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [speedDialOpen, setSpeedDialOpen] = useState(false);
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
   const drawerToggle = () => {
     setDrawerOpen(!drawerOpen);
@@ -149,6 +161,27 @@ export default function MiniDrawer() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  const userActions = [
+    {
+      text: "Profile",
+      icon: <AccountCircleIcon />,
+      action: handleCloseUserMenu,
+    },
+    {
+      text: "Settings",
+      icon: <SettingsApplicationsIcon />,
+      action: handleCloseUserMenu,
+    },
+    {
+      text: "Logout",
+      icon: <LogoutIcon />,
+      action: () => {
+        localStorage.setItem("userLogged", false);
+        setUserLogged(false);
+      },
+    },
+  ];
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -168,40 +201,62 @@ export default function MiniDrawer() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography  noWrap component="div" color="White" sx={{fontFamily: "'Jersey 25', sans-serif", fontSize: "2.3rem"}}>
+          <Typography
+            noWrap
+            component="div"
+            color="White"
+            sx={{ fontFamily: "'Jersey 25', sans-serif", fontSize: "2.3rem" }}
+          >
             ENGINAR
           </Typography>
 
-          <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ position: "absolute", right: 2 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {userActions.map((action, index) => (
-                <>
-                <MenuItem key={action.text} onClick={handleCloseUserMenu} style={{width: "140px", display: "flex", justifyContent: "space-between"}}>
-                  <Typography sx={{ textAlign: 'left' }}>{action.text}</Typography>
-                  {action.icon}
-                </MenuItem>
-                </>
-              ))}
-            </Menu>
+          {userLogged ? (
+            <>
+              <Tooltip title="Open settings">
+                <IconButton
+                  onClick={handleOpenUserMenu}
+                  sx={{ position: "absolute", right: 2 }}
+                >
+                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {userActions.map((action, index) => (
+                  <MenuItem
+                    key={action.text}
+                    onClick={action.action}
+                    style={{
+                      width: "140px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography sx={{ textAlign: "left" }}>
+                      {action.text}
+                    </Typography>
+                    {action.icon}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </>
+          ) : (
+            <AuthPopup/>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -213,28 +268,24 @@ export default function MiniDrawer() {
           },
         }}
       >
-        <DrawerHeader>
-          <IconButton>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
+        <DrawerHeader></DrawerHeader>
         <List>
           {navbarTitlesIcons.map((item) => (
-            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
+            <ListItem
+              key={item.text}
+              disablePadding
+              sx={{ display: "block", position: "relative" }}
+            >
               <ListItemButton
                 sx={[
                   {
                     minHeight: 48,
-                    px: 1,
+                    paddingLeft: 0,
+                    paddingRight: 0,
                   },
                   drawerOpen
                     ? {
-                        justifyContent: "flex-start",
+                        justifyContent: "initial",
                       }
                     : {
                         justifyContent: "center",
@@ -246,13 +297,15 @@ export default function MiniDrawer() {
                     {
                       minWidth: 0,
                       justifyContent: "center",
+                      position: "relative",
+                      left: isSmUp ? 16 : 12,
                     },
                     drawerOpen
                       ? {
                           mr: 3,
                         }
                       : {
-                          mr: 3,
+                          mr: "auto",
                         },
                   ]}
                 >
@@ -277,7 +330,6 @@ export default function MiniDrawer() {
       </Drawer>
       <ActionSpeedDial
         ariaLabel="SpeedDial tooltip example"
-        sx={{ position: "absolute", bottom: 16, left: 5 }}
         icon={<SpeedDialIcon />}
         onClose={handleSpeedDialClose}
         onOpen={handleSpeedDialOpen}
@@ -300,7 +352,7 @@ export default function MiniDrawer() {
             tooltipTitle={action.name}
             tooltipOpen
             onClick={handleSpeedDialClose}
-            tooltipPlacement="right"
+            tooltipPlacement={isSmUp ? "right" : "left"}
           />
         ))}
       </ActionSpeedDial>
