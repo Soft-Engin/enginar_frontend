@@ -2,12 +2,12 @@ import "./App.css";
 
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import MiniDrawer from "./components/Navbar";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <div>
-    <MiniDrawer></MiniDrawer>
+    <Navbar></Navbar>
       <Stack spacing={2} direction="row" justifyContent={"center"}>
         <Button variant="text">Text</Button>
         <Button variant="contained">Contained</Button>
