@@ -110,6 +110,32 @@ const Drawer = styled(MuiDrawer, {
   ],
 }));
 
+const StyledToolbar = styled(Toolbar)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  [theme.breakpoints.up('lg')]: {
+    justifyContent: 'space-between',
+    '& > *:nth-of-type(2)': {
+      position: 'absolute',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      maxWidth: '600px',
+      width: '100%'
+    },
+  },
+}));
+
+const LeftSection = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+}));
+
+const RightSection = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+});
+
 const navbarTitlesIcons = [
   { text: "Anasayfa", icon: <HomeIcon sx={drawerIconStyle} /> },
   {
@@ -183,78 +209,78 @@ export default function Navbar() {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" open={drawerOpen}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={drawerToggle}
-            edge="start"
-            sx={[
-              {
-                marginRight: isMdUp ? 2 : isSmUp ? 1.5 : 1,
-              },
-            ]}
-          >
-            <MenuIcon />
-          </IconButton>
-          {isMdUp && (
-            <Typography
-              noWrap
-              component="div"
-              color="White"
-              sx={{ fontFamily: "'Jersey 25', sans-serif", fontSize: "2.3rem" }}
+      <StyledToolbar>
+          <LeftSection>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={drawerToggle}
+              edge="start"
+              sx={{ marginRight: isMdUp ? 2 : isSmUp ? 1.5 : 1 }}
             >
-              ENGINAR
-            </Typography>
-          )}
+              <MenuIcon />
+            </IconButton>
+            {isMdUp && (
+              <Typography
+                noWrap
+                component="div"
+                color="White"
+                sx={{ fontFamily: "'Jersey 25', sans-serif", fontSize: "2.3rem" }}
+              >
+                ENGINAR
+              </Typography>
+            )}
+          </LeftSection>
 
           <SearchBar />
 
-          {userLogged ? (
-            <>
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: "45px" }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {userActions.map((action, index) => (
-                  <MenuItem
-                    key={action.text}
-                    onClick={action.action}
-                    style={{
-                      width: "140px",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography sx={{ textAlign: "left" }}>
-                      {action.text}
-                    </Typography>
-                    {action.icon}
-                  </MenuItem>
-                ))}
-              </Menu>
-            </>
-          ) : (
-            <AuthPopup setUserLogged={setUserLogged} setAnchorElUser={setAnchorElUser}/>
-          )}
-        </Toolbar>
+          <RightSection>
+            {userLogged ? (
+              <>
+                <Tooltip title="Open settings">
+                  <IconButton onClick={handleOpenUserMenu}>
+                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  {userActions.map((action) => (
+                    <MenuItem
+                      key={action.text}
+                      onClick={action.action}
+                      style={{
+                        width: "140px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography sx={{ textAlign: "left" }}>
+                        {action.text}
+                      </Typography>
+                      {action.icon}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </>
+            ) : (
+              <AuthPopup setUserLogged={setUserLogged} setAnchorElUser={setAnchorElUser} />
+            )}
+          </RightSection>
+        </StyledToolbar>
       </AppBar>
       <Drawer
         variant="permanent"
