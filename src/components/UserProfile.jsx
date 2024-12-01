@@ -138,7 +138,6 @@ const UserProfile = () => {
     <Box
       sx={{
         display: "flex",
-        height: "100vh",
         flexDirection: "column",
         minWidth: "730px",
         maxWidth: "730px",
