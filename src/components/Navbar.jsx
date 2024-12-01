@@ -76,7 +76,7 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
 
 const ActionSpeedDial = styled(SpeedDial)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  position: "absolute",
+  position: "fixed",
   bottom: 8,
   right: 8,
   [theme.breakpoints.up("sm")]: {
@@ -157,7 +157,7 @@ const dialActions = [
   { icon: <RestaurantMenuIcon />, name: "Tarif" },
 ];
 
-export default function Navbar() {
+export default function Navbar(props) {
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
@@ -291,7 +291,7 @@ export default function Navbar() {
           },
         }}
       >
-        <DrawerHeader></DrawerHeader>
+        <DrawerHeader/>
         <List>
           {navbarTitlesIcons.map((item) => (
             <ListItem
@@ -351,6 +351,10 @@ export default function Navbar() {
           ))}
         </List>
       </Drawer>
+      <Box component="main" sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "center"}}>
+        <DrawerHeader />
+        {props.body}
+      </Box>
       <ActionSpeedDial
         ariaLabel="SpeedDial tooltip example"
         icon={<SpeedDialIcon />}
