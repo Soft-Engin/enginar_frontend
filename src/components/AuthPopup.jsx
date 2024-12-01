@@ -14,12 +14,12 @@ import EmailIcon from "@mui/icons-material/Email";
 import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
 
-
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "black",
   borderStyle: "solid",
   borderWidth: "1px",
   height: "30px",
+  minWidth: "100px",
 }));
 
 const SignupButton = styled(SharedButton)(({ theme }) => ({
@@ -51,7 +51,7 @@ const SubmitButton = styled(Button)(({ theme }) => ({
   fontWeight: "bold",
 }));
 
-export default function AuthPopup() {
+export default function AuthPopup(props) {
   const [open, setOpen] = React.useState(false);
   const [isSignup, setIsSignup] = React.useState(true);
 
@@ -77,17 +77,16 @@ export default function AuthPopup() {
     const formData = new FormData(event.currentTarget);
     const formJson = Object.fromEntries(formData.entries());
     console.log(formJson);
+    if (!isSignup) {
+      props.setAnchorElUser(null);
+      props.setUserLogged(true);
+    }
     handleClose();
   };
 
   return (
     <React.Fragment>
-      <Stack
-        spacing={2}
-        direction="row"
-        justifyContent={"center"}
-        sx={{ position: "absolute", right: 14 }}
-      >
+      <Stack spacing={2} direction="row" justifyContent={"center"}>
         <LoginButton variant="contained" onClick={() => handleClickOpen(false)}>
           Log In
         </LoginButton>
@@ -186,14 +185,14 @@ export default function AuthPopup() {
             variant="outlined"
             sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
             slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <KeyIcon />
-                    </InputAdornment>
-                  ),
-                },
-              }}
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <KeyIcon />
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
 
           {isSignup && (
