@@ -7,6 +7,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Stack from "@mui/material/Stack";
 import {
   Box,
   Typography,
@@ -14,18 +15,11 @@ import {
   Button,
   Card,
   CardContent,
-  Paper,
-  Divider,
 } from "@mui/material";
-import {
-  Chat as ChatIcon,
-  Repeat as RepeatIcon,
-  Favorite as FavoriteIcon,
-  Comment as CommentIcon,
-  Share as ShareIcon,
-} from "@mui/icons-material";
 
 import BannerImg from "../assets/bg2.jpeg";
+import RecipeCompressed from "./RecipeCompressed";
+import BlogPostCompressed from "./BlogPostCompressed";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "black",
@@ -80,7 +74,6 @@ const randomPosts = [
       "Just exploring the fascinating world of AI and its potential to help humanity!",
     likes: 1234,
     comments: 56,
-    retweets: 89,
   },
   {
     id: 2,
@@ -88,7 +81,6 @@ const randomPosts = [
       "Excited about the latest advancements in machine learning and natural language processing.",
     likes: 2345,
     comments: 78,
-    retweets: 123,
   },
   {
     id: 3,
@@ -96,7 +88,6 @@ const randomPosts = [
       "Ethics in AI is crucial. We must always prioritize human values and safety.",
     likes: 3456,
     comments: 99,
-    retweets: 210,
   },
   {
     id: 4,
@@ -104,7 +95,6 @@ const randomPosts = [
       "Collaborating with researchers to push the boundaries of AI capabilities.",
     likes: 1567,
     comments: 45,
-    retweets: 67,
   },
 ];
 
@@ -240,7 +230,7 @@ const UserProfile = () => {
             </Box>
           </CardContent>
           {/* User Content */}
-          <Box sx={{ width: "100%" }}>
+          <Box sx={{ width: "100%", pb: 2 }}>
             <Box sx={{ borderTop: 1, borderColor: "divider" }}>
               <Tabs
                 value={value}
@@ -256,89 +246,19 @@ const UserProfile = () => {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              <Box
-                sx={{
-                  backgroundColor: "#E9F6BC",
-                }}
-              >
+              <Stack spacing={2} direction={"column"} alignItems={"center"}>
                 {randomPosts.map((post) => (
-                  <Paper
-                    key={post.id}
-                    sx={{
-                      m: 2,
-                      p: 2,
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <Avatar
-                        src={profileData.profileImage}
-                        sx={{ width: 40, height: 40, mr: 2 }}
-                      />
-                      <Box>
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          {profileData.name}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          @{profileData.username}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Typography variant="body1" sx={{ mb: 1 }}>
-                      {post.content}
-                    </Typography>
-                    <Divider sx={{ my: 1 }} />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        color: "text.secondary",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                          ml: 1,
-                        }}
-                      >
-                        <FavoriteIcon fontSize="small" />
-                        <Typography variant="caption">{post.likes}</Typography>
-                      </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                          ml: 1,
-                        }}
-                      >
-                        <CommentIcon fontSize="small" />
-                        <Typography variant="caption">
-                          {post.comments}
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                          ml: 65,
-                        }}
-                      >
-                        <ShareIcon fontSize="small" />
-                      </Box>
-                    </Box>
-                  </Paper>
+                  <BlogPostCompressed
+                    content={post.content}
+                    likes={post.likes}
+                    comments={post.comments}
+                  />
                 ))}
-              </Box>
+              </Stack>
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-              Item Two
-            </CustomTabPanel>
+            <CustomTabPanel value={value} index={1}></CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-              Item Three
+              <RecipeCompressed></RecipeCompressed>
             </CustomTabPanel>
           </Box>
         </Card>
