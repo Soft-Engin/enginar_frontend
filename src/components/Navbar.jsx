@@ -38,6 +38,7 @@ import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 
 import AuthPopup from "./AuthPopup";
 import SearchBar from "./SearchBar";
+import PostPopup from "./PostPopup";
 
 const drawerWidth = 280;
 const drawerIconStyle = { fontSize: { xs: 24, sm: 32, md: 32, lg: 32 } };
@@ -152,7 +153,6 @@ const navbarTitlesIcons = [
 ];
 
 const dialActions = [
-  { icon: <PostAddIcon />, name: "Post" },
   { icon: <GroupAddIcon />, name: "Etkinlik" },
   { icon: <RestaurantMenuIcon />, name: "Tarif" },
 ];
@@ -182,6 +182,18 @@ export default function Navbar(props) {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const [postPopupOpen, setPostPopupOpen] = React.useState(false);
+
+  const handlePostPopupOpen = () => {
+    setPostPopupOpen(true);
+    setSpeedDialOpen(false);
+  };
+
+  const handlePostPopupClose = () => {
+    setPostPopupOpen(false);
+    setSpeedDialOpen(false);
   };
 
   const userActions = [
@@ -372,6 +384,14 @@ export default function Navbar(props) {
           },
         }}
       >
+        <SpeedDialAction
+            key={"Post"}
+            icon={<PostAddIcon/>}
+            tooltipTitle={"Post"}
+            tooltipOpen
+            onClick={handlePostPopupOpen}
+            tooltipPlacement={isSmUp ? "right" : "left"}
+          />
         {dialActions.map((action) => (
           <SpeedDialAction
             key={action.name}
@@ -383,6 +403,10 @@ export default function Navbar(props) {
           />
         ))}
       </ActionSpeedDial>
+      <PostPopup
+        open={postPopupOpen}
+        handleClose={handlePostPopupClose}
+      />
     </Box>
   );
 }
