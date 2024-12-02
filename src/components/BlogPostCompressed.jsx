@@ -111,7 +111,7 @@ const BlogPostCompressed = (props) => {
                 }}
               >
                 {bookmarked ? (
-                  <BookmarkIcon color="primary" />
+                  <BookmarkIcon color="secondary" />
                 ) : (
                   <BookmarkBorderIcon />
                 )}
