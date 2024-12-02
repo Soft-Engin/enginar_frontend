@@ -1,13 +1,14 @@
 import * as React from "react";
-import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
-import { Button } from "@mui/material";
 import AvatarGroup from "@mui/material/AvatarGroup";
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 function generate(element) {
   return [0, 1].map((value) =>
@@ -20,31 +21,14 @@ function generate(element) {
   /* Bu komple kaldırılacak */
 }
 
-const SharedButton = styled(Button)(({ theme }) => ({
-  border: "black",
-  borderStyle: "solid",
-  borderWidth: "1px",
-  height: "25px",
-  minWidth: "100px",
-  borderRadius: "15px",
-}));
-
-const FollowButton = styled(SharedButton)(({ theme }) => ({
-  color: "#453E3E",
-  backgroundColor: "#FFFFFF",
-  "&:hover": {
-    backgroundColor: "#FFFFFF",
-  },
-}));
-
 export default function UpcomingEvents() {
   return (
     <Box
       sx={{
         position: "fixed",
-        top: 550,
+        top: 500,
         right: 160,
-        width: 350,
+        width: 310,
         borderRadius: 3,
         outline: "1.5px solid #AAAAAA",
         backgroundColor: "#C8EFA5",
@@ -65,27 +49,61 @@ export default function UpcomingEvents() {
             <Box
               sx={{
                 outline: "1.5px solid #AAAAAA",
-                width: 330,
-                pt: 1,
-                pl: 2,
+                width: 280,
+                pl: 0.5,
+                pr: 1,
+                pb: 0.5,
                 backgroundColor: "#FFFFFF",
                 borderRadius: 3,
               }}
             >
               <ListItemText>
-                <Typography variant="h6" component="div" noWrap>
-                  Pair Programming @ Octa's {/* Buraya username gelecek*/}
-                </Typography>
+                <Box 
+                  sx={{
+                    display: 'grid',
+                    gridAutoFlow: 'row',
+                    gridTemplateColumns: '0.9fr 1fr',
+                    gridTemplateRows: 'auto',
+                  }}
+                >
+                  <Box display="flex">
+                    <LocalOfferOutlinedIcon style={{ fontSize: '50px' }} />
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start'
+                    }}
+                  >
+                    <Typography variant="subtitle1" component="div" fontWeight="bold" mt={0.5} noWrap>
+                      Pair Programming @Octa's
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <PlaceOutlinedIcon style={{ fontSize: '30px', marginRight: '2px' }} />
+                      <Typography variant="body2" component="div" sx={{ marginRight: '20px' }} noWrap>
+                        Istanbul
+                      </Typography>
+                      <CalendarMonthIcon style={{ fontSize: '30px', marginRight: '2px' }} />
+                      <Typography variant="body2" component="div" noWrap>
+                        24.12.2024
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
+                      <AvatarGroup total={24} sx={{'& .MuiAvatar-root': { width: 35, height: 35, fontSize: 17 }}}>
+                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                        <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
+                        <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
+                        <Avatar alt="Trevor Henderson" src="/static/images/avatar/5.jpg" />
+                      </AvatarGroup>
+                      <Typography variant="body2" component="div" color="text.secondary" sx={{ marginLeft: '2px' }} noWrap>
+                        are<br />going
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
               </ListItemText>
-              <AvatarGroup total={24}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-                <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
-                <Avatar
-                  alt="Trevor Henderson"
-                  src="/static/images/avatar/5.jpg"
-                />
-              </AvatarGroup>
             </Box>
           </ListItem>
         )}
