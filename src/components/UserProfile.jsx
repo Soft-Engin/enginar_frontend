@@ -7,6 +7,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Stack from "@mui/material/Stack";
 import {
   Box,
   Typography,
@@ -229,7 +230,7 @@ const UserProfile = () => {
             </Box>
           </CardContent>
           {/* User Content */}
-          <Box sx={{ width: "100%", pb: 2}}>
+          <Box sx={{ width: "100%", pb: 2 }}>
             <Box sx={{ borderTop: 1, borderColor: "divider" }}>
               <Tabs
                 value={value}
@@ -245,13 +246,15 @@ const UserProfile = () => {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              {randomPosts.map((post) => (
-                <BlogPostCompressed
-                  content={post.content}
-                  likes={post.likes}
-                  comments={post.comments}
-                />
-              ))}
+              <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                {randomPosts.map((post) => (
+                  <BlogPostCompressed
+                    content={post.content}
+                    likes={post.likes}
+                    comments={post.comments}
+                  />
+                ))}
+              </Stack>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}></CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
