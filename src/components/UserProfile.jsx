@@ -256,7 +256,8 @@ const UserProfile = () => {
                 ))}
               </Stack>
             </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}></CustomTabPanel>
+            <CustomTabPanel value={value} index={1}>
+            </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
               <RecipeCompressed></RecipeCompressed>
             </CustomTabPanel>
