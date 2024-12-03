@@ -1,17 +1,16 @@
 import "./App.css";
 
 import Navbar from "./components/Navbar";
-import RecommendedUsers from "./components/RecommendedUsers";
-import UpcomingEvents from "./components/UpcomingEvents";
-import UserProfile from "./components/UserProfile";
+import EventCompressed from "./components/EventCompressed";
+import Box from "@mui/material/Box";
 
 function App() {
   return (
     <div>
     <Navbar></Navbar>
-    <UserProfile/>
-    <RecommendedUsers></RecommendedUsers>
-    <UpcomingEvents></UpcomingEvents>
+    <Box display="flex" justifyContent="center" alignItems="center" height="90vh" >
+        <EventCompressed />
+    </Box>
     </div>
   );
 }
