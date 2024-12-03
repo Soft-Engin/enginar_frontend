@@ -28,10 +28,11 @@ export default function UpcomingEvents() {
         position: "fixed",
         top: 500,
         right: 160,
-        width: 310,
+        width: 320,
         borderRadius: 3,
         outline: "1.5px solid #AAAAAA",
         backgroundColor: "#C8EFA5",
+        boxShadow: 5
       }}
     >
       <Typography
@@ -49,12 +50,12 @@ export default function UpcomingEvents() {
             <Box
               sx={{
                 outline: "1.5px solid #AAAAAA",
-                width: 280,
+                width: 290,
                 pl: 0.5,
                 pr: 1,
                 pb: 0.5,
                 backgroundColor: "#FFFFFF",
-                borderRadius: 3,
+                borderRadius: 3
               }}
             >
               <ListItemText>
@@ -62,14 +63,13 @@ export default function UpcomingEvents() {
                   sx={{
                     display: 'grid',
                     gridAutoFlow: 'row',
-                    gridTemplateColumns: '0.9fr 1fr',
+                    gridTemplateColumns: '0.7fr 1fr',
                     gridTemplateRows: 'auto',
                   }}
                 >
                   <Box display="flex">
                     <LocalOfferOutlinedIcon style={{ fontSize: '50px' }} />
                   </Box>
-
                   <Box
                     sx={{
                       display: 'flex',
@@ -77,25 +77,24 @@ export default function UpcomingEvents() {
                       alignItems: 'flex-start'
                     }}
                   >
-                    <Typography variant="subtitle1" component="div" fontWeight="bold" mt={0.5} noWrap>
-                      Pair Programming @Octa's
+                    <Typography variant="subtitle1" component="div" fontWeight="bold" mt={0.5} sx={{ maxWidth: '230px' }} noWrap>
+                      Enginar Festival @test wrapping
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '2px' }}>
                       <PlaceOutlinedIcon style={{ fontSize: '30px', marginRight: '2px' }} />
-                      <Typography variant="body2" component="div" sx={{ marginRight: '20px' }} noWrap>
+                      <Typography variant="body2" component="div" sx={{ marginRight: '15px', maxWidth: '75px' }} noWrap>
                         Istanbul
                       </Typography>
                       <CalendarMonthIcon style={{ fontSize: '30px', marginRight: '2px' }} />
-                      <Typography variant="body2" component="div" noWrap>
+                      <Typography variant="body2" component="div" sx={{ maxWidth: '75px' }} noWrap>
                         24.12.2024
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-                      <AvatarGroup total={24} sx={{'& .MuiAvatar-root': { width: 35, height: 35, fontSize: 17 }}}>
+                      <AvatarGroup total={23} spacing={4} sx={{'& .MuiAvatar-root': { width: 36, height: 36, fontSize: 17 }}}>
                         <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
                         <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
                         <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
-                        <Avatar alt="Trevor Henderson" src="/static/images/avatar/5.jpg" />
                       </AvatarGroup>
                       <Typography variant="body2" component="div" color="text.secondary" sx={{ marginLeft: '2px' }} noWrap>
                         are<br />going
