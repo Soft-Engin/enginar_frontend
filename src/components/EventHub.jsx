@@ -17,12 +17,12 @@ export default function EventHub() {
     <Grid container spacing={4} sx={{ pt: 3, pb: 5, pl: 20, pr: 20 }}>
       <Grid item size={12} sx={{ pl: 5 }}>
         <Button variant="contained" style={{ backgroundColor: "#4B9023", borderRadius: 20, width: "200px", height: "50px", textTransform: "none", marginRight: 25 }}>
-        <Typography variant="h5" >
+        <Typography variant="h5" noWrap>
           City: Istanbul
         </Typography>
         </Button>
         <Button variant="contained" style={{ backgroundColor: "#4B9023", borderRadius: 20, width: "100px", height: "50px", textTransform: "none" }}>
-        <Typography variant="h5" >
+        <Typography variant="h5" noWrap>
           Date
         </Typography>
         </Button>

@@ -14,11 +14,11 @@ import CalendarMonthIcon  from "@mui/icons-material/CalendarMonth";
 
 export default function EventCompressed() {
   return (
-    <Box sx= {{ width: 700, height: 320, outline: "1.5px solid #AAAAAA", backgroundColor: "#FFFFFF", pl: 3, pt: 3, pr: 3, pb: 3, borderRadius: 5 }}>
+    <Box sx= {{ width: 700, height: 320, outline: "1.5px solid #AAAAAA", backgroundColor: "#FFFFFF", pl: 3, pt: 3, pr: 3, pb: 3, borderRadius: 5, boxShadow: 5 }}>
       <Grid container spacing={1}>
         <Grid item size={9.5}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="h5" fontWeight="bold" style={{ marginRight: '15px'}} noWrap>
+            <Typography variant="h5" fontWeight="bold" style={{ marginRight: '15px', maxWidth: '400px' }} noWrap>
               Enginar Festival
             </Typography>
             <PlaceOutlinedIcon style={{ fontSize: '30px', marginRight: '2px' }} />
@@ -41,7 +41,7 @@ export default function EventCompressed() {
               Host:
             </Typography>
             <Avatar sx={{ width: 34, height: 34, marginRight: 0.7 }}/>
-            <Typography variant="body2" component="div" color="text.secondary" >
+            <Typography variant="body2" component="div" color="text.secondary" noWrap>
               <b>Hoshino Ichika</b><br/>CEO
             </Typography>
           </Box>
@@ -63,7 +63,7 @@ export default function EventCompressed() {
               <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
               <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
             </AvatarGroup>
-            <Typography variant="caption" component="div" color="text.secondary" >
+            <Typography variant="caption" component="div" color="text.secondary">
               X, Y and Z whom you follow are going
             </Typography>
           </Box>
