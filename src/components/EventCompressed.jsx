@@ -14,11 +14,11 @@ import CalendarMonthIcon  from "@mui/icons-material/CalendarMonth";
 
 export default function EventCompressed() {
   return (
-    <Box sx= {{ width: 600, height: 280, outline: "1.5px solid #AAAAAA", backgroundColor: "#FFFFFF", pl: 3, pt: 3, pr: 3, pb: 3, borderRadius: 5 }}>
+    <Box sx= {{ width: 700, height: 320, outline: "1.5px solid #AAAAAA", backgroundColor: "#FFFFFF", pl: 3, pt: 3, pr: 3, pb: 3, borderRadius: 5 }}>
       <Grid container spacing={1}>
-        <Grid item size={9}>
+        <Grid item size={9.5}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="h5" fontWeight="bold" style={{ marginRight: '20px'}} noWrap>
+            <Typography variant="h5" fontWeight="bold" style={{ marginRight: '15px'}} noWrap>
               Enginar Festival
             </Typography>
             <PlaceOutlinedIcon style={{ fontSize: '30px', marginRight: '2px' }} />
@@ -27,7 +27,7 @@ export default function EventCompressed() {
             </Typography>
           </Box>
         </Grid>
-        <Grid item size={3}>
+        <Grid item size={2.5}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <CalendarMonthIcon style={{ fontSize: '30px', marginRight: '2px' }} />
             <Typography variant="body2" component="div" noWrap>
@@ -46,19 +46,19 @@ export default function EventCompressed() {
             </Typography>
           </Box>
         </Grid>
-        <Grid item size={12}>
+        <Grid item size={12} sx={{ height: 150 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="caption" component="div" >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            <Typography variant="body2" component="div" sx={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 6, textOverflow: 'ellipsis' }}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </Typography>
           </Box>
         </Grid>
         <Grid item size={9}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body1" component="div" fontWeight="bold" style={{ marginRight: '6px' }} >
+            <Typography variant="body1" component="div" fontWeight="bold" style={{ marginRight: '6px' }}>
               Participants:
             </Typography>
-            <AvatarGroup total={24} sx={{'& .MuiAvatar-root': { width: 32, height: 32, fontSize: 15 }, marginRight: 0.5}}>
+            <AvatarGroup total={23} sx={{'& .MuiAvatar-root': { width: 32, height: 32, fontSize: 15 }, marginRight: 0.5}}>
               <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
               <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
               <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
