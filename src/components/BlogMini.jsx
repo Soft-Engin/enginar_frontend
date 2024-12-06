@@ -11,7 +11,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import ShareIcon from "@mui/icons-material/Share";
 
-export default function RecipeMini() {
+export default function BlogMini() {
   return(
     <Box sx= {{ width: 450, height: 450, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 3, pt: 2, pr: 3, pb: 2, borderRadius: 5, boxShadow: 5 }}>
       <Grid container spacing={1}>
@@ -22,7 +22,7 @@ export default function RecipeMini() {
               Hoshino Ichika
             </Typography>
             <Typography variant="body2" component="span" color="text.secondary">
-              · 2h
+              · 5d
             </Typography>
           </Box>
         </Grid>
@@ -33,23 +33,16 @@ export default function RecipeMini() {
         </Grid>
         <Grid item size={12}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="h5" fontWeight="bold" style={{ marginRight: '15px', maxWidth: '380px' }} noWrap>
-              My Enginar Recipe
+            <Typography variant="body2" component="div" sx={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 5, textOverflow: 'ellipsis', lineHeight: "24px" }}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </Typography>
           </Box>
         </Grid>
-        <Grid item size={12}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body2" component="div" sx={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, textOverflow: 'ellipsis', lineHeight: "24px" }}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item size={12}>
+        <Grid item size={12} sx={{ mt: "2px" }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <img
-              src="https://via.placeholder.com/400x225"
-              alt="Enginar Yemeği"
+              src="https://via.placeholder.com/400x215"
+              alt="Post Img"
               style={{ border: "1px solid #C0C0C0", borderRadius: 10 }}
             />
           </Box>
@@ -58,7 +51,7 @@ export default function RecipeMini() {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <FavoriteBorderIcon style={{ fontSize: '32px' }} />
             <Typography variant="body2" component="span" color="text.secondary">
-              39k
+              3
             </Typography>
           </Box>
         </Grid>
@@ -66,7 +59,7 @@ export default function RecipeMini() {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <ChatBubbleOutlineIcon style={{ fontSize: '28px', marginRight: '1px' }} />
             <Typography variant="body2" component="span" color="text.secondary">
-              14
+              1
             </Typography>
           </Box>
         </Grid>

@@ -1,13 +1,13 @@
 import "./App.css";
 
 import Navbar from "./components/Navbar";
-import SavedPosts from "./components/SavedPosts";
+import SavedLikedPosts from "./components/SavedLikedPosts";
 
 function App() {
   return (
     <div>
     <Navbar></Navbar>
-    <SavedPosts />
+    <SavedLikedPosts />
     </div>
   );
 }
