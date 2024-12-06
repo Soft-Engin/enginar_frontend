@@ -1,13 +1,13 @@
 import "./App.css";
 
 import Navbar from "./components/Navbar";
-import EventHub from "./components/EventHub";
+import SavedPosts from "./components/SavedPosts";
 
 function App() {
   return (
     <div>
     <Navbar></Navbar>
-    <EventHub />
+    <SavedPosts />
     </div>
   );
 }
