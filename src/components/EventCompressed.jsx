@@ -1,8 +1,6 @@
 import * as React from "react";
 import {
-  Card,
   Typography,
-  IconButton,
   Box,
   Avatar,
   AvatarGroup,
@@ -14,7 +12,7 @@ import CalendarMonthIcon  from "@mui/icons-material/CalendarMonth";
 
 export default function EventCompressed() {
   return (
-    <Box sx= {{ width: 700, height: 320, outline: "1.5px solid #AAAAAA", backgroundColor: "#FFFFFF", pl: 3, pt: 3, pr: 3, pb: 3, borderRadius: 5, boxShadow: 5 }}>
+    <Box sx= {{ width: 700, height: 320, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 3, pt: 3, pr: 3, pb: 3, borderRadius: 5, boxShadow: 5 }}>
       <Grid container spacing={1}>
         <Grid item size={9.5}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
