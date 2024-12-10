@@ -8,6 +8,14 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 
+function generate(element) {
+  return [0, 1, 2, 3, 4, 5, 6].map((value) =>
+    React.cloneElement(element, {
+      key: value,
+    })
+  );
+}
+
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -54,9 +62,14 @@ export default function ContentFeed() {
           sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
         >
           <Tab
-            label="Popular Posts"
+            label="Popular Blogs"
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
             {...a11yProps(0)}
+          />
+          <Tab
+            label="Popular Recipes"
+            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
+            {...a11yProps(1)}
           />
           <Tab
             label="Following"
@@ -67,12 +80,26 @@ export default function ContentFeed() {
       </Box>
 
       <CustomTabPanel value={value} index={0}>
-        <BlogMini />
-        <RecipeMini />
+        {generate(<BlogMini />).map((blog, index) => (
+          <Box key={index} sx={{ width: 600, mb: 2 }}>
+            {blog}
+          </Box>
+        ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        <BlogMini />
-        <RecipeMini />
+        {generate(<RecipeMini />).map((recipe, index) => (
+          <Box key={index} sx={{ width: 600, mb: 2 }}>
+            {recipe}
+          </Box>
+        ))}
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={2}>
+        <Box sx={{ width: 600, mb: 2 }}>
+          <BlogMini />
+        </Box>
+        <Box sx={{ width: 600, mb: 2 }}>
+          <RecipeMini />
+        </Box>
       </CustomTabPanel>
 
       <RecommendedUsers />

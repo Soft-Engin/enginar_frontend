@@ -4,7 +4,6 @@ import {
   Box,
   Avatar
 } from "@mui/material";
-import Grid from '@mui/material/Grid2';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
@@ -13,70 +12,61 @@ import ShareIcon from "@mui/icons-material/Share";
 
 export default function RecipeMini() {
   return(
-    <Box sx= {{ width: 450, height: 450, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 3, pt: 2, pr: 3, pb: 2, borderRadius: 5, boxShadow: 5 }}>
-      <Grid container spacing={1}>
-        <Grid item size={11}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Avatar sx={{ width: 30, height: 30, marginRight: 0.8 }}/>
-            <Typography variant="body2" component="div" fontWeight="bold" style={{ marginRight: '3px'}} noWrap>
-              Hoshino Ichika
-            </Typography>
-            <Typography variant="body2" component="span" color="text.secondary">
-              · 2h
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item size={1}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <MoreHorizIcon style={{ fontSize: '30px' }} />
-          </Box>
-        </Grid>
-        <Grid item size={12}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="h5" fontWeight="bold" style={{ marginRight: '15px', maxWidth: '380px' }} noWrap>
-              My Enginar Recipe
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item size={12}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body2" component="div" sx={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, textOverflow: 'ellipsis', lineHeight: "24px" }}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            </Typography>
-          </Box>
-        </Grid>
-        <Grid item size={12}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <img
-              src="https://via.placeholder.com/400x225"
-              alt="Enginar Yemeği"
-              style={{ border: "1px solid #C0C0C0", borderRadius: 10 }}
-            />
-          </Box>
-        </Grid>
-        <Grid item size={2} sx={{ mt: "1px" }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <FavoriteBorderIcon style={{ fontSize: '32px' }} />
-            <Typography variant="body2" component="span" color="text.secondary">
+    <Box sx={{maxWidth: 700, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 3, pt: 2, pr: 3, pb: 1.5, borderRadius: 5, boxShadow: 5 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Avatar sx={{ width: 30, height: 30, marginRight: 1 }} />
+          <Typography variant="body2" fontWeight="bold" sx={{ marginRight: 0.5 }} noWrap>
+            Hoshino Ichika
+          </Typography>
+          <Typography variant="body2" color="text.secondary" noWrap>
+            · 2h
+          </Typography>
+        </Box>
+        <MoreHorizIcon style={{ fontSize: "30px" }} />
+      </Box>
+
+      <Typography variant="h5" fontWeight="bold" sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", mb: 1}}>
+        My Enginar Recipe
+      </Typography>
+
+      <Typography variant="body2" sx={{ display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 3, overflow: "hidden", textOverflow: "ellipsis", lineHeight: "24px", mb: 2 }}>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      </Typography>
+
+      <Box sx={{ mb: 0.5 }}>
+        <img 
+          src="https://via.placeholder.com/400x225"
+          alt="Enginar Yemeği"
+          style={{
+            width: "100%",
+            borderRadius: 10,
+            border: "1px solid #C0C0C0",
+          }}
+        />
+      </Box>
+
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <FavoriteBorderIcon style={{ fontSize: "30px", marginRight: 4 }} />
+            <Typography variant="body2" color="text.secondary">
               39k
             </Typography>
           </Box>
-        </Grid>
-        <Grid item size={8} sx={{ mt: "3px" }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <ChatBubbleOutlineIcon style={{ fontSize: '28px', marginRight: '1px' }} />
-            <Typography variant="body2" component="span" color="text.secondary">
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <ChatBubbleOutlineIcon style={{ fontSize: "28px", marginRight: 4 }} />
+            <Typography variant="body2" color="text.secondary">
               14
             </Typography>
           </Box>
-        </Grid>
-        <Grid item size={2} sx={{ mt: "1px" }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <ShareIcon style={{ fontSize: '28px', marginRight: '6px' }} />
-            <BookmarkIcon style={{ fontSize: '32px' }} />
-          </Box>
-        </Grid>
-      </Grid>
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <ShareIcon style={{ fontSize: "28px", marginRight: 6 }} />
+          <BookmarkIcon style={{ fontSize: "32px" }} />
+        </Box>
+      </Box>
     </Box>
   )
 }

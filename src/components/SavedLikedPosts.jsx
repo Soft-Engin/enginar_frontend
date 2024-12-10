@@ -60,18 +60,18 @@ export default function SavedLikedPosts() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <Grid container spacing={4} sx={{ pt: 2, pb: 5, pl: 20, pr: 20 }}>
+        <Grid container spacing={6} justifyContent="center" sx={{ pt: 2, pb: 5 }}>
           {generate(<RecipeMini />).map((recipe, index) => (
-            <Grid item size={4} key={index} display="flex" justifyContent="center" alignItems="center">
+            <Grid item size={4} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: 450 }}>
               {recipe}
             </Grid>
           ))}
         </Grid>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        <Grid container spacing={4} sx={{ pt: 2, pb: 5, pl: 20, pr: 20 }}>
+        <Grid container spacing={6} justifyContent="center" sx={{ pt: 2, pb: 5 }}>
           {generate(<BlogMini />).map((blog, index) => (
-            <Grid item size={4} key={index} display="flex" justifyContent="center" alignItems="center">
+            <Grid item size={4} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: 450 }}>
               {blog}
             </Grid>
           ))}
