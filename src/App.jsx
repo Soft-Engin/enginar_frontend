@@ -1,13 +1,13 @@
 import "./App.css";
 
 import Navbar from "./components/Navbar";
-import SavedLikedPosts from "./components/SavedLikedPosts";
+import ContentFeed from "./components/ContentFeed";
 
 function App() {
   return (
     <div>
     <Navbar></Navbar>
-    <SavedLikedPosts />
+    <ContentFeed />
     </div>
   );
 }
