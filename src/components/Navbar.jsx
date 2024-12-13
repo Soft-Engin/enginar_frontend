@@ -22,12 +22,12 @@ import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-import HomeIcon from "@mui/icons-material/Home";
-import FilterAltSharpIcon from "@mui/icons-material/FilterAltSharp";
-import CasinoSharpIcon from "@mui/icons-material/CasinoSharp";
-import GroupIcon from "@mui/icons-material/Group";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import KitchenOutlinedIcon from '@mui/icons-material/KitchenOutlined';
+import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -40,7 +40,7 @@ import AuthPopup from "./AuthPopup";
 import SearchBar from "./SearchBar";
 
 const drawerWidth = 280;
-const drawerIconStyle = { fontSize: { xs: 24, sm: 32, md: 32, lg: 32 } };
+const drawerIconStyle = { fontSize: { xs: 28, sm: 36, md: 36, lg: 36 }, color: "black" };
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -137,24 +137,18 @@ const RightSection = styled(Box)({
 });
 
 const navbarTitlesIcons = [
-  { text: "Anasayfa", icon: <HomeIcon sx={drawerIconStyle} /> },
-  {
-    text: "Dolabımdan Yemek",
-    icon: <FilterAltSharpIcon sx={drawerIconStyle} />,
-  },
-  {
-    text: "Kendimi Aç Hissediyorum",
-    icon: <CasinoSharpIcon sx={drawerIconStyle} />,
-  },
-  { text: "Etkinlik Merkezi", icon: <GroupIcon sx={drawerIconStyle} /> },
-  { text: "Favorilerim", icon: <FavoriteIcon sx={drawerIconStyle} /> },
-  { text: "Kaydettiklerim", icon: <BookmarkIcon sx={drawerIconStyle} /> },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Home</Typography>, icon: <HomeOutlinedIcon sx={drawerIconStyle} /> },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >From My Kitchen</Typography>, icon: <KitchenOutlinedIcon sx={drawerIconStyle} />,},
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Feelin' Hungry</Typography>, icon: <CasinoOutlinedIcon sx={drawerIconStyle} />,},
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Event Hub</Typography>, icon: <PeopleAltOutlinedIcon sx={drawerIconStyle} /> },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Favorited Posts</Typography>, icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} /> },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Saved Posts</Typography>, icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} /> },
 ];
 
 const dialActions = [
-  { icon: <PostAddIcon />, name: "Post" },
-  { icon: <GroupAddIcon />, name: "Etkinlik" },
-  { icon: <RestaurantMenuIcon />, name: "Tarif" },
+  { icon: <PostAddIcon />, name: "Blog" },
+  { icon: <GroupAddIcon />, name: "Event" },
+  { icon: <RestaurantMenuIcon />, name: "Recipe" },
 ];
 
 export default function Navbar(props) {
@@ -292,7 +286,7 @@ export default function Navbar(props) {
         }}
       >
         <DrawerHeader/>
-        <List>
+        <List sx={{ marginTop: "6px" }} >
           {navbarTitlesIcons.map((item) => (
             <ListItem
               key={item.text}
