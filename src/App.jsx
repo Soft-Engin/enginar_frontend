@@ -1,13 +1,13 @@
 import "./App.css";
 
 import Navbar from "./components/Navbar";
-import ContentFeed from "./components/ContentFeed";
+import EventPage from "./components/EventPage";
 
 function App() {
   return (
     <div>
     <Navbar></Navbar>
-    <ContentFeed />
+    <EventPage />
     </div>
   );
 }

@@ -39,7 +39,7 @@ import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import AuthPopup from "./AuthPopup";
 import SearchBar from "./SearchBar";
 
-const drawerWidth = 280;
+const drawerWidth = 300;
 const drawerIconStyle = { fontSize: { xs: 28, sm: 36, md: 36, lg: 36 }, color: "black" };
 
 const openedMixin = (theme) => ({
@@ -57,9 +57,9 @@ const closedMixin = (theme) => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `calc(${theme.spacing(6)} + 1px)`,
+  width: `calc(${theme.spacing(6)} + 7px)`,
   [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
+    width: `calc(${theme.spacing(8)} + 7px)`,
   },
 });
 
@@ -141,7 +141,7 @@ const navbarTitlesIcons = [
   { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >From My Kitchen</Typography>, icon: <KitchenOutlinedIcon sx={drawerIconStyle} />,},
   { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Feelin' Hungry</Typography>, icon: <CasinoOutlinedIcon sx={drawerIconStyle} />,},
   { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Event Hub</Typography>, icon: <PeopleAltOutlinedIcon sx={drawerIconStyle} /> },
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Favorited Posts</Typography>, icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} /> },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Liked Posts</Typography>, icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} /> },
   { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Saved Posts</Typography>, icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} /> },
 ];
 
