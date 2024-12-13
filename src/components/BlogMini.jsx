@@ -7,7 +7,7 @@ import {
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
+import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
 import ShareIcon from "@mui/icons-material/Share";
 
 export default function BlogMini() {
@@ -60,7 +60,7 @@ export default function BlogMini() {
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <ShareIcon style={{ fontSize: "28px", marginRight: 6 }} />
-          <BookmarkIcon style={{ fontSize: "32px" }} />
+          <BookmarkBorderOutlinedIcon style={{ fontSize: "32px" }} />
         </Box>
       </Box>
     </Box>

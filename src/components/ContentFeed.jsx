@@ -58,16 +58,16 @@ export default function ContentFeed() {
           centered
           value={value}
           onChange={handleChange}
-          aria-label="basic tabs example"
+          aria-label="Feed Tabs"
           sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
         >
           <Tab
-            label="Popular Blogs"
+            label="Popular Recipes"
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
             {...a11yProps(0)}
           />
           <Tab
-            label="Popular Recipes"
+            label="Popular Blogs"
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
             {...a11yProps(1)}
           />
@@ -80,16 +80,16 @@ export default function ContentFeed() {
       </Box>
 
       <CustomTabPanel value={value} index={0}>
-        {generate(<BlogMini />).map((blog, index) => (
+        {generate(<RecipeMini />).map((recipe, index) => (
           <Box key={index} sx={{ width: 600, mb: 2 }}>
-            {blog}
+            {recipe}
           </Box>
         ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        {generate(<RecipeMini />).map((recipe, index) => (
+        {generate(<BlogMini />).map((blog, index) => (
           <Box key={index} sx={{ width: 600, mb: 2 }}>
-            {recipe}
+            {blog}
           </Box>
         ))}
       </CustomTabPanel>
