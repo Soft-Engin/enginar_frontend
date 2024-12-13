@@ -12,7 +12,7 @@ import ShareIcon from "@mui/icons-material/Share";
 
 export default function BlogMini() {
   return(
-    <Box sx={{maxWidth: 700, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 3, pt: 2, pr: 3, pb: 1.5, borderRadius: 5, boxShadow: 5 }}>
+    <Box sx={{ maxWidth: 700, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 3, pt: 2, pr: 3, pb: 1.5, borderRadius: 5, boxShadow: 5 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Avatar sx={{ width: 30, height: 30, marginRight: 1 }} />
