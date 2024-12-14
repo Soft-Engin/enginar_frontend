@@ -1,13 +1,13 @@
-import EventDetailed from "./EventDetailed"
+import BlogDetailed from "./BlogDetailed"
 import Box from '@mui/material/Box';
 import CommentSection from "./CommentSection";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 
-export default function EventPage() {
+export default function BlogPage() {
   return(
     <Box sx={{ m: 4, maxWidth: 900 }}>
-      <EventDetailed />
+      <BlogDetailed />
       <CommentSection />
       <RecommendedUsers />
       <UpcomingEvents />
