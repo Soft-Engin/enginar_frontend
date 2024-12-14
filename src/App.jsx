@@ -1,13 +1,13 @@
 import "./App.css";
 
 import Navbar from "./components/Navbar";
-import EventPage from "./components/EventPage";
+import BlogPage from "./components/BlogPage";
 
 function App() {
   return (
     <div>
     <Navbar></Navbar>
-    <EventPage />
+    <BlogPage />
     </div>
   );
 }

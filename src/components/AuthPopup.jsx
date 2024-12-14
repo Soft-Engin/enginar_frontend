@@ -19,7 +19,9 @@ const SharedButton = styled(Button)(({ theme }) => ({
   borderStyle: "solid",
   borderWidth: "1px",
   height: "30px",
-  minWidth: "100px",
+  minWidth: "110px",
+  borderRadius: 5,
+  textTransform: "none"
 }));
 
 const SignupButton = styled(SharedButton)(({ theme }) => ({
@@ -88,10 +90,10 @@ export default function AuthPopup(props) {
     <React.Fragment>
       <Stack spacing={2} direction="row" justifyContent={"center"}>
         <LoginButton variant="contained" onClick={() => handleClickOpen(false)}>
-          Log In
+          Log in
         </LoginButton>
         <SignupButton variant="contained" onClick={() => handleClickOpen(true)}>
-          Sign Up
+          Sign up
         </SignupButton>
       </Stack>
       <Dialog
