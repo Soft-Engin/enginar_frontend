@@ -1,4 +1,8 @@
-import { Box } from "@mui/material"
+import { 
+  Box, 
+  Typography,
+  Avatar
+} from "@mui/material";
 
 export default function BlogDetailed() {
   return(

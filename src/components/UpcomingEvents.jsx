@@ -27,7 +27,7 @@ export default function UpcomingEvents() {
       sx={{
         position: "fixed",
         top: 500,
-        right: 160,
+        right: 105,
         width: 320,
         borderRadius: 3,
         outline: "1.5px solid #959595",
