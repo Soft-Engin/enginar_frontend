@@ -6,7 +6,7 @@ import UpcomingEvents from "./UpcomingEvents";
 
 export default function EventPage() {
   return(
-    <Box sx={{ m: 5, maxWidth: 900 }}>
+    <Box sx={{ m: 4, maxWidth: 900 }}>
       <EventDetailed />
       <CommentSection />
       <RecommendedUsers />

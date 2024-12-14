@@ -6,7 +6,7 @@ import UpcomingEvents from "./UpcomingEvents";
 
 export default function BlogPage() {
   return(
-    <Box sx={{ m: 5, maxWidth: 800 }}>
+    <Box sx={{ m: 4, maxWidth: 900 }}>
       <BlogDetailed />
       <CommentSection />
       <RecommendedUsers />
