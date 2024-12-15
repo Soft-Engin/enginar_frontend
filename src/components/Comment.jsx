@@ -10,7 +10,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
 export default function Comment() {
   return(
-    <Box sx={{ maxWidth: 1500, backgroundColor: "#EAEAEA", pb: 2, pt: 2.2 }}>
+    <Box sx={{ maxWidth: 1500, backgroundColor: "#EAEAEA", pb: 1.3, pt: 2.2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: 'flex' }}>
           <Avatar sx={{ width: 50, height: 50, mr: 1.3 }}/>

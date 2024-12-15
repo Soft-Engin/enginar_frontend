@@ -18,12 +18,12 @@ export default function RecipeDetailed() {
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Avatar sx={{ width: 50, height: 50, marginRight: 1.5 }} />
-            <Typography variant="h6" fontWeight="bold" sx={{ marginRight: 0.5 }} noWrap>
-              Shiraishi An
-            </Typography>
-            <Typography variant="h6" color="text.secondary" noWrap>
-              · 2h
-            </Typography>
+          <Typography variant="h6" fontWeight="bold" sx={{ marginRight: 0.5 }} noWrap>
+            Shiraishi An
+          </Typography>
+          <Typography variant="h6" color="text.secondary" noWrap>
+            · 2h
+          </Typography>
           </Box>
         <MoreHorizIcon sx={{ fontSize: '40px' }} />
       </Box>
