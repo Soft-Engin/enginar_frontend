@@ -1,15 +1,13 @@
 import "./App.css";
 
 import Navbar from "./components/Navbar";
-import BlogPage from "./components/BlogPage";
-import EventPage from "./components/EventPage";
-import ContentFeed from "./components/ContentFeed";
+import RecipePage from "./components/RecipePage";
 
 function App() {
   return (
     <div>
     <Navbar></Navbar>
-    <BlogPage />
+    <RecipePage />
     </div>
   );
 }
