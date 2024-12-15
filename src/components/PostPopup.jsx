@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Box from "@mui/material/Box";
@@ -57,7 +56,7 @@ export default function PostPopup(props) {
         sx: {
           width: 620,
           borderRadius: 4,
-          backgroundColor: "#C8EFA5", // Light green background
+          backgroundColor: "#C8EFA5",
           padding: 0.5,
         },
       }}
@@ -77,7 +76,7 @@ export default function PostPopup(props) {
           <IconButton
             onClick={handleClose}
             sx={{
-              color: "#555", // Subtle color for the close button
+              color: "#555",
             }}
           >
             <CloseIcon />
@@ -184,8 +183,6 @@ export default function PostPopup(props) {
           <IconButton>
             <LinkIcon sx={{ color: "#2196f3" }} />
           </IconButton>
-        </DialogContent>
-        <DialogActions>
           <Button
             variant="contained"
             type="submit"
@@ -196,11 +193,12 @@ export default function PostPopup(props) {
                 backgroundColor: "#4B9023",
               },
               borderRadius: 20,
+              marginLeft: 46,
             }}
           >
             Post
           </Button>
-        </DialogActions>
+        </DialogContent>
       </form>
     </Dialog>
   );
