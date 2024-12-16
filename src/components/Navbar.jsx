@@ -39,6 +39,8 @@ import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import AuthPopup from "./AuthPopup";
 import SearchBar from "./SearchBar";
 
+import {Link} from "react-router-dom";
+
 const drawerWidth = 300;
 const drawerIconStyle = { fontSize: { xs: 28, sm: 36, md: 36, lg: 36 }, color: "black" };
 
@@ -137,12 +139,12 @@ const RightSection = styled(Box)({
 });
 
 const navbarTitlesIcons = [
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Home</Typography>, icon: <HomeOutlinedIcon sx={drawerIconStyle} /> },
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >From My Kitchen</Typography>, icon: <KitchenOutlinedIcon sx={drawerIconStyle} />,},
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Feelin' Hungry</Typography>, icon: <CasinoOutlinedIcon sx={drawerIconStyle} />,},
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Event Hub</Typography>, icon: <PeopleAltOutlinedIcon sx={drawerIconStyle} /> },
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Liked Posts</Typography>, icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} /> },
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Saved Posts</Typography>, icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} /> },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Home</Typography>, icon: <HomeOutlinedIcon sx={drawerIconStyle} />, link: "/" },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >From My Kitchen</Typography>, icon: <KitchenOutlinedIcon sx={drawerIconStyle} />, link: "/profile"},
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Feelin' Hungry</Typography>, icon: <CasinoOutlinedIcon sx={drawerIconStyle} />, link: "/profile"},
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Event Hub</Typography>, icon: <PeopleAltOutlinedIcon sx={drawerIconStyle} />, link: "/eventhub" },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Liked Posts</Typography>, icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} />, link: "/profile" },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Saved Posts</Typography>, icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} />, link: "/profile" },
 ];
 
 const dialActions = [
@@ -183,11 +185,13 @@ export default function Navbar(props) {
       text: "Profile",
       icon: <AccountCircleIcon />,
       action: handleCloseUserMenu,
+      link: "/profile"
     },
     {
       text: "Settings",
       icon: <SettingsApplicationsIcon />,
       action: handleCloseUserMenu,
+      link: "/settings"
     },
     {
       text: "Logout",
@@ -294,6 +298,7 @@ export default function Navbar(props) {
               sx={{ display: "block", position: "relative" }}
             >
               <ListItemButton
+                to={item.link}
                 sx={[
                   {
                     minHeight: 48,

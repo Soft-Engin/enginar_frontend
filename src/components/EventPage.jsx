@@ -4,7 +4,11 @@ import CommentSection from "./CommentSection";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 
+import {useParams} from 'react-router-dom';
+
 export default function EventPage() {
+  const params = useParams();
+  console.log(params);
   return(
     <Box sx={{ m: 4, maxWidth: 900 }}>
       <EventDetailed />
