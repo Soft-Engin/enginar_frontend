@@ -11,7 +11,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 export default function EventDetailed() {
   return(
-    <Box sx={{ maxWidth: 1500, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", p: 5, borderRadius: "20px 20px 0 0" }} >
+    <Box sx={{ maxWidth: 1500, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", p: 5, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography variant="h4" fontWeight="bold" style={{ marginRight: '15px', maxWidth: '400px' }} noWrap>
