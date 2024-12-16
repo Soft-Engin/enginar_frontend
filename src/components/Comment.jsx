@@ -10,7 +10,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
 export default function Comment() {
   return(
-    <Box sx={{ maxWidth: 1500, backgroundColor: "#EAEAEA", pb: 2, pt: 2.2 }}>
+    <Box sx={{ maxWidth: 1500, backgroundColor: "#EAEAEA", pb: 1.3, pt: 2.2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: 'flex' }}>
           <Avatar sx={{ width: 50, height: 50, mr: 1.3 }}/>
@@ -19,7 +19,7 @@ export default function Comment() {
               Kusanagi Nene
             </Typography>
             <Typography variant="body2">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1 }}>
               <Box sx={{ display: "flex", alignItems: "center" }}>

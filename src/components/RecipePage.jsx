@@ -1,13 +1,13 @@
-import EventDetailed from "./EventDetailed"
+import RecipeDetailed from "./RecipeDetailed"
 import Box from '@mui/material/Box';
 import CommentSection from "./CommentSection";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 
-export default function EventPage() {
+export default function RecipePage() {
   return(
     <Box sx={{ m: 4, maxWidth: 800 }}>
-      <EventDetailed />
+      <RecipeDetailed />
       <CommentSection />
       <RecommendedUsers />
       <UpcomingEvents />
