@@ -6,7 +6,7 @@ import UpcomingEvents from "./UpcomingEvents";
 
 export default function RecipePage() {
   return(
-    <Box sx={{ m: 4, maxWidth: 900 }}>
+    <Box sx={{ m: 4, maxWidth: 800 }}>
       <RecipeDetailed />
       <CommentSection />
       <RecommendedUsers />
