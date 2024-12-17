@@ -5,7 +5,8 @@ import BlogPage from "./components/BlogPage";
 import EventPage from "./components/EventPage";
 import EventHub from "./components/EventHub";
 import ContentFeed from "./components/ContentFeed";
-import UserProfile from "./components/UserProfile"
+import UserProfile from "./components/UserProfile";
+import SavedLikedPosts from "./components/SavedLikedPosts"
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -33,14 +34,18 @@ const router = createBrowserRouter([
   { /* değişecek */
     path: '/settings',
     element: <EventPage />
+  },
+  {
+    path: '/savedliked',
+    element: <SavedLikedPosts />
   }
 ]);
 
 function App() {
   return (
     <div>
+      <Navbar></Navbar>
       <RouterProvider router={router} />
-    <Navbar></Navbar>
     </div>
   );
 }

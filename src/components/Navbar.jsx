@@ -143,8 +143,8 @@ const navbarTitlesIcons = [
   { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >From My Kitchen</Typography>, icon: <KitchenOutlinedIcon sx={drawerIconStyle} />, link: "/profile"},
   { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Feelin' Hungry</Typography>, icon: <CasinoOutlinedIcon sx={drawerIconStyle} />, link: "/profile"},
   { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Event Hub</Typography>, icon: <PeopleAltOutlinedIcon sx={drawerIconStyle} />, link: "/eventhub" },
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Liked Posts</Typography>, icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} />, link: "/profile" },
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Saved Posts</Typography>, icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} />, link: "/profile" },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Liked Posts</Typography>, icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} />, link: "/savedliked" },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Saved Posts</Typography>, icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} />, link: "/savedliked" },
 ];
 
 const dialActions = [
