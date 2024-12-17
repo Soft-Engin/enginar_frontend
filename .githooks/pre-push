@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Source the branch helper script.
+source .githooks/hook-helper.sh
+
+restricted_remote_branches="^refs\/heads\/(main|dev|release\/.+)$"
+# Zero hash for new branches or deleted branches
+zero=$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')
+
+# Fetch the latest changes from the remote
+git fetch origin --quiet
+
+# Process each branch being pushed
+while read local_ref local_oid remote_ref remote_oid
+do
+    # Deleting main and dev on remote restricted.
+    if test "$local_oid" = "$zero" ; then
+        echo "Branch $remote_ref is being deleted on remote."
+        if echo "$remote_ref" | grep -Eq "$restricted_remote_branches"; then
+            echo "Error: Deleting the $remote_ref branch is not allowed." >&2
+            exit 1
+        fi
+        echo "Branch $remote_ref is deleted on remote."
+    else
+        is_push_allowed "$(echo "$local_ref" | sed 's|refs/heads/||')"
+    fi
+done
+
+echo "Push allowed."
+exit 0
