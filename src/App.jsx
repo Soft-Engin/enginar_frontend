@@ -6,7 +6,8 @@ import EventPage from "./components/EventPage";
 import EventHub from "./components/EventHub";
 import ContentFeed from "./components/ContentFeed";
 import UserProfile from "./components/UserProfile";
-import SavedLikedPosts from "./components/SavedLikedPosts"
+import SavedLikedPosts from "./components/SavedLikedPosts";
+import SearchPage from "./components/SearchPage";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
   {
     path: '/savedliked',
     element: <SavedLikedPosts />
+  },
+  {
+    path: '/searchpage',
+    element: <SearchPage />
   }
 ]);
 

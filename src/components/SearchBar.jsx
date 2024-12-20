@@ -80,7 +80,7 @@ export default function SearchBar() {
           sx={{ minWidth: 100 }}
         >
           <MenuItem value="user">Users</MenuItem>
-          <MenuItem value="post">Posts</MenuItem>
+          <MenuItem value="blog">Blogs</MenuItem>
           <MenuItem value="recipe">Recipes</MenuItem>
         </StyledSelect>
       </Search>

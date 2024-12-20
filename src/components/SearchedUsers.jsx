@@ -1,8 +1,5 @@
 import * as React from "react";
-import BlogMini from "./BlogMini";
-import RecipeMini from "./RecipeMini";
-import RecommendedUsers from "./RecommendedUsers";
-import UpcomingEvents from "./UpcomingEvents";
+import UserMini from "./UserMini";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -45,7 +42,7 @@ function a11yProps(index) {
   };
 }
 
-export default function ContentFeed() {
+export default function SearchedUsers() {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -58,52 +55,24 @@ export default function ContentFeed() {
           centered
           value={value}
           onChange={handleChange}
-          aria-label="Feed Tabs"
+          aria-label="Search Tabs"
           sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
         >
           <Tab
-            label="Popular Recipes"
+            label="Users"
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
             {...a11yProps(0)}
-          />
-          <Tab
-            label="Popular Blogs"
-            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
-            {...a11yProps(1)}
-          />
-          <Tab
-            label="Following"
-            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
-            {...a11yProps(2)}
           />
         </Tabs>
       </Box>
 
       <CustomTabPanel value={value} index={0}>
-        {generate(<RecipeMini />).map((recipe, index) => (
+        {generate(<UserMini />).map((user, index) => (
           <Box key={index} sx={{ width: 600, mb: 2 }}>
-            {recipe}
+            {user}
           </Box>
         ))}
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        {generate(<BlogMini />).map((blog, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
-            {blog}
-          </Box>
-        ))}
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        <Box sx={{ width: 600, mb: 2 }}>
-          <BlogMini />
-        </Box>
-        <Box sx={{ width: 600, mb: 2 }}>
-          <RecipeMini />
-        </Box>
-      </CustomTabPanel>
-
-      <RecommendedUsers />
-      <UpcomingEvents />
     </Box>
   );
 }
