@@ -41,7 +41,7 @@ const router = createBrowserRouter([
     element: <SavedLikedPosts />
   },
   {
-    path: '/searchpage',
+    path: '/search',
     element: <SearchPage />
   }
 ]);
