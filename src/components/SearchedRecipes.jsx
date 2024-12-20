@@ -73,14 +73,14 @@ export default function SearchedRecipes() {
 
       <CustomTabPanel value={value} index={0}>
         {generate(<RecipeMini />).map((recipe, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
+          <Box key={index} sx={{ width: 550, mb: 2 }}>
             {recipe}
           </Box>
         ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         {generate(<RecipeMini />).map((recipe, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
+          <Box key={index} sx={{ width: 550, mb: 2 }}>
             {recipe}
           </Box>
         ))}

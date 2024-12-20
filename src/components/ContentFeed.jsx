@@ -81,23 +81,23 @@ export default function ContentFeed() {
 
       <CustomTabPanel value={value} index={0}>
         {generate(<RecipeMini />).map((recipe, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
+          <Box key={index} sx={{ width: 550, mb: 2 }}>
             {recipe}
           </Box>
         ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         {generate(<BlogMini />).map((blog, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
+          <Box key={index} sx={{ width: 550, mb: 2 }}>
             {blog}
           </Box>
         ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        <Box sx={{ width: 600, mb: 2 }}>
+        <Box sx={{ width: 550, mb: 2 }}>
           <BlogMini />
         </Box>
-        <Box sx={{ width: 600, mb: 2 }}>
+        <Box sx={{ width: 550, mb: 2 }}>
           <RecipeMini />
         </Box>
       </CustomTabPanel>
