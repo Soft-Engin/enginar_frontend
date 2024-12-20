@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
@@ -20,6 +20,7 @@ import {
 import BannerImg from "../assets/bg2.jpeg";
 import RecipeCompressed from "./RecipeCompressed";
 import BlogPostCompressed from "./BlogPostCompressed";
+import ProfileEditDialog from "./ProfileEditDialog"; 
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "black",
@@ -98,30 +99,45 @@ const randomPosts = [
   },
 ];
 
-const profileData = {
-  name: "Hoshino Ichika",
-  username: "adl",
-  bio: "GOING 8TH CHECKLIST: I already won the game ✔ This lobby’s playing for second ✔ This is my last loss ✔ I win out from here ✔ My board is too lit ✔ HP is fake ✔ I’m about to spike hard ✔ That’s a fake loss ✔ 20hp? That’s 3 lives ✔ This game is over ✔ We win out ✔",
-  following: 42,
-  followers: 1500000,
-  coverImage: BannerImg,
-  profileImage: "/pp3.jpeg",
-};
-
 const UserProfile = () => {
+  const [profileData, setProfileData] = useState({
+    name: "Hoshino Ichika",
+    username: "adl",
+    bio: "GOING 8TH CHECKLIST: I already won the game ✔ This lobby's playing for second ✔ This is my last loss ✔ I win out from here ✔ My board is too lit ✔ HP is fake ✔ I'm about to spike hard ✔ That's a fake loss ✔ 20hp? That's 3 lives ✔ This game is over ✔ We win out ✔",
+    following: 42,
+    followers: 1500000,
+    coverImage: BannerImg,
+    profileImage: "/pp3.jpeg",
+  });
+
   const [value, setValue] = React.useState(0);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+  const open = Boolean(anchorEl);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleEditProfile = () => {
+    setEditDialogOpen(true);
+    handleClose(); // Close the options menu
+  };
+
+  const handleUpdateProfile = (updatedProfile) => {
+    setProfileData(prevData => ({
+      ...updatedProfile,
+      following: prevData.following,
+      followers: prevData.followers
+    }));
   };
 
   return (
@@ -133,6 +149,14 @@ const UserProfile = () => {
         maxWidth: "730px",
       }}
     >
+      {/* Profile Edit Dialog */}
+      <ProfileEditDialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        profileData={profileData}
+        onProfileUpdate={handleUpdateProfile}
+      />
+
       {/* Profile Column */}
       <Box>
         <Card
@@ -217,6 +241,9 @@ const UserProfile = () => {
                   open={open}
                   onClose={handleClose}
                 >
+                  <MenuItem key="Edit" onClick={handleEditProfile}>
+                    Edit Profile
+                  </MenuItem>
                   <MenuItem key="Ban" onClick={handleClose}>
                     Ban
                   </MenuItem>
@@ -249,6 +276,7 @@ const UserProfile = () => {
               <Stack spacing={2} direction={"column"} alignItems={"center"}>
                 {randomPosts.map((post) => (
                   <BlogPostCompressed
+                    key={post.id}
                     content={post.content}
                     likes={post.likes}
                     comments={post.comments}
