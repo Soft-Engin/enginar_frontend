@@ -63,6 +63,12 @@ const StyledSelect = styled(Select)(({ theme }) => ({
 export default function SearchBar() {
   const [searchType, setSearchType] = React.useState('user');
 
+  const handleKeyDown = (event) => {
+    if (event.key == 'Enter') {
+      window.location.href = `/search?type=${searchType}`;
+    }
+  };
+
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
       <Search>
@@ -72,6 +78,7 @@ export default function SearchBar() {
         <StyledInputBase
           placeholder="Search…"
           inputProps={{ 'aria-label': 'search' }}
+          onKeyDown={handleKeyDown}
         />
         <StyledSelect
           value={searchType}
@@ -86,4 +93,4 @@ export default function SearchBar() {
       </Search>
     </Box>
   );
-};
+}
