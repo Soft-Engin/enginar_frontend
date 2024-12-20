@@ -22,12 +22,12 @@ import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-import HomeIcon from "@mui/icons-material/Home";
-import FilterAltSharpIcon from "@mui/icons-material/FilterAltSharp";
-import CasinoSharpIcon from "@mui/icons-material/CasinoSharp";
-import GroupIcon from "@mui/icons-material/Group";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import KitchenOutlinedIcon from '@mui/icons-material/KitchenOutlined';
+import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -40,8 +40,10 @@ import AuthPopup from "./AuthPopup";
 import SearchBar from "./SearchBar";
 import PostPopup from "./PostPopup";
 
-const drawerWidth = 280;
-const drawerIconStyle = { fontSize: { xs: 24, sm: 32, md: 32, lg: 32 } };
+import {Link} from "react-router-dom";
+
+const drawerWidth = 300;
+const drawerIconStyle = { fontSize: { xs: 28, sm: 36, md: 36, lg: 36 }, color: "black" };
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -58,9 +60,9 @@ const closedMixin = (theme) => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `calc(${theme.spacing(6)} + 1px)`,
+  width: `calc(${theme.spacing(6)} + 7px)`,
   [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
+    width: `calc(${theme.spacing(8)} + 7px)`,
   },
 });
 
@@ -138,18 +140,12 @@ const RightSection = styled(Box)({
 });
 
 const navbarTitlesIcons = [
-  { text: "Anasayfa", icon: <HomeIcon sx={drawerIconStyle} /> },
-  {
-    text: "Dolabımdan Yemek",
-    icon: <FilterAltSharpIcon sx={drawerIconStyle} />,
-  },
-  {
-    text: "Kendimi Aç Hissediyorum",
-    icon: <CasinoSharpIcon sx={drawerIconStyle} />,
-  },
-  { text: "Etkinlik Merkezi", icon: <GroupIcon sx={drawerIconStyle} /> },
-  { text: "Favorilerim", icon: <FavoriteIcon sx={drawerIconStyle} /> },
-  { text: "Kaydettiklerim", icon: <BookmarkIcon sx={drawerIconStyle} /> },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Home</Typography>, icon: <HomeOutlinedIcon sx={drawerIconStyle} />, link: "/" },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >From My Kitchen</Typography>, icon: <KitchenOutlinedIcon sx={drawerIconStyle} />, link: "/profile"},
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Feelin' Hungry</Typography>, icon: <CasinoOutlinedIcon sx={drawerIconStyle} />, link: "/profile"},
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Event Hub</Typography>, icon: <PeopleAltOutlinedIcon sx={drawerIconStyle} />, link: "/eventhub" },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Liked Posts</Typography>, icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} />, link: "/savedliked" },
+  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Saved Posts</Typography>, icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} />, link: "/savedliked" },
 ];
 
 const dialActions = [
@@ -201,11 +197,13 @@ export default function Navbar(props) {
       text: "Profile",
       icon: <AccountCircleIcon />,
       action: handleCloseUserMenu,
+      link: "/profile"
     },
     {
       text: "Settings",
       icon: <SettingsApplicationsIcon />,
       action: handleCloseUserMenu,
+      link: "/settings"
     },
     {
       text: "Logout",
@@ -304,7 +302,7 @@ export default function Navbar(props) {
         }}
       >
         <DrawerHeader/>
-        <List>
+        <List sx={{ marginTop: "6px" }} >
           {navbarTitlesIcons.map((item) => (
             <ListItem
               key={item.text}
@@ -312,6 +310,7 @@ export default function Navbar(props) {
               sx={{ display: "block", position: "relative" }}
             >
               <ListItemButton
+                to={item.link}
                 sx={[
                   {
                     minHeight: 48,
