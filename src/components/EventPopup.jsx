@@ -6,27 +6,17 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+
 import CloseIcon from "@mui/icons-material/Close";
 
 export default function EventPopup(props) {
-  const [images, setImages] = useState([]);
-
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-    const newImages = files.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-    }));
-    setImages((prev) => [...prev, ...newImages]);
-  };
-
-  const handleRemoveImage = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-  };
+  const [location, setLocation] = React.useState('');
 
   const handleClose = () => {
-    setImages([]);
     props.handleClose();
   };
 
@@ -34,14 +24,14 @@ export default function EventPopup(props) {
     event.preventDefault();
     const formData = new FormData(event.target);
 
-    images.forEach((image, index) => {
-      formData.append(`image${index}`, image.file);
-    });
-
     const formJson = Object.fromEntries(formData.entries());
     console.log(formJson);
 
     props.handleClose();
+  };
+
+  const handleLocation = (event) => {
+    setLocation(event.target.value);
   };
 
   return (
@@ -114,18 +104,24 @@ export default function EventPopup(props) {
               }}
             />
           </Box>
-          <TextField
-            name="location"
-            fullWidth
-            required
-            label="Location"
-            variant="outlined"
-            sx={{
-              marginBottom: 2,
-              backgroundColor: "#fff",
-              borderRadius: 2,
-            }}
-          />
+          <FormControl fullWidth sx={{marginBottom: 2}}>
+            <InputLabel id="demo-simple-select-autowidth-label">Location </InputLabel>
+            <Select
+              labelId="demo-simple-select-autowidth-label"
+              id="demo-simple-select-autowidth"
+              value={location}
+              onChange={handleLocation}
+              label="Location"
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value={20}>Twenty</MenuItem>
+              <MenuItem value={21}>Twenty one</MenuItem>
+              <MenuItem value={22}>Twenty two</MenuItem>
+            </Select>
+          </FormControl>
+
           <TextField
             name="description"
             fullWidth
@@ -139,60 +135,6 @@ export default function EventPopup(props) {
               borderRadius: 2,
             }}
           />
-          {images.length > 0 && (
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                marginBottom: 2,
-                flexWrap: "wrap",
-              }}
-            >
-              {images.map((image, index) => (
-                <Box key={index} sx={{ position: "relative" }}>
-                  <Box
-                    component="img"
-                    src={image.preview}
-                    alt={`Preview ${index}`}
-                    sx={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: 2,
-                      objectFit: "cover",
-                      border: "1px solid #ccc",
-                    }}
-                  />
-                  <IconButton
-                    onClick={() => handleRemoveImage(index)}
-                    sx={{
-                      position: "absolute",
-                      top: 0,
-                      right: 0,
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      "&:hover": {
-                        backgroundColor: "rgba(255, 255, 255, 1)",
-                      },
-                    }}
-                  >
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              ))}
-            </Box>
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            id="event-image-upload"
-            style={{ display: "none" }}
-            onChange={handleImageUpload}
-          />
-          <label htmlFor="event-image-upload">
-            <IconButton component="span">
-              <AddPhotoAlternateIcon sx={{ color: "#4caf50" }} />
-            </IconButton>
-          </label>
           <Button
             variant="contained"
             type="submit"
