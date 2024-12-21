@@ -14,6 +14,8 @@ import EmailIcon from "@mui/icons-material/Email";
 import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
 
+import axios from "axios";
+
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "black",
   borderStyle: "solid",
@@ -21,7 +23,7 @@ const SharedButton = styled(Button)(({ theme }) => ({
   height: "30px",
   minWidth: "110px",
   borderRadius: 5,
-  textTransform: "none"
+  textTransform: "none",
 }));
 
 const SignupButton = styled(SharedButton)(({ theme }) => ({
@@ -56,35 +58,85 @@ const SubmitButton = styled(Button)(({ theme }) => ({
 export default function AuthPopup(props) {
   const [open, setOpen] = React.useState(false);
   const [isSignup, setIsSignup] = React.useState(true);
+  const [formError, setFormError] = React.useState(null);
 
   const handleClickOpen = (signup = true) => {
     setIsSignup(signup);
     setOpen(true);
+    setFormError(null); // Clear any previous errors when opening dialog
   };
 
   const handleClose = () => {
     setOpen(false);
+    setFormError(null); // Clear any error
   };
 
   const handleSwitchToLogin = () => {
     setIsSignup(false);
+    setFormError(null); // Clear any error
   };
 
   const handleSwitchToSignup = () => {
     setIsSignup(true);
+    setFormError(null); // Clear any error
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const formJson = Object.fromEntries(formData.entries());
-    console.log(formJson);
-    if (!isSignup) {
-      props.setAnchorElUser(null);
-      localStorage.setItem("userLogged", "true");
-      props.setUserLogged(true);
+    const apiURL = isSignup ? "/api/v1/auth/register" : "/api/v1/auth/login";
+
+    try {
+      const response = await axios.post(apiURL, formJson);
+
+      if (response.status === 200) {
+        if (!isSignup) {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("userLogged", "true");
+          props.setUserLogged(true);
+          axios.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${response.data.token}`;
+        }
+
+        props.setAnchorElUser(null);
+        handleClose();
+      } else if (response.status === 400) {
+        if (isSignup) {
+          // Handle the validation errors from signup
+          setFormError("Invalid input data. Check your fields.");
+        } else {
+          setFormError(response.data.message); //Set the login error
+        }
+      } else if (response.status === 401) {
+        // Invalid login
+        setFormError("Invalid Login Credentials");
+      } else {
+        setFormError("An error occurred. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+
+      if (error.response) {
+        // Request made and server responded with a status code
+        console.log(error.response.data);
+        console.log(error.response.status);
+        setFormError(
+          error.response.data.message || "An unexpected error occurred."
+        );
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+        setFormError(
+          "Could not connect to the server. Please try again later."
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error", error.message);
+        setFormError("An unexpected error occurred.");
+      }
     }
-    handleClose();
   };
 
   return (

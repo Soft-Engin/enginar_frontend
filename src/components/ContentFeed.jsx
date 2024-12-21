@@ -7,14 +7,9 @@ import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-
-function generate(element) {
-  return [0, 1, 2, 3, 4, 5, 6].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    })
-  );
-}
+import axios from "axios";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -47,10 +42,64 @@ function a11yProps(index) {
 
 export default function ContentFeed() {
   const [value, setValue] = React.useState(0);
+  const [recipes, setRecipes] = React.useState([]);
+  const [blogs, setBlogs] = React.useState([]);
+  const [followingContent, setFollowingContent] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [recipesResponse, blogsResponse] = await Promise.all([
+          axios.get("/api/v1/recipes", { params: { pageSize: 5 } }), // Fetch 5 popular recipes
+          axios.get("/api/v1/blog", { params: { pageSize: 5 } }), // Fetch 5 popular blogs
+        ]);
+        setRecipes(recipesResponse.data.items);
+        setBlogs(blogsResponse.data.items);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(err.message || "An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <Typography color="error">Error: {error}</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
@@ -74,32 +123,32 @@ export default function ContentFeed() {
           <Tab
             label="Following"
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
-            {...a11yProps(1)}
+            {...a11yProps(2)}
           />
         </Tabs>
       </Box>
 
       <CustomTabPanel value={value} index={0}>
-        {generate(<RecipeMini />).map((recipe, index) => (
+        {recipes.map((recipe, index) => (
           <Box key={index} sx={{ width: 600, mb: 2 }}>
-            {recipe}
+            <RecipeMini recipe={recipe} />
           </Box>
         ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        {generate(<BlogMini />).map((blog, index) => (
+        {blogs.map((blog, index) => (
           <Box key={index} sx={{ width: 600, mb: 2 }}>
-            {blog}
+            <BlogMini blog={blog} />
           </Box>
         ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        <Box sx={{ width: 600, mb: 2 }}>
-          <BlogMini />
-        </Box>
-        <Box sx={{ width: 600, mb: 2 }}>
-          <RecipeMini />
-        </Box>
+        {followingContent.map((user, index) => (
+          <Box key={index} sx={{ width: 600, mb: 2 }}>
+            <BlogMini blog={user} />
+            <RecipeMini recipe={user} />
+          </Box>
+        ))}
       </CustomTabPanel>
 
       <RecommendedUsers />

@@ -8,6 +8,7 @@ import UserProfile from "./components/UserProfile";
 import SavedLikedPosts from "./components/SavedLikedPosts";
 import SettingsPage from "./components/SettingsPage";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import RecipePage from "./components/RecipePage";
 
 // Create a root layout component that includes the Navbar
 const RootLayout = () => {
@@ -26,7 +27,7 @@ const router = createBrowserRouter([
     children: [  // These are the child routes that will render in the Outlet
       {
         path: '/',
-        element: <BlogPage />
+        element: <ContentFeed />
       },
       {
         path: '/profile',
@@ -51,7 +52,15 @@ const router = createBrowserRouter([
       {
         path: '/savedliked',
         element: <SavedLikedPosts />
-      }
+      },
+      {
+        path: '/blog',
+        element: <BlogPage />
+      },
+      {
+        path: '/recipe',
+        element: <RecipePage />
+      },
     ]
   }
 ]);

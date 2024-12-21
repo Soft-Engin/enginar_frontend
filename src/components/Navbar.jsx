@@ -42,6 +42,7 @@ import PostPopup from "./PostPopup";
 import EventPopup from "./EventPopup";
 
 import { useNavigate , Link } from "react-router-dom";
+import axios from "axios";
 
 const drawerWidth = 300;
 const drawerIconStyle = {
@@ -198,6 +199,10 @@ const navbarTitlesIcons = [
   },
 ];
 
+// Set axios base url and authorization header
+axios.defaults.baseURL = "http://localhost:8090"; //  API base URL
+axios.defaults.headers.common['Authorization'] = localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : "";
+
 export default function Navbar(props) {
   const navigate = useNavigate();
 
@@ -297,7 +302,9 @@ export default function Navbar(props) {
                 sx={{
                   fontFamily: "'Jersey 25', sans-serif",
                   fontSize: "2.3rem",
+                  cursor: "pointer"
                 }}
+                onClick={() => navigate("/")}
               >
                 ENGINAR
               </Typography>

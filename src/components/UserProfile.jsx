@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
@@ -15,12 +15,14 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
 } from "@mui/material";
-
+import axios from "axios";
 import BannerImg from "../assets/bg2.jpeg";
-import RecipeCompressed from "./RecipeCompressed";
-import BlogPostCompressed from "./BlogPostCompressed";
-import ProfileEditDialog from "./ProfileEditDialog"; 
+import ProfileEditDialog from "./ProfileEditDialog";
+import { useSearchParams } from "react-router-dom";
+import RecipeMini from "./RecipeMini";
+import BlogMini from "./BlogMini";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "black",
@@ -48,6 +50,7 @@ function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       {...other}
     >
       {value === index && <Box sx={{ pt: 0 }}>{children}</Box>}
@@ -68,52 +71,94 @@ function a11yProps(index) {
   };
 }
 
-const randomPosts = [
-  {
-    id: 1,
-    content:
-      "Just exploring the fascinating world of AI and its potential to help humanity!",
-    likes: 1234,
-    comments: 56,
-  },
-  {
-    id: 2,
-    content:
-      "Excited about the latest advancements in machine learning and natural language processing.",
-    likes: 2345,
-    comments: 78,
-  },
-  {
-    id: 3,
-    content:
-      "Ethics in AI is crucial. We must always prioritize human values and safety.",
-    likes: 3456,
-    comments: 99,
-  },
-  {
-    id: 4,
-    content:
-      "Collaborating with researchers to push the boundaries of AI capabilities.",
-    likes: 1567,
-    comments: 45,
-  },
-];
-
 const UserProfile = () => {
-  const [profileData, setProfileData] = useState({
-    name: "Hoshino Ichika",
-    username: "adl",
-    bio: "GOING 8TH CHECKLIST: I already won the game ✔ This lobby's playing for second ✔ This is my last loss ✔ I win out from here ✔ My board is too lit ✔ HP is fake ✔ I'm about to spike hard ✔ That's a fake loss ✔ 20hp? That's 3 lives ✔ This game is over ✔ We win out ✔",
-    following: 42,
-    followers: 1500000,
-    coverImage: BannerImg,
-    profileImage: "/pp3.jpeg",
-  });
+  const [searchParams] = useSearchParams();
+  const userId = searchParams.get("id");
 
+  const [profileData, setProfileData] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
+  const [userRecipes, setUserRecipes] = useState([]);
   const [value, setValue] = React.useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [following, setFollowing] = useState(false);
   const open = Boolean(anchorEl);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [userResponse, blogsResponse, recipesResponse] =
+          await Promise.all([
+            axios.get(`/api/v1/user/GetUser/${userId}`),
+            axios.get(`/api/v1/blog/search`, {
+              params: { userId: userId, pageSize: 5 },
+            }),
+            axios.get("/api/v1/recipes/search", {
+              params: { userId: userId, pageSize: 5 },
+            }),
+          ]);
+
+        setProfileData(userResponse.data);
+        setUserPosts(blogsResponse.data.items);
+        setUserRecipes(recipesResponse.data.items);
+
+        // Check if the user is already followed
+        const followedUser = blogsResponse.data.items?.find(
+          (item) => item.id === userId
+        );
+        if (followedUser) {
+          setFollowing(true);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(err.message || "An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [userId]);
+
+  const handleFollowUser = async () => {
+    try {
+      const response = await axios.post(
+        `/api/v1/user/follow?targetUserld=${userId}`
+      );
+      if (response.status === 200) {
+        setFollowing(true);
+      }
+    } catch (error) {
+      console.error("Error follow user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to follow the user."
+      );
+    }
+  };
+
+  const handleUnfollowUser = async () => {
+    try {
+      const response = await axios.delete(
+        `/api/v1/user/unfollow?targetUserld=${userId}`
+      );
+      if (response.status === 200) {
+        setFollowing(false);
+      }
+    } catch (error) {
+      console.error("Error unfollow user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to unfollow the user."
+      );
+    }
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -133,13 +178,44 @@ const UserProfile = () => {
   };
 
   const handleUpdateProfile = (updatedProfile) => {
-    setProfileData(prevData => ({
+    setProfileData((prevData) => ({
       ...updatedProfile,
-      following: prevData.following,
-      followers: prevData.followers
+      following: prevData?.following,
+      followers: prevData?.followers,
     }));
   };
 
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <Typography color="error">Error: {error}</Typography>
+      </Box>
+    );
+  }
+
+  if (!profileData) {
+    return (
+      <Typography textAlign={"center"}>User profile not found!</Typography>
+    );
+  }
   return (
     <Box
       sx={{
@@ -170,7 +246,9 @@ const UserProfile = () => {
           <Box
             sx={{
               height: 200,
-              background: `url(${profileData.coverImage}) no-repeat center`,
+              background: `url(${
+                profileData?.coverImage || BannerImg
+              }) no-repeat center`,
               backgroundSize: "cover",
             }}
           />
@@ -185,7 +263,7 @@ const UserProfile = () => {
               }}
             >
               <Avatar
-                src={profileData.profileImage}
+                src={profileData?.profileImage || "/pp3.jpeg"}
                 sx={{
                   width: 120,
                   height: 120,
@@ -200,16 +278,32 @@ const UserProfile = () => {
                   sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
                 >
                   <Typography variant="h5" fontWeight="bold">
-                    {profileData.name}
+                    {profileData.firstName} {profileData.lastName}
                   </Typography>
-                  <FollowButton variant="contained">Follow</FollowButton>
+                  {userId !== localStorage.getItem("userId") ? (
+                    following ? (
+                      <FollowButton
+                        variant="contained"
+                        onClick={handleUnfollowUser}
+                      >
+                        Unfollow
+                      </FollowButton>
+                    ) : (
+                      <FollowButton
+                        variant="contained"
+                        onClick={handleFollowUser}
+                      >
+                        Follow
+                      </FollowButton>
+                    )
+                  ) : null}
                 </Box>
                 <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
                   <Typography variant="body2">
-                    <strong>{profileData.following}</strong> Following
+                    <strong>{profileData.following?.length}</strong> Following
                   </Typography>
                   <Typography variant="body2">
-                    <strong>{profileData.followers}</strong> Followers
+                    <strong>{profileData.followers?.length}</strong> Followers
                   </Typography>
                 </Box>
               </Box>
@@ -241,9 +335,11 @@ const UserProfile = () => {
                   open={open}
                   onClose={handleClose}
                 >
-                  <MenuItem key="Edit" onClick={handleEditProfile}>
-                    Edit Profile
-                  </MenuItem>
+                  {userId === localStorage.getItem("userId") || true ? (
+                    <MenuItem key="Edit" onClick={handleEditProfile}>
+                      Edit Profile
+                    </MenuItem>
+                  ) : null}
                   <MenuItem key="Ban" onClick={handleClose}>
                     Ban
                   </MenuItem>
@@ -273,21 +369,22 @@ const UserProfile = () => {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                {randomPosts.map((post) => (
-                  <BlogPostCompressed
-                    key={post.id}
-                    content={post.content}
-                    likes={post.likes}
-                    comments={post.comments}
-                  />
-                ))}
-              </Stack>
+              {userPosts.map((blog, index) => (
+                <Box key={index} sx={{ width: 660, mb: 2 }}>
+                  <BlogMini blog={blog} />
+                </Box>
+              ))}
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
+              {/* TODO: Add event display*/}
+              <Typography textAlign={"center"}>No events scheduled</Typography>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-              <RecipeCompressed></RecipeCompressed>
+              {userRecipes.map((recipe, index) => (
+                <Box key={index} sx={{ width: 660, mb: 2 }}>
+                  <RecipeMini recipe={recipe} />
+                </Box>
+              ))}
             </CustomTabPanel>
           </Box>
         </Card>
