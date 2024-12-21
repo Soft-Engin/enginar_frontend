@@ -41,7 +41,7 @@ import SearchBar from "./SearchBar";
 import PostPopup from "./PostPopup";
 import EventPopup from "./EventPopup";
 
-import { BrowserRouter, Link } from "react-router-dom";
+import { useNavigate , Link } from "react-router-dom";
 
 const drawerWidth = 300;
 const drawerIconStyle = {
@@ -199,6 +199,8 @@ const navbarTitlesIcons = [
 ];
 
 export default function Navbar(props) {
+  const navigate = useNavigate();
+
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
@@ -226,7 +228,7 @@ export default function Navbar(props) {
   };
 
   const [postPopupOpen, setPostPopupOpen] = React.useState(false);
-  const [eventPopupOpen, setEventPopupOpen] = React.useState(false);  
+  const [eventPopupOpen, setEventPopupOpen] = React.useState(false);
 
   const handleEventPopupOpen = () => {
     setEventPopupOpen(true);
@@ -267,6 +269,7 @@ export default function Navbar(props) {
       action: () => {
         localStorage.setItem("userLogged", false);
         setUserLogged(false);
+        navigate("/");
       },
     },
   ];
@@ -330,14 +333,14 @@ export default function Navbar(props) {
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
                 >
-                  {userActions.map((action) => (
-                    <BrowserRouter>
+                  {userActions.map((action) =>
+                    action.link ? (
                       <Link
+                        key={action.text}
                         to={action.link}
                         style={{ textDecoration: "none", color: "black" }}
                       >
                         <MenuItem
-                          key={action.text}
                           onClick={action.action}
                           style={{
                             width: "140px",
@@ -351,8 +354,23 @@ export default function Navbar(props) {
                           {action.icon}
                         </MenuItem>
                       </Link>
-                    </BrowserRouter>
-                  ))}
+                    ) : (
+                      <MenuItem
+                        key={action.text}
+                        onClick={action.action}
+                        style={{
+                          width: "140px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography sx={{ textAlign: "left" }}>
+                          {action.text}
+                        </Typography>
+                        {action.icon}
+                      </MenuItem>
+                    )
+                  )}
                 </Menu>
               </>
             ) : (
@@ -480,12 +498,12 @@ export default function Navbar(props) {
           tooltipPlacement={isSmUp ? "right" : "left"}
         />
         <SpeedDialAction
-            key={"Tarif"}
-            icon={<RestaurantMenuIcon />}
-            tooltipTitle={"Tarif"}
-            tooltipOpen
-            onClick={handleSpeedDialClose}
-            tooltipPlacement={isSmUp ? "right" : "left"}
+          key={"Tarif"}
+          icon={<RestaurantMenuIcon />}
+          tooltipTitle={"Tarif"}
+          tooltipOpen
+          onClick={handleSpeedDialClose}
+          tooltipPlacement={isSmUp ? "right" : "left"}
         />
       </ActionSpeedDial>
       <PostPopup open={postPopupOpen} handleClose={handlePostPopupClose} />
