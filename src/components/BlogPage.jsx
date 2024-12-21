@@ -4,10 +4,14 @@ import CommentSection from "./CommentSection";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 
+import { useSearchParams } from 'react-router-dom'
+
 export default function BlogPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   return(
     <Box sx={{ m: 4, maxWidth: 800 }}>
-      <BlogDetailed />
+      <BlogDetailed blogId={searchParams.get('id')}/>
       <CommentSection />
       <RecommendedUsers />
       <UpcomingEvents />
