@@ -63,11 +63,12 @@ const StyledSelect = styled(Select)(({ theme }) => ({
 
 export default function SearchBar() {
   const [searchType, setSearchType] = React.useState('user');
+  const [searchQuery, setSearchQuery] = React.useState('');
   const navigate = useNavigate();
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
-      navigate(`/search?type=${searchType}`);
+      navigate(`/search?type=${searchType}&query=${searchQuery}`);
     }
   };
 
@@ -81,6 +82,7 @@ export default function SearchBar() {
           placeholder="Search…"
           inputProps={{ 'aria-label': 'search' }}
           onKeyDown={handleKeyDown}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <StyledSelect
           value={searchType}

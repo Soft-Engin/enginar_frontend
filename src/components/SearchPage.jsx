@@ -10,6 +10,7 @@ import SearchedRecipes from "./SearchedRecipes";
 export default function SearchPage() {
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
+  const query = searchParams.get("query"); // Not used for fetching yet
 
   return (
     <Box>
