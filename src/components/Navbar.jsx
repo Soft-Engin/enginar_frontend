@@ -22,12 +22,12 @@ import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import KitchenOutlinedIcon from '@mui/icons-material/KitchenOutlined';
-import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
-import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import KitchenOutlinedIcon from "@mui/icons-material/KitchenOutlined";
+import CasinoOutlinedIcon from "@mui/icons-material/CasinoOutlined";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -39,11 +39,15 @@ import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import AuthPopup from "./AuthPopup";
 import SearchBar from "./SearchBar";
 import PostPopup from "./PostPopup";
+import EventPopup from "./EventPopup";
 
-import {Link} from "react-router-dom";
+import { useNavigate , Link } from "react-router-dom";
 
 const drawerWidth = 300;
-const drawerIconStyle = { fontSize: { xs: 28, sm: 36, md: 36, lg: 36 }, color: "black" };
+const drawerIconStyle = {
+  fontSize: { xs: 28, sm: 36, md: 36, lg: 36 },
+  color: "black",
+};
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -114,46 +118,89 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  [theme.breakpoints.up('lg')]: {
-    justifyContent: 'space-between',
-    '& > *:nth-of-type(2)': {
-      position: 'absolute',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      maxWidth: '600px',
-      width: '100%'
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  [theme.breakpoints.up("lg")]: {
+    justifyContent: "space-between",
+    "& > *:nth-of-type(2)": {
+      position: "absolute",
+      left: "50%",
+      transform: "translateX(-50%)",
+      maxWidth: "600px",
+      width: "100%",
     },
   },
 }));
 
 const LeftSection = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
 }));
 
 const RightSection = styled(Box)({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
 });
 
 const navbarTitlesIcons = [
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Home</Typography>, icon: <HomeOutlinedIcon sx={drawerIconStyle} />, link: "/" },
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >From My Kitchen</Typography>, icon: <KitchenOutlinedIcon sx={drawerIconStyle} />, link: "/profile"},
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Feelin' Hungry</Typography>, icon: <CasinoOutlinedIcon sx={drawerIconStyle} />, link: "/profile"},
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Event Hub</Typography>, icon: <PeopleAltOutlinedIcon sx={drawerIconStyle} />, link: "/eventhub" },
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Liked Posts</Typography>, icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} />, link: "/savedliked" },
-  { text: <Typography sx={{ fontWeight: '500', fontSize: '20px' }} >Saved Posts</Typography>, icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} />, link: "/savedliked" },
-];
-
-const dialActions = [
-  { icon: <GroupAddIcon />, name: "Etkinlik" },
-  { icon: <RestaurantMenuIcon />, name: "Tarif" },
+  {
+    text: (
+      <Typography sx={{ fontWeight: "500", fontSize: "20px" }}>Home</Typography>
+    ),
+    icon: <HomeOutlinedIcon sx={drawerIconStyle} />,
+    link: "/",
+  },
+  {
+    text: (
+      <Typography sx={{ fontWeight: "500", fontSize: "20px" }}>
+        From My Kitchen
+      </Typography>
+    ),
+    icon: <KitchenOutlinedIcon sx={drawerIconStyle} />,
+    link: "/profile",
+  },
+  {
+    text: (
+      <Typography sx={{ fontWeight: "500", fontSize: "20px" }}>
+        Feelin' Hungry
+      </Typography>
+    ),
+    icon: <CasinoOutlinedIcon sx={drawerIconStyle} />,
+    link: "/profile",
+  },
+  {
+    text: (
+      <Typography sx={{ fontWeight: "500", fontSize: "20px" }}>
+        Event Hub
+      </Typography>
+    ),
+    icon: <PeopleAltOutlinedIcon sx={drawerIconStyle} />,
+    link: "/eventhub",
+  },
+  {
+    text: (
+      <Typography sx={{ fontWeight: "500", fontSize: "20px" }}>
+        Liked Posts
+      </Typography>
+    ),
+    icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} />,
+    link: "/savedliked",
+  },
+  {
+    text: (
+      <Typography sx={{ fontWeight: "500", fontSize: "20px" }}>
+        Saved Posts
+      </Typography>
+    ),
+    icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} />,
+    link: "/savedliked",
+  },
 ];
 
 export default function Navbar(props) {
+  const navigate = useNavigate();
+
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
@@ -181,6 +228,17 @@ export default function Navbar(props) {
   };
 
   const [postPopupOpen, setPostPopupOpen] = React.useState(false);
+  const [eventPopupOpen, setEventPopupOpen] = React.useState(false);
+
+  const handleEventPopupOpen = () => {
+    setEventPopupOpen(true);
+    setSpeedDialOpen(false);
+  };
+
+  const handleEventPopupClose = () => {
+    setEventPopupOpen(false);
+    setSpeedDialOpen(false);
+  };
 
   const handlePostPopupOpen = () => {
     setPostPopupOpen(true);
@@ -197,13 +255,13 @@ export default function Navbar(props) {
       text: "Profile",
       icon: <AccountCircleIcon />,
       action: handleCloseUserMenu,
-      link: "/profile"
+      link: "/profile",
     },
     {
       text: "Settings",
       icon: <SettingsApplicationsIcon />,
       action: handleCloseUserMenu,
-      link: "/settings"
+      link: "/settings",
     },
     {
       text: "Logout",
@@ -211,6 +269,7 @@ export default function Navbar(props) {
       action: () => {
         localStorage.setItem("userLogged", false);
         setUserLogged(false);
+        navigate("/");
       },
     },
   ];
@@ -219,7 +278,7 @@ export default function Navbar(props) {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" open={drawerOpen}>
-      <StyledToolbar>
+        <StyledToolbar>
           <LeftSection>
             <IconButton
               color="inherit"
@@ -235,7 +294,10 @@ export default function Navbar(props) {
                 noWrap
                 component="div"
                 color="White"
-                sx={{ fontFamily: "'Jersey 25', sans-serif", fontSize: "2.3rem" }}
+                sx={{
+                  fontFamily: "'Jersey 25', sans-serif",
+                  fontSize: "2.3rem",
+                }}
               >
                 ENGINAR
               </Typography>
@@ -249,7 +311,10 @@ export default function Navbar(props) {
               <>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu}>
-                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                    <Avatar
+                      alt="Remy Sharp"
+                      src="/static/images/avatar/2.jpg"
+                    />
                   </IconButton>
                 </Tooltip>
                 <Menu
@@ -268,26 +333,51 @@ export default function Navbar(props) {
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
                 >
-                  {userActions.map((action) => (
-                    <MenuItem
-                      key={action.text}
-                      onClick={action.action}
-                      style={{
-                        width: "140px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Typography sx={{ textAlign: "left" }}>
-                        {action.text}
-                      </Typography>
-                      {action.icon}
-                    </MenuItem>
-                  ))}
+                  {userActions.map((action) =>
+                    action.link ? (
+                      <Link
+                        key={action.text}
+                        to={action.link}
+                        style={{ textDecoration: "none", color: "black" }}
+                      >
+                        <MenuItem
+                          onClick={action.action}
+                          style={{
+                            width: "140px",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography sx={{ textAlign: "left" }}>
+                            {action.text}
+                          </Typography>
+                          {action.icon}
+                        </MenuItem>
+                      </Link>
+                    ) : (
+                      <MenuItem
+                        key={action.text}
+                        onClick={action.action}
+                        style={{
+                          width: "140px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography sx={{ textAlign: "left" }}>
+                          {action.text}
+                        </Typography>
+                        {action.icon}
+                      </MenuItem>
+                    )
+                  )}
                 </Menu>
               </>
             ) : (
-              <AuthPopup setUserLogged={setUserLogged} setAnchorElUser={setAnchorElUser} />
+              <AuthPopup
+                setUserLogged={setUserLogged}
+                setAnchorElUser={setAnchorElUser}
+              />
             )}
           </RightSection>
         </StyledToolbar>
@@ -301,8 +391,8 @@ export default function Navbar(props) {
           },
         }}
       >
-        <DrawerHeader/>
-        <List sx={{ marginTop: "6px" }} >
+        <DrawerHeader />
+        <List sx={{ marginTop: "6px" }}>
           {navbarTitlesIcons.map((item) => (
             <ListItem
               key={item.text}
@@ -362,7 +452,15 @@ export default function Navbar(props) {
           ))}
         </List>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "center"}}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <DrawerHeader />
         {props.body}
       </Box>
@@ -384,28 +482,32 @@ export default function Navbar(props) {
         }}
       >
         <SpeedDialAction
-            key={"Post"}
-            icon={<PostAddIcon/>}
-            tooltipTitle={"Post"}
-            tooltipOpen
-            onClick={handlePostPopupOpen}
-            tooltipPlacement={isSmUp ? "right" : "left"}
-          />
-        {dialActions.map((action) => (
-          <SpeedDialAction
-            key={action.name}
-            icon={action.icon}
-            tooltipTitle={action.name}
-            tooltipOpen
-            onClick={handleSpeedDialClose}
-            tooltipPlacement={isSmUp ? "right" : "left"}
-          />
-        ))}
+          key={"Post"}
+          icon={<PostAddIcon />}
+          tooltipTitle={"Post"}
+          tooltipOpen
+          onClick={handlePostPopupOpen}
+          tooltipPlacement={isSmUp ? "right" : "left"}
+        />
+        <SpeedDialAction
+          key={"Etkinlik"}
+          icon={<GroupAddIcon />}
+          tooltipTitle={"Etkinlik"}
+          tooltipOpen
+          onClick={handleEventPopupOpen}
+          tooltipPlacement={isSmUp ? "right" : "left"}
+        />
+        <SpeedDialAction
+          key={"Tarif"}
+          icon={<RestaurantMenuIcon />}
+          tooltipTitle={"Tarif"}
+          tooltipOpen
+          onClick={handleSpeedDialClose}
+          tooltipPlacement={isSmUp ? "right" : "left"}
+        />
       </ActionSpeedDial>
-      <PostPopup
-        open={postPopupOpen}
-        handleClose={handlePostPopupClose}
-      />
+      <PostPopup open={postPopupOpen} handleClose={handlePostPopupClose} />
+      <EventPopup open={eventPopupOpen} handleClose={handleEventPopupClose} />
     </Box>
   );
 }
