@@ -27,7 +27,7 @@ const router = createBrowserRouter([
     children: [  // These are the child routes that will render in the Outlet
       {
         path: '/',
-        element: <BlogPage />
+        element: <ContentFeed />
       },
       {
         path: '/profile',
@@ -40,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: '/contentFeed',
         element: <ContentFeed />
+      },
+      {
+        path: '/search',
+        element: <SearchPage />
       },
       {
         path: '/event/:eventid',

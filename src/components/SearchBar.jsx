@@ -5,6 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
+import { useNavigate } from "react-router-dom";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -62,10 +63,11 @@ const StyledSelect = styled(Select)(({ theme }) => ({
 
 export default function SearchBar() {
   const [searchType, setSearchType] = React.useState('user');
+  const navigate = useNavigate();
 
   const handleKeyDown = (event) => {
-    if (event.key == 'Enter') {
-      window.location.href = `/search?type=${searchType}`;
+    if (event.key === 'Enter') {
+      navigate(`/search?type=${searchType}`);
     }
   };
 
