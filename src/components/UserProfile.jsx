@@ -18,17 +18,18 @@ import {
 } from "@mui/material";
 
 import BannerImg from "../assets/bg2.jpeg";
-import RecipeCompressed from "./RecipeCompressed";
-import BlogPostCompressed from "./BlogPostCompressed";
+import RecipeMini from "./RecipeMini";
+import BlogMini from "./BlogMini";
 import ProfileEditDialog from "./ProfileEditDialog"; 
+import EventCompressed from "./EventCompressed";
 
 const SharedButton = styled(Button)(({ theme }) => ({
-  border: "black",
+  border: "#888888",
   borderStyle: "solid",
-  borderWidth: "1px",
-  height: "25px",
-  minWidth: "100px",
-  borderRadius: "15px",
+  borderWidth: "2px",
+  height: "30px",
+  minWidth: "90px",
+  borderRadius: "20px",
 }));
 
 const FollowButton = styled(SharedButton)(({ theme }) => ({
@@ -37,6 +38,9 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#FFFFFF",
   },
+  textTransform: "none",
+  fontWeight: "bold",
+  variant: "subtitle1"
 }));
 
 function CustomTabPanel(props) {
@@ -267,7 +271,7 @@ const UserProfile = () => {
                 textColor="secondary"
                 indicatorColor="secondary"
               >
-                <Tab label="Post" {...a11yProps(0)} />
+                <Tab label="Blogs" {...a11yProps(0)} />
                 <Tab label="Events" {...a11yProps(1)} />
                 <Tab label="Recipes" {...a11yProps(2)} />
               </Tabs>
@@ -275,7 +279,7 @@ const UserProfile = () => {
             <CustomTabPanel value={value} index={0}>
               <Stack spacing={2} direction={"column"} alignItems={"center"}>
                 {randomPosts.map((post) => (
-                  <BlogPostCompressed
+                  <BlogMini
                     key={post.id}
                     content={post.content}
                     likes={post.likes}
@@ -285,9 +289,20 @@ const UserProfile = () => {
               </Stack>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                  <EventCompressed />
+                  <EventCompressed />
+                </Stack>
+              </Box>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-              <RecipeCompressed></RecipeCompressed>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                  <RecipeMini />
+                  <RecipeMini />
+                </Stack>
+              </Box>
             </CustomTabPanel>
           </Box>
         </Card>

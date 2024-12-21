@@ -12,12 +12,12 @@ import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const SharedButton = styled(Button)(({ theme }) => ({
-  border: "black",
+  border: "#888888",
   borderStyle: "solid",
-  borderWidth: "1px",
-  height: "25px",
-  minWidth: "100px",
-  borderRadius: "15px",
+  borderWidth: "2px",
+  height: "30px",
+  minWidth: "90px",
+  borderRadius: "20px",
 }));
 
 const FollowButton = styled(SharedButton)(({ theme }) => ({
@@ -26,6 +26,9 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#FFFFFF",
   },
+  textTransform: "none",
+  fontWeight: "bold",
+  variant: "subtitle1"
 }));
 
 export default function UserMini() {
