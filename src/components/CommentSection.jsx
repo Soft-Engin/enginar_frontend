@@ -6,8 +6,6 @@ import {
   Button,
   TextField
 } from "@mui/material";
-import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
-import AddReactionOutlinedIcon from '@mui/icons-material/AddReactionOutlined';
 import Comment from "./Comment"
 
 function generate(element) {
@@ -21,7 +19,7 @@ function generate(element) {
 export default function CommentSection() {
   return(
     <Box sx={{ maxWidth: 1500, outline: "1px solid #C0C0C0", backgroundColor: "#EAEAEA", px: 3, py: 2, borderRadius: "0 0 15px 15px", boxShadow: 3 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5, mr: 2.5 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5, mr: 2.5, pb: 1.6 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
           <Avatar sx={{ width: 50, height: 50, marginRight: 0.5 }}/>
           <TextField fullWidth multiline placeholder="Write a comment..." variant="outlined" sx={{
@@ -48,10 +46,6 @@ export default function CommentSection() {
             </Typography>
           </Button>
         </Box>
-      </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', ml: 8.5, mb: 2 }}>
-        <AddPhotoAlternateOutlinedIcon sx={{ fontSize: '30px', marginRight: 1, color: "#417D1E" }}/>
-        <AddReactionOutlinedIcon sx={{ fontSize: '30px', color: "#417D1E" }}/>
       </Box>
 
       {generate(<Comment />).map((comment, index) => (

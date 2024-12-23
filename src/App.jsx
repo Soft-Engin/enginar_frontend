@@ -40,8 +40,8 @@ const router = createBrowserRouter([
         element: <EventHub />
       },
       {
-        path: '/contentFeed',
-        element: <ContentFeed />
+        path: '/blog',
+        element: <BlogPage />
       },
       {
         path: '/search',
