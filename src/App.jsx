@@ -9,6 +9,7 @@ import SavedLikedPosts from "./components/SavedLikedPosts";
 import SearchPage from "./components/SearchPage";
 import SettingsPage from "./components/SettingsPage";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import RecipeCreator from "./components/CreateRecipe";
 
 
 // Create a root layout component that includes the Navbar
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
       {
         path: '/savedliked',
         element: <SavedLikedPosts />
+      },
+      {
+        path: '/createRecipe',
+        element: <RecipeCreator />
       }
     ]
   }
