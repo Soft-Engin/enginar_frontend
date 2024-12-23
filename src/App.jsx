@@ -10,6 +10,7 @@ import SearchPage from "./components/SearchPage";
 import SettingsPage from "./components/SettingsPage";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 
+
 // Create a root layout component that includes the Navbar
 const RootLayout = () => {
   return (
