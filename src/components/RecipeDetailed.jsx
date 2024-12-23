@@ -17,7 +17,11 @@ import LocalDiningIcon from '@mui/icons-material/LocalDining';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import axios from "axios";
 
+import { useNavigate, Link } from "react-router-dom";
+
 export default function RecipeDetailed({ recipeId }) {
+    const navigate = useNavigate();
+
     const [recipe, setRecipe] = React.useState(null);
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState(null);
@@ -78,6 +82,15 @@ export default function RecipeDetailed({ recipeId }) {
         <Box sx={{ maxWidth: 1500, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", px: 4, pt: 2, pb: 1, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1.5, borderBottom: "1px solid #E0E0E0" }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Link
+                                to={`/profile?id=${recipe.userId}`}
+                                style={{
+                                  textDecoration: "none",
+                                  color: "inherit",
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
                     <Avatar sx={{ width: 50, height: 50, marginRight: 1.5 }} />
                     <Box>
                         <Typography variant="h6" fontWeight="bold" sx={{ marginRight: 0.5 }} noWrap>
@@ -89,6 +102,7 @@ export default function RecipeDetailed({ recipeId }) {
                             2 hours ago
                         </Typography>
                     </Box>
+                    </Link>
                 </Box>
                 <MoreHorizIcon sx={{ fontSize: '40px' }} />
             </Box>
