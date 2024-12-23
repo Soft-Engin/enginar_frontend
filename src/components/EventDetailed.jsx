@@ -10,8 +10,19 @@ import {
 } from "@mui/material";
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import ParticipantsListPopup from "./ParticipantsListPopup"
 
 export default function EventDetailed() {
+  const [participantsPopupOpen, setParticipantsPopupOpen] = React.useState(false);
+  
+  const handleParticipantsPopupOpen = () => {
+    setParticipantsPopupOpen(true);
+  };
+
+  const handleParticipantsPopupClose = () => {
+    setParticipantsPopupOpen(false);
+  };
+  
   return(
     <Box sx={{ maxWidth: 1500, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", px: 5, py: 4, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
@@ -73,7 +84,7 @@ export default function EventDetailed() {
       </Typography>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pt: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <AvatarGroup total={23} sx={{'& .MuiAvatar-root': { width: 38, height: 38, fontSize: 19 }, marginRight: 1}}>
+          <AvatarGroup total={23} sx={{'& .MuiAvatar-root': { width: 38, height: 38, fontSize: 19 }, marginRight: 1}} onClick={handleParticipantsPopupOpen}>
             <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
             <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
             <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
@@ -90,6 +101,7 @@ export default function EventDetailed() {
           </Button>
         </Box>
       </Box>
+      <ParticipantsListPopup open={participantsPopupOpen} handleClose={handleParticipantsPopupClose} />
     </Box>
   );
 }
