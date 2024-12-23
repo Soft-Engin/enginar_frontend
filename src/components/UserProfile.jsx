@@ -22,6 +22,8 @@ import RecipeMini from "./RecipeMini";
 import BlogMini from "./BlogMini";
 import ProfileEditDialog from "./ProfileEditDialog"; 
 import EventCompressed from "./EventCompressed";
+import FollowersListPopup from "./FollowersListPopup"
+import FollowingListPopup from "./FollowingListPopup";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
@@ -144,6 +146,25 @@ const UserProfile = () => {
     }));
   };
 
+  const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
+  const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
+    
+  const handleFollowingPopupOpen = () => {
+    setFollowingPopupOpen(true);
+  };
+
+  const handleFollowingPopupClose = () => {
+    setFollowingPopupOpen(false);
+  };
+
+  const handleFollowersPopupOpen = () => {
+    setFollowersPopupOpen(true);
+  };
+
+  const handleFollowersPopupClose = () => {
+    setFollowersPopupOpen(false);
+  };
+
   return (
     <Box
       sx={{
@@ -209,10 +230,10 @@ const UserProfile = () => {
                   <FollowButton variant="contained">Follow</FollowButton>
                 </Box>
                 <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                  <Typography variant="body2">
+                  <Typography variant="body2" onClick={handleFollowingPopupOpen} sx={{ cursor: "pointer" }}>
                     <strong>{profileData.following}</strong> Following
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" onClick={handleFollowersPopupOpen} sx={{ cursor: "pointer" }}>
                     <strong>{profileData.followers}</strong> Followers
                   </Typography>
                 </Box>
@@ -307,6 +328,8 @@ const UserProfile = () => {
           </Box>
         </Card>
       </Box>
+      <FollowersListPopup open={followersPopupOpen} handleClose={handleFollowersPopupClose} />
+      <FollowingListPopup open={followingPopupOpen} handleClose={handleFollowingPopupClose} />
     </Box>
   );
 };

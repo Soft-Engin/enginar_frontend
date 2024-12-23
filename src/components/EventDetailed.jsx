@@ -84,7 +84,7 @@ export default function EventDetailed() {
       </Typography>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pt: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <AvatarGroup total={23} sx={{'& .MuiAvatar-root': { width: 38, height: 38, fontSize: 19 }, marginRight: 1}} onClick={handleParticipantsPopupOpen}>
+          <AvatarGroup total={23} sx={{'& .MuiAvatar-root': { width: 38, height: 38, fontSize: 19 }, marginRight: 1, cursor: "pointer" }} onClick={handleParticipantsPopupOpen}>
             <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
             <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
             <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
