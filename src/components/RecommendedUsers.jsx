@@ -21,7 +21,7 @@ const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
   borderStyle: "solid",
   borderWidth: "2px",
-  height: "33px",
+  height: "30px",
   minWidth: "90px",
   borderRadius: "20px",
 }));
@@ -32,12 +32,14 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#FFFFFF",
   },
-  textTransform: "none"
+  textTransform: "none",
+  fontWeight: "bold",
+  variant: "subtitle1"
 }));
 
 export default function RecommendedUsers() {
   return (
-    <Box sx={{ position: "fixed", top: 150, right: 105, width: 320, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#C8EFA5", boxShadow: 5}}>
+    <Box sx={{ position: "fixed", top: 150, right: 105, width: 300, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#C8EFA5", boxShadow: 5}}>
         <Typography
           fontWeight="bold"
           style={{ color: "#000000" }}
@@ -59,9 +61,7 @@ export default function RecommendedUsers() {
                 </Typography>
               </ListItemText>
               <FollowButton variant="contained">
-                <Typography variant="subtitle1" fontWeight="bold" >
                 Follow
-                </Typography>
               </FollowButton>
             </ListItem>
           )}

@@ -5,6 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
+import { useNavigate } from "react-router-dom";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -62,6 +63,14 @@ const StyledSelect = styled(Select)(({ theme }) => ({
 
 export default function SearchBar() {
   const [searchType, setSearchType] = React.useState('user');
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const navigate = useNavigate();
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      navigate(`/search?type=${searchType}&query=${searchQuery}`);
+    }
+  };
 
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
@@ -72,6 +81,8 @@ export default function SearchBar() {
         <StyledInputBase
           placeholder="Search…"
           inputProps={{ 'aria-label': 'search' }}
+          onKeyDown={handleKeyDown}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <StyledSelect
           value={searchType}
@@ -80,10 +91,10 @@ export default function SearchBar() {
           sx={{ minWidth: 100 }}
         >
           <MenuItem value="user">Users</MenuItem>
-          <MenuItem value="post">Posts</MenuItem>
+          <MenuItem value="blog">Blogs</MenuItem>
           <MenuItem value="recipe">Recipes</MenuItem>
         </StyledSelect>
       </Search>
     </Box>
   );
-};
+}

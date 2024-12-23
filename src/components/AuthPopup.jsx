@@ -81,6 +81,7 @@ export default function AuthPopup(props) {
     console.log(formJson);
     if (!isSignup) {
       props.setAnchorElUser(null);
+      localStorage.setItem("userLogged", "true");
       props.setUserLogged(true);
     }
     handleClose();

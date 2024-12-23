@@ -20,7 +20,7 @@ function generate(element) {
 
 export default function CommentSection() {
   return(
-    <Box sx={{ maxWidth: 1500, outline: "1px solid #C0C0C0", backgroundColor: "#EAEAEA", p: 3, borderRadius: "0 0 15px 15px" }}>
+    <Box sx={{ maxWidth: 1500, outline: "1px solid #C0C0C0", backgroundColor: "#EAEAEA", px: 3, py: 2, borderRadius: "0 0 15px 15px", boxShadow: 3 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5, mr: 2.5 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
           <Avatar sx={{ width: 50, height: 50, marginRight: 0.5 }}/>
@@ -49,7 +49,7 @@ export default function CommentSection() {
           </Button>
         </Box>
       </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', ml: 8.5, mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', ml: 8.5, mb: 2 }}>
         <AddPhotoAlternateOutlinedIcon sx={{ fontSize: '30px', marginRight: 1, color: "#417D1E" }}/>
         <AddReactionOutlinedIcon sx={{ fontSize: '30px', color: "#417D1E" }}/>
       </Box>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
@@ -18,16 +18,18 @@ import {
 } from "@mui/material";
 
 import BannerImg from "../assets/bg2.jpeg";
-import RecipeCompressed from "./RecipeCompressed";
-import BlogPostCompressed from "./BlogPostCompressed";
+import RecipeMini from "./RecipeMini";
+import BlogMini from "./BlogMini";
+import ProfileEditDialog from "./ProfileEditDialog"; 
+import EventCompressed from "./EventCompressed";
 
 const SharedButton = styled(Button)(({ theme }) => ({
-  border: "black",
+  border: "#888888",
   borderStyle: "solid",
-  borderWidth: "1px",
-  height: "25px",
-  minWidth: "100px",
-  borderRadius: "15px",
+  borderWidth: "2px",
+  height: "30px",
+  minWidth: "90px",
+  borderRadius: "20px",
 }));
 
 const FollowButton = styled(SharedButton)(({ theme }) => ({
@@ -36,6 +38,9 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#FFFFFF",
   },
+  textTransform: "none",
+  fontWeight: "bold",
+  variant: "subtitle1"
 }));
 
 function CustomTabPanel(props) {
@@ -98,30 +103,45 @@ const randomPosts = [
   },
 ];
 
-const profileData = {
-  name: "Hoshino Ichika",
-  username: "adl",
-  bio: "GOING 8TH CHECKLIST: I already won the game ✔ This lobby’s playing for second ✔ This is my last loss ✔ I win out from here ✔ My board is too lit ✔ HP is fake ✔ I’m about to spike hard ✔ That’s a fake loss ✔ 20hp? That’s 3 lives ✔ This game is over ✔ We win out ✔",
-  following: 42,
-  followers: 1500000,
-  coverImage: BannerImg,
-  profileImage: "/pp3.jpeg",
-};
-
 const UserProfile = () => {
+  const [profileData, setProfileData] = useState({
+    name: "Hoshino Ichika",
+    username: "adl",
+    bio: "GOING 8TH CHECKLIST: I already won the game ✔ This lobby's playing for second ✔ This is my last loss ✔ I win out from here ✔ My board is too lit ✔ HP is fake ✔ I'm about to spike hard ✔ That's a fake loss ✔ 20hp? That's 3 lives ✔ This game is over ✔ We win out ✔",
+    following: 42,
+    followers: 1500000,
+    coverImage: BannerImg,
+    profileImage: "/pp3.jpeg",
+  });
+
   const [value, setValue] = React.useState(0);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+  const open = Boolean(anchorEl);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleEditProfile = () => {
+    setEditDialogOpen(true);
+    handleClose(); // Close the options menu
+  };
+
+  const handleUpdateProfile = (updatedProfile) => {
+    setProfileData(prevData => ({
+      ...updatedProfile,
+      following: prevData.following,
+      followers: prevData.followers
+    }));
   };
 
   return (
@@ -133,6 +153,14 @@ const UserProfile = () => {
         maxWidth: "730px",
       }}
     >
+      {/* Profile Edit Dialog */}
+      <ProfileEditDialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        profileData={profileData}
+        onProfileUpdate={handleUpdateProfile}
+      />
+
       {/* Profile Column */}
       <Box>
         <Card
@@ -217,6 +245,9 @@ const UserProfile = () => {
                   open={open}
                   onClose={handleClose}
                 >
+                  <MenuItem key="Edit" onClick={handleEditProfile}>
+                    Edit Profile
+                  </MenuItem>
                   <MenuItem key="Ban" onClick={handleClose}>
                     Ban
                   </MenuItem>
@@ -240,7 +271,7 @@ const UserProfile = () => {
                 textColor="secondary"
                 indicatorColor="secondary"
               >
-                <Tab label="Post" {...a11yProps(0)} />
+                <Tab label="Blogs" {...a11yProps(0)} />
                 <Tab label="Events" {...a11yProps(1)} />
                 <Tab label="Recipes" {...a11yProps(2)} />
               </Tabs>
@@ -248,7 +279,8 @@ const UserProfile = () => {
             <CustomTabPanel value={value} index={0}>
               <Stack spacing={2} direction={"column"} alignItems={"center"}>
                 {randomPosts.map((post) => (
-                  <BlogPostCompressed
+                  <BlogMini
+                    key={post.id}
                     content={post.content}
                     likes={post.likes}
                     comments={post.comments}
@@ -257,9 +289,20 @@ const UserProfile = () => {
               </Stack>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                  <EventCompressed />
+                  <EventCompressed />
+                </Stack>
+              </Box>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-              <RecipeCompressed></RecipeCompressed>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                  <RecipeMini />
+                  <RecipeMini />
+                </Stack>
+              </Box>
             </CustomTabPanel>
           </Box>
         </Card>
