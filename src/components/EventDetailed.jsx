@@ -57,7 +57,7 @@ export default function EventDetailed() {
           Host:
         </Typography>
         <Avatar sx={{ width: 38, height: 38, marginRight: 0.7 }}/>
-        <Typography variant="body1" component="div" color="text.secondary" noWrap>
+        <Typography variant="body1" component="div" noWrap>
           <b>Hoshino Ichika</b>
         </Typography>
       </Box>

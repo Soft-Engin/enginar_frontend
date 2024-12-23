@@ -28,7 +28,7 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
 
 export default function UserListItem() {
   return(
-    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#FFFFFF", borderRadius: 3, boxShadow: 3, py: 1, px: 2, mb: 1 }}>
+    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#FFFFFF", borderRadius: 5, boxShadow: 2, py: 0.8, px: 2, outline: "1.5px solid #C0C0C0" }}>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Avatar sx={{ width: 38, height: 38, marginRight: 0.7 }}/>
         <Typography variant="body1" component="div" color="text.secondary" noWrap>
