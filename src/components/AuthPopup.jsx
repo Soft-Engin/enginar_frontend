@@ -10,6 +10,7 @@ import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import InputAdornment from "@mui/material/InputAdornment";
+import Alert from "@mui/material/Alert";
 import EmailIcon from "@mui/icons-material/Email";
 import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
@@ -59,26 +60,31 @@ export default function AuthPopup(props) {
   const [open, setOpen] = React.useState(false);
   const [isSignup, setIsSignup] = React.useState(true);
   const [formError, setFormError] = React.useState(null);
+  const [showSuccess, setShowSuccess] = React.useState(false);
 
   const handleClickOpen = (signup = true) => {
     setIsSignup(signup);
     setOpen(true);
-    setFormError(null); // Clear any previous errors when opening dialog
+    setFormError(null);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setFormError(null); // Clear any error
+    setFormError(null);
   };
 
   const handleSwitchToLogin = () => {
     setIsSignup(false);
-    setFormError(null); // Clear any error
+    setShowSuccess("true");
+    setFormError(null);
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 3000);
   };
 
   const handleSwitchToSignup = () => {
     setIsSignup(true);
-    setFormError(null); // Clear any error
+    setFormError(null);
   };
 
   const handleSubmit = async (event) => {
@@ -91,49 +97,42 @@ export default function AuthPopup(props) {
       const response = await axios.post(apiURL, formJson);
 
       if (response.status === 200) {
-        if (!isSignup) {
+        if (isSignup) {
+          // Show success message and switch to login
+          setShowSuccess(true);
+          handleSwitchToLogin();
+        } else {
           localStorage.setItem("token", response.data.token);
           localStorage.setItem("userLogged", "true");
           props.setUserLogged(true);
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${response.data.token}`;
+          props.setAnchorElUser(null);
+          handleClose();
         }
-
-        props.setAnchorElUser(null);
-        handleClose();
       } else if (response.status === 400) {
         if (isSignup) {
-          // Handle the validation errors from signup
           setFormError("Invalid input data. Check your fields.");
         } else {
-          setFormError(response.data.message); //Set the login error
+          setFormError(response.data.message);
         }
       } else if (response.status === 401) {
-        // Invalid login
         setFormError("Invalid Login Credentials");
       } else {
         setFormError("An error occurred. Please try again later.");
       }
     } catch (error) {
       console.error("Error:", error);
-
       if (error.response) {
-        // Request made and server responded with a status code
-        console.log(error.response.data);
-        console.log(error.response.status);
         setFormError(
           error.response.data.message || "An unexpected error occurred."
         );
       } else if (error.request) {
-        // The request was made but no response was received
-        console.log(error.request);
         setFormError(
           "Could not connect to the server. Please try again later."
         );
       } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log("Error", error.message);
         setFormError("An unexpected error occurred.");
       }
     }
@@ -149,6 +148,7 @@ export default function AuthPopup(props) {
           Sign up
         </SignupButton>
       </Stack>
+
       <Dialog
         open={open}
         onClose={handleClose}
@@ -163,6 +163,26 @@ export default function AuthPopup(props) {
           {isSignup ? "Sign Up" : "Log In"}
         </DialogTitle>
         <DialogContent>
+          {showSuccess && !isSignup && (
+            <Alert
+              severity="success"
+              sx={{
+                mb: 2,
+                backgroundColor: "#4B9023",
+                color: "white",
+                "& .MuiAlert-icon": {
+                  color: "white",
+                },
+              }}
+            >
+              Account created successfully!
+            </Alert>
+          )}
+          {formError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {formError}
+            </Alert>
+          )}
           {isSignup ? (
             <>
               <TextField
@@ -175,14 +195,12 @@ export default function AuthPopup(props) {
                 fullWidth
                 variant="outlined"
                 sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <PersonIcon />
-                      </InputAdornment>
-                    ),
-                  },
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <PersonIcon />
+                    </InputAdornment>
+                  ),
                 }}
               />
               <TextField
@@ -195,14 +213,12 @@ export default function AuthPopup(props) {
                 fullWidth
                 variant="outlined"
                 sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <EmailIcon />
-                      </InputAdornment>
-                    ),
-                  },
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <EmailIcon />
+                    </InputAdornment>
+                  ),
                 }}
               />
             </>
@@ -217,14 +233,12 @@ export default function AuthPopup(props) {
               fullWidth
               variant="outlined"
               sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <PersonIcon />
-                    </InputAdornment>
-                  ),
-                },
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <PersonIcon />
+                  </InputAdornment>
+                ),
               }}
             />
           )}
@@ -239,14 +253,12 @@ export default function AuthPopup(props) {
             fullWidth
             variant="outlined"
             sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <KeyIcon />
-                  </InputAdornment>
-                ),
-              },
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyIcon />
+                </InputAdornment>
+              ),
             }}
           />
 
@@ -261,14 +273,12 @@ export default function AuthPopup(props) {
               fullWidth
               variant="outlined"
               sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <KeyIcon />
-                    </InputAdornment>
-                  ),
-                },
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <KeyIcon />
+                  </InputAdornment>
+                ),
               }}
             />
           )}
