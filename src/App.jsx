@@ -6,6 +6,7 @@ import EventHub from "./components/EventHub";
 import ContentFeed from "./components/ContentFeed";
 import UserProfile from "./components/UserProfile";
 import SavedLikedPosts from "./components/SavedLikedPosts";
+import SearchPage from "./components/SearchPage";
 import SettingsPage from "./components/SettingsPage";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 
@@ -26,7 +27,7 @@ const router = createBrowserRouter([
     children: [  // These are the child routes that will render in the Outlet
       {
         path: '/',
-        element: <BlogPage />
+        element: <ContentFeed />
       },
       {
         path: '/profile',
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: '/contentFeed',
         element: <ContentFeed />
+      },
+      {
+        path: '/search',
+        element: <SearchPage />
       },
       {
         path: '/event/:eventid',
