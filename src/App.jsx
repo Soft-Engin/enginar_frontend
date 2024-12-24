@@ -6,9 +6,15 @@ import EventHub from "./components/EventHub";
 import ContentFeed from "./components/ContentFeed";
 import UserProfile from "./components/UserProfile";
 import SavedLikedPosts from "./components/SavedLikedPosts";
+import SearchPage from "./components/SearchPage";
 import SettingsPage from "./components/SettingsPage";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+<<<<<<< HEAD
 import RecipePage from "./components/RecipePage";
+=======
+import RecipeCreator from "./components/CreateRecipe";
+
+>>>>>>> dev
 
 // Create a root layout component that includes the Navbar
 const RootLayout = () => {
@@ -38,8 +44,12 @@ const router = createBrowserRouter([
         element: <EventHub />
       },
       {
-        path: '/contentFeed',
-        element: <ContentFeed />
+        path: '/blog',
+        element: <BlogPage />
+      },
+      {
+        path: '/search',
+        element: <SearchPage />
       },
       {
         path: '/event/:eventid',
@@ -54,6 +64,7 @@ const router = createBrowserRouter([
         element: <SavedLikedPosts />
       },
       {
+<<<<<<< HEAD
         path: '/blog',
         element: <BlogPage />
       },
@@ -61,6 +72,11 @@ const router = createBrowserRouter([
         path: '/recipe',
         element: <RecipePage />
       },
+=======
+        path: '/createRecipe',
+        element: <RecipeCreator />
+      }
+>>>>>>> dev
     ]
   }
 ]);

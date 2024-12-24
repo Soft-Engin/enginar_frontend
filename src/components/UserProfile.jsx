@@ -19,18 +19,20 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import BannerImg from "../assets/bg2.jpeg";
-import ProfileEditDialog from "./ProfileEditDialog";
-import { useSearchParams } from "react-router-dom";
 import RecipeMini from "./RecipeMini";
 import BlogMini from "./BlogMini";
+import ProfileEditDialog from "./ProfileEditDialog"; 
+import EventCompressed from "./EventCompressed";
+import FollowersListPopup from "./FollowersListPopup"
+import FollowingListPopup from "./FollowingListPopup";
 
 const SharedButton = styled(Button)(({ theme }) => ({
-  border: "black",
+  border: "#888888",
   borderStyle: "solid",
-  borderWidth: "1px",
-  height: "25px",
-  minWidth: "100px",
-  borderRadius: "15px",
+  borderWidth: "2px",
+  height: "30px",
+  minWidth: "90px",
+  borderRadius: "20px",
 }));
 
 const FollowButton = styled(SharedButton)(({ theme }) => ({
@@ -39,6 +41,9 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#FFFFFF",
   },
+  textTransform: "none",
+  fontWeight: "bold",
+  variant: "subtitle1"
 }));
 
 function CustomTabPanel(props) {
@@ -185,37 +190,25 @@ const UserProfile = () => {
     }));
   };
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="200px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+  const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
+  const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
+    
+  const handleFollowingPopupOpen = () => {
+    setFollowingPopupOpen(true);
+  };
 
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="200px"
-      >
-        <Typography color="error">Error: {error}</Typography>
-      </Box>
-    );
-  }
+  const handleFollowingPopupClose = () => {
+    setFollowingPopupOpen(false);
+  };
 
-  if (!profileData) {
-    return (
-      <Typography textAlign={"center"}>User profile not found!</Typography>
-    );
-  }
+  const handleFollowersPopupOpen = () => {
+    setFollowersPopupOpen(true);
+  };
+
+  const handleFollowersPopupClose = () => {
+    setFollowersPopupOpen(false);
+  };
+
   return (
     <Box
       sx={{
@@ -299,11 +292,11 @@ const UserProfile = () => {
                   ) : null}
                 </Box>
                 <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                  <Typography variant="body2">
-                    <strong>{profileData.following?.length}</strong> Following
+                  <Typography variant="body2" onClick={handleFollowingPopupOpen} sx={{ cursor: "pointer" }}>
+                    <strong>{profileData.following}</strong> Following
                   </Typography>
-                  <Typography variant="body2">
-                    <strong>{profileData.followers?.length}</strong> Followers
+                  <Typography variant="body2" onClick={handleFollowersPopupOpen} sx={{ cursor: "pointer" }}>
+                    <strong>{profileData.followers}</strong> Followers
                   </Typography>
                 </Box>
               </Box>
@@ -363,32 +356,44 @@ const UserProfile = () => {
                 textColor="secondary"
                 indicatorColor="secondary"
               >
-                <Tab label="Post" {...a11yProps(0)} />
+                <Tab label="Blogs" {...a11yProps(0)} />
                 <Tab label="Events" {...a11yProps(1)} />
                 <Tab label="Recipes" {...a11yProps(2)} />
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              {userPosts.map((blog, index) => (
-                <Box key={index} sx={{ width: 660, mb: 2 }}>
-                  <BlogMini blog={blog} />
-                </Box>
-              ))}
+              <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                {randomPosts.map((post) => (
+                  <BlogMini
+                    key={post.id}
+                    content={post.content}
+                    likes={post.likes}
+                    comments={post.comments}
+                  />
+                ))}
+              </Stack>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              {/* TODO: Add event display*/}
-              <Typography textAlign={"center"}>No events scheduled</Typography>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                  <EventCompressed />
+                  <EventCompressed />
+                </Stack>
+              </Box>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-              {userRecipes.map((recipe, index) => (
-                <Box key={index} sx={{ width: 660, mb: 2 }}>
-                  <RecipeMini recipe={recipe} />
-                </Box>
-              ))}
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                  <RecipeMini />
+                  <RecipeMini />
+                </Stack>
+              </Box>
             </CustomTabPanel>
           </Box>
         </Card>
       </Box>
+      <FollowersListPopup open={followersPopupOpen} handleClose={handleFollowersPopupClose} />
+      <FollowingListPopup open={followingPopupOpen} handleClose={handleFollowingPopupClose} />
     </Box>
   );
 };

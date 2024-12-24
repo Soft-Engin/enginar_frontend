@@ -28,7 +28,7 @@ export default function UpcomingEvents() {
         position: "fixed",
         top: 500,
         right: 105,
-        width: 320,
+        width: 300,
         borderRadius: 3,
         outline: "1.5px solid #959595",
         backgroundColor: "#C8EFA5",
@@ -50,7 +50,7 @@ export default function UpcomingEvents() {
             <Box
               sx={{
                 outline: "1.5px solid #AAAAAA",
-                width: 290,
+                width: 270,
                 pl: 0.5,
                 pr: 1,
                 pb: 0.5,
@@ -77,7 +77,7 @@ export default function UpcomingEvents() {
                       alignItems: 'flex-start'
                     }}
                   >
-                    <Typography variant="subtitle1" component="div" fontWeight="bold" mt={0.5} sx={{ maxWidth: '230px' }} noWrap>
+                    <Typography variant="subtitle1" component="div" fontWeight="bold" mt={0.5} sx={{ maxWidth: '210px' }} noWrap>
                       Enginar Festival @test wrapping
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '2px' }}>
