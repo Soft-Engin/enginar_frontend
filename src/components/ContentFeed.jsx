@@ -46,23 +46,81 @@ export default function ContentFeed() {
   const [blogs, setBlogs] = React.useState([]);
   const [followingContent, setFollowingContent] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [loadingMore, setLoadingMore] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [errorMore, setErrorMore] = React.useState(null);
+  const [pageNumber, setPageNumber] = React.useState(1);
+  let randSeed = (Math.random() + 1).toString(36).substring(7);
+  let scrollTimeout = null;
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
+  const fetchData = async () => {
+    if (loadingMore) return;
+    setLoadingMore(true);
+    setErrorMore(null);
+    try {
+      const [recipesResponse, blogsResponse] = await Promise.all([
+        axios.get("/api/v1/feed/recipe", {
+          params: { pageSize: 10, seed: randSeed, pageNumber: pageNumber },
+        }),
+        axios.get("/api/v1/feed/blog", {
+          params: { pageSize: 10, seed: randSeed, pageNumber: pageNumber },
+        }),
+      ]);
+      if (recipesResponse.data && recipesResponse.data.items) {
+        setRecipes((prevRecipes) => [
+          ...prevRecipes,
+          ...recipesResponse.data.items,
+        ]);
+      }
+      if (blogsResponse.data && blogsResponse.data.items) {
+        setBlogs((prevBlogs) => [...prevBlogs, ...blogsResponse.data.items]);
+      }
+      setPageNumber((prevPageNumber) => prevPageNumber + 1);
+    } catch (err) {
+      console.error("Error fetching more data:", err);
+      setErrorMore(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const handleScroll = () => {
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+    }
+
+    scrollTimeout = setTimeout(() => {
+      if (loadingMore || errorMore) return;
+      const scrollPosition =
+        window.innerHeight + document.documentElement.scrollTop;
+      const totalContentHeight = document.documentElement.scrollHeight;
+      // Check if scrolled to the bottom
+      if (scrollPosition >= totalContentHeight - 300) {
+        fetchData();
+      }
+    }, 100);
+  };
+
   React.useEffect(() => {
-    const fetchData = async () => {
+    const initialFetch = async () => {
       setLoading(true);
       setError(null);
       try {
         const [recipesResponse, blogsResponse] = await Promise.all([
-          axios.get("/api/v1/recipes", { params: { pageSize: 5 } }), // Fetch 5 popular recipes
-          axios.get("/api/v1/blog", { params: { pageSize: 5 } }), // Fetch 5 popular blogs
+          axios.get("/api/v1/feed/recipe", {
+            params: { pageSize: 10, seed: randSeed, pageNumber: 1 },
+          }),
+          axios.get("/api/v1/feed/blog", {
+            params: { pageSize: 10, seed: randSeed, pageNumber: 1 },
+          }),
         ]);
         setRecipes(recipesResponse.data.items);
         setBlogs(blogsResponse.data.items);
+        setPageNumber(2);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError(err.message || "An unexpected error occurred.");
@@ -70,8 +128,11 @@ export default function ContentFeed() {
         setLoading(false);
       }
     };
+    initialFetch();
 
-    fetchData();
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   if (loading) {
@@ -134,6 +195,16 @@ export default function ContentFeed() {
             <RecipeMini recipe={recipe} />
           </Box>
         ))}
+        {loadingMore && (
+          <Box display="flex" justifyContent="center" my={2}>
+            <CircularProgress size={20} />
+          </Box>
+        )}
+        {errorMore && (
+          <Box display="flex" justifyContent="center" my={2}>
+            <Typography color="error">Error: {errorMore}</Typography>
+          </Box>
+        )}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         {blogs.map((blog, index) => (
@@ -141,6 +212,16 @@ export default function ContentFeed() {
             <BlogMini blog={blog} />
           </Box>
         ))}
+        {loadingMore && (
+          <Box display="flex" justifyContent="center" my={2}>
+            <CircularProgress size={20} />
+          </Box>
+        )}
+        {errorMore && (
+          <Box display="flex" justifyContent="center" my={2}>
+            <Typography color="error">Error: {errorMore}</Typography>
+          </Box>
+        )}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
         {followingContent.map((user, index) => (

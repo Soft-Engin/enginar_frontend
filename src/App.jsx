@@ -9,12 +9,7 @@ import SavedLikedPosts from "./components/SavedLikedPosts";
 import SearchPage from "./components/SearchPage";
 import SettingsPage from "./components/SettingsPage";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
-<<<<<<< HEAD
 import RecipePage from "./components/RecipePage";
-=======
-import RecipeCreator from "./components/CreateRecipe";
-
->>>>>>> dev
 
 // Create a root layout component that includes the Navbar
 const RootLayout = () => {
@@ -28,57 +23,52 @@ const RootLayout = () => {
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <RootLayout />,
-    children: [  // These are the child routes that will render in the Outlet
+    children: [
+      // These are the child routes that will render in the Outlet
       {
-        path: '/',
-        element: <ContentFeed />
+        path: "/",
+        element: <ContentFeed />,
       },
       {
-        path: '/profile',
-        element: <UserProfile />
+        path: "/profile",
+        element: <UserProfile />,
       },
       {
-        path: '/eventhub',
-        element: <EventHub />
+        path: "/eventhub",
+        element: <EventHub />,
       },
       {
-        path: '/blog',
-        element: <BlogPage />
+        path: "/blog",
+        element: <BlogPage />,
       },
       {
-        path: '/search',
-        element: <SearchPage />
+        path: "/search",
+        element: <SearchPage />,
       },
       {
-        path: '/event/:eventid',
-        element: <EventPage />
+        path: "/event/:eventid",
+        element: <EventPage />,
       },
       {
-        path: '/settings',
-        element: <SettingsPage />
+        path: "/settings",
+        element: <SettingsPage />,
       },
       {
-        path: '/savedliked',
-        element: <SavedLikedPosts />
+        path: "/savedliked",
+        element: <SavedLikedPosts />,
       },
       {
-<<<<<<< HEAD
-        path: '/blog',
-        element: <BlogPage />
+        path: "/blog",
+        element: <BlogPage />,
       },
       {
-        path: '/recipe',
-        element: <RecipePage />
+        path: "/recipe",
+        element: <RecipePage />,
       },
-=======
-        path: '/createRecipe',
-        element: <RecipeCreator />
-      }
->>>>>>> dev
-    ]
-  }
+    ],
+  },
 ]);
 
 function App() {

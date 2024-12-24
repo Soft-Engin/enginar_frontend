@@ -1,15 +1,191 @@
-import * as React from "react";
-import { Typography, Box, Avatar } from "@mui/material";
+import React from "react";
+import { Typography, Box, Avatar, IconButton } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 import ShareIcon from "@mui/icons-material/Share";
-
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import { styled } from "@mui/material/styles";
+import { format, parseISO, formatDistanceToNow } from "date-fns";
 
+const StyledCardMedia = styled("img")({
+  width: "100%",
+  borderRadius: 10,
+  border: "1px solid #C0C0C0",
+  objectFit: "cover",
+  height: "225px",
+});
 export default function RecipeMini({ recipe }) {
   const navigate = useNavigate();
+  const [bannerUrl, setBannerUrl] = React.useState(null);
+  const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [likeCount, setLikeCount] = React.useState(0);
+  const [commentCount, setCommentCount] = React.useState(0);
+  const [isLiked, setIsLiked] = React.useState(false);
+  const [isBookmarked, setIsBookmarked] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [loadingProfile, setLoadingProfile] = React.useState(true);
+  const [loadingLikesComments, setLoadingLikesComments] = React.useState(true);
+  const [loadingIsLiked, setLoadingIsLiked] = React.useState(true);
+  const [error, setError] = React.useState(null);
+  const [errorProfile, setErrorProfile] = React.useState(null);
+  const [errorLikesComments, setErrorLikesComments] = React.useState(null);
+  const [errorIsLiked, setErrorIsLiked] = React.useState(null);
+  let authButtonId = "loginButton";
+  let userLogged = localStorage.getItem("userLogged") === "true";
+
+  React.useEffect(() => {
+    if (recipe && recipe.id) {
+      const fetchBanner = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${recipe.id}/banner`,
+            { responseType: "blob" }
+          );
+          if (response.data) {
+            const imageUrl = URL.createObjectURL(response.data);
+            setBannerUrl(imageUrl);
+          } else {
+            setBannerUrl(null);
+          }
+        } catch (err) {
+          console.error("Error fetching banner image:", err);
+          setError(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchBanner();
+    }
+    return () => {
+      if (bannerUrl) {
+        URL.revokeObjectURL(bannerUrl);
+      }
+    };
+  }, [recipe]);
+  React.useEffect(() => {
+    if (recipe && recipe.userId) {
+      const fetchProfilePicture = async () => {
+        setLoadingProfile(true);
+        setErrorProfile(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/users/${recipe.userId}/profile-picture`,
+            { responseType: "blob" }
+          );
+          if (response.data) {
+            const profileUrl = URL.createObjectURL(response.data);
+            setProfilePictureUrl(profileUrl);
+          } else {
+            setProfilePictureUrl(null);
+          }
+        } catch (err) {
+          console.error("Error fetching profile picture:", err);
+          setErrorProfile(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingProfile(false);
+        }
+      };
+      fetchProfilePicture();
+    }
+    return () => {
+      if (profilePictureUrl) {
+        URL.revokeObjectURL(profilePictureUrl);
+      }
+    };
+  }, [recipe]);
+  React.useEffect(() => {
+    if (recipe && recipe.id) {
+      const fetchLikesAndComments = async () => {
+        setLoadingLikesComments(true);
+        setErrorLikesComments(null);
+        try {
+          const [likeResponse, commentResponse] = await Promise.all([
+            axios.get(`/api/v1/recipes/${recipe.id}/like-count`),
+            axios.get(`/api/v1/recipes/${recipe.id}/comments`),
+          ]);
+
+          setLikeCount(likeResponse.data.likeCount || 0);
+          setCommentCount(commentResponse.data.totalCount || 0);
+        } catch (err) {
+          console.error("Error fetching likes and comments:", err);
+          setErrorLikesComments(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingLikesComments(false);
+        }
+      };
+      fetchLikesAndComments();
+    }
+  }, [recipe]);
+  React.useEffect(() => {
+    if (recipe && recipe.id && userLogged) {
+      const fetchIsLiked = async () => {
+        setLoadingIsLiked(true);
+        setErrorIsLiked(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${recipe.id}/is-liked`
+          );
+          setIsLiked(response.data.isLiked || false);
+        } catch (err) {
+          console.error("Error fetching isLiked:", err);
+          setErrorIsLiked(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingIsLiked(false);
+        }
+      };
+      fetchIsLiked();
+    }
+  }, [recipe, userLogged]);
+
+  const handleLikeToggle = async () => {
+    if (!userLogged) {
+      const authButton = document.getElementById(authButtonId);
+      if (authButton) {
+        authButton.click();
+      }
+      return;
+    }
+    setIsLiked((prevIsLiked) => !prevIsLiked);
+    if (isLiked) {
+      setLikeCount((prevLikeCount) => prevLikeCount - 1);
+    } else {
+      setLikeCount((prevLikeCount) => prevLikeCount + 1);
+    }
+    try {
+      await axios.post(`/api/v1/recipes/${recipe.id}/toggle-like`);
+    } catch (err) {
+      console.error("Error toggling like", err);
+      setIsLiked((prevIsLiked) => !prevIsLiked);
+      if (isLiked) {
+        setLikeCount((prevLikeCount) => prevLikeCount + 1);
+      } else {
+        setLikeCount((prevLikeCount) => prevLikeCount - 1);
+      }
+    }
+  };
+  const handleBookmarkToggle = async () => {
+    if (!userLogged) {
+      const authButton = document.getElementById(authButtonId);
+      if (authButton) {
+        authButton.click();
+      }
+      return;
+    }
+    setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
+    try {
+      await axios.post(`/api/v1/recipes/${recipe.id}/bookmark`);
+    } catch (err) {
+      console.error("Error toggling bookmark", err);
+      setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
+    }
+  };
 
   return (
     <Box
@@ -43,18 +219,25 @@ export default function RecipeMini({ recipe }) {
               alignItems: "center",
             }}
           >
-            <Avatar sx={{ width: 30, height: 30, marginRight: 1 }} />
+            <Avatar
+              src={profilePictureUrl}
+              sx={{ width: 30, height: 30, marginRight: 1 }}
+              onError={() => setProfilePictureUrl(null)}
+            />
             <Typography
               variant="body2"
               fontWeight="bold"
               sx={{ marginRight: 0.5 }}
               noWrap
             >
-              Hoshino Ichika
+              {recipe.userName}
             </Typography>
           </Link>
           <Typography variant="body2" color="text.secondary" noWrap>
-            · 2h
+            {recipe.createdAt &&
+              formatDistanceToNow(parseISO(recipe.createdAt), {
+                addSuffix: true,
+              })}
           </Typography>
         </Box>
         <MoreHorizIcon style={{ fontSize: "30px" }} />
@@ -91,17 +274,19 @@ export default function RecipeMini({ recipe }) {
         >
           {recipe.bodyText}
         </Typography>
-
         <Box sx={{ mb: 0.5 }}>
-          <img
-            src="https://via.placeholder.com/400x225"
-            alt="Enginar Yemeği"
-            style={{
-              width: "100%",
-              borderRadius: 10,
-              border: "1px solid #C0C0C0",
-            }}
-          />
+          {bannerUrl && !loading && (
+            <StyledCardMedia
+              src={bannerUrl}
+              alt="Recipe Banner"
+              onError={() => setBannerUrl(null)}
+            />
+          )}
+          {error && (
+            <Box display="flex" justifyContent="center" my={2}>
+              <Typography color="error">Error: {error}</Typography>
+            </Box>
+          )}
         </Box>
       </Box>
 
@@ -114,9 +299,19 @@ export default function RecipeMini({ recipe }) {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <FavoriteBorderIcon style={{ fontSize: "30px", marginRight: 4 }} />
+            <IconButton onClick={handleLikeToggle} style={{ padding: 0 }}>
+              {isLiked ? (
+                <FavoriteIcon
+                  style={{ fontSize: "30px", marginRight: 4, color: "red" }}
+                />
+              ) : (
+                <FavoriteBorderIcon
+                  style={{ fontSize: "30px", marginRight: 4 }}
+                />
+              )}
+            </IconButton>
             <Typography variant="body2" color="text.secondary">
-              39k
+              {likeCount}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -124,14 +319,20 @@ export default function RecipeMini({ recipe }) {
               style={{ fontSize: "28px", marginRight: 4 }}
             />
             <Typography variant="body2" color="text.secondary">
-              14
+              {commentCount}
             </Typography>
           </Box>
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <ShareIcon style={{ fontSize: "28px", marginRight: 6 }} />
-          <BookmarkBorderOutlinedIcon style={{ fontSize: "32px" }} />
+          <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+            {isBookmarked ? (
+              <BookmarkIcon style={{ fontSize: "32px" }} />
+            ) : (
+              <BookmarkBorderOutlinedIcon style={{ fontSize: "32px" }} />
+            )}
+          </IconButton>
         </Box>
       </Box>
     </Box>

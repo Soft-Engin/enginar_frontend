@@ -141,7 +141,11 @@ export default function AuthPopup(props) {
   return (
     <React.Fragment>
       <Stack spacing={2} direction="row" justifyContent={"center"}>
-        <LoginButton variant="contained" onClick={() => handleClickOpen(false)}>
+        <LoginButton
+          variant="contained"
+          onClick={() => handleClickOpen(false)}
+          id="loginButton"
+        >
           Log in
         </LoginButton>
         <SignupButton variant="contained" onClick={() => handleClickOpen(true)}>
