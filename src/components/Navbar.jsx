@@ -313,7 +313,7 @@ export default function Navbar(props) {
           <RightSection>
             {userLogged ? (
               <>
-                <Tooltip title="Open settings">
+                <Tooltip title="Profile Menu">
                   <IconButton onClick={handleOpenUserMenu}>
                     <Avatar
                       alt="Remy Sharp"
