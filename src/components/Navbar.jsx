@@ -254,14 +254,18 @@ export default function Navbar(props) {
     {
       text: "Profile",
       icon: <AccountCircleIcon />,
-      action: handleCloseUserMenu,
-      link: "/profile",
+      action: () => {
+        handleCloseUserMenu;
+        navigate("/profile");
+      }
     },
     {
       text: "Settings",
       icon: <SettingsApplicationsIcon />,
-      action: handleCloseUserMenu,
-      link: "/settings",
+      action: () => {
+        handleCloseUserMenu;
+        navigate("/settings");
+      }
     },
     {
       text: "Logout",
@@ -335,12 +339,8 @@ export default function Navbar(props) {
                 >
                   {userActions.map((action) =>
                     action.link ? (
-                      <Link
-                        key={action.text}
-                        to={action.link}
-                        style={{ textDecoration: "none", color: "black" }}
-                      >
                         <MenuItem
+                          key={action.text}
                           onClick={action.action}
                           style={{
                             width: "140px",
@@ -353,7 +353,6 @@ export default function Navbar(props) {
                           </Typography>
                           {action.icon}
                         </MenuItem>
-                      </Link>
                     ) : (
                       <MenuItem
                         key={action.text}
