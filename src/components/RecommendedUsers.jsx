@@ -39,7 +39,7 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
 
 export default function RecommendedUsers() {
   return (
-    <Box sx={{ position: "fixed", top: 150, right: 105, width: 300, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#C8EFA5", boxShadow: 5}}>
+    <Box sx={{ position: "fixed", top: 100, right: { md: "0.01%", lg: "2%", xl: "5%" }, width: 300, scale: { xs: "0%", sm: "0%", md: "70%", lg: "80%", xl: "90%" }, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#C8EFA5", boxShadow: 5}}>
         <Typography
           fontWeight="bold"
           style={{ color: "#000000" }}
