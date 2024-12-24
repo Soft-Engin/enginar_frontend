@@ -12,7 +12,7 @@ export default function BlogPage() {
   return(
     <Box sx={{ m: 4, maxWidth: 800 }}>
       <BlogDetailed blogId={searchParams.get('id')}/>
-      <CommentSection />
+      <CommentSection type="blog" contentId={searchParams.get('id')} />
       <RecommendedUsers />
       <UpcomingEvents />
     </Box>

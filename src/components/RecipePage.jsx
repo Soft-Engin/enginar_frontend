@@ -12,7 +12,7 @@ export default function RecipePage() {
   return(
     <Box sx={{ m: 4, maxWidth: 800 }}>
       <RecipeDetailed recipeId={searchParams.get('id')}/>
-      <CommentSection />
+      <CommentSection type="recipe" contentId={searchParams.get('id')}/>
       <RecommendedUsers />
       <UpcomingEvents />
     </Box>
