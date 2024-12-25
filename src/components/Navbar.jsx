@@ -338,22 +338,6 @@ export default function Navbar(props) {
                   onClose={handleCloseUserMenu}
                 >
                   {userActions.map((action) =>
-                    action.link ? (
-                        <MenuItem
-                          key={action.text}
-                          onClick={action.action}
-                          style={{
-                            width: "140px",
-                            display: "flex",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <Typography sx={{ textAlign: "left" }}>
-                            {action.text}
-                          </Typography>
-                          {action.icon}
-                        </MenuItem>
-                    ) : (
                       <MenuItem
                         key={action.text}
                         onClick={action.action}
@@ -368,7 +352,6 @@ export default function Navbar(props) {
                         </Typography>
                         {action.icon}
                       </MenuItem>
-                    )
                   )}
                 </Menu>
               </>
