@@ -49,8 +49,8 @@ export default function ContentFeed() {
   const [loadingMore, setLoadingMore] = React.useState(false);
   const [error, setError] = React.useState(null);
   const [errorMore, setErrorMore] = React.useState(null);
-  const [pageNumber, setPageNumber] = React.useState(1);
   let randSeed = (Math.random() + 1).toString(36).substring(7);
+  let pageNumber = 1;
   let scrollTimeout = null;
 
   const handleChange = (event, newValue) => {
@@ -79,7 +79,7 @@ export default function ContentFeed() {
       if (blogsResponse.data && blogsResponse.data.items) {
         setBlogs((prevBlogs) => [...prevBlogs, ...blogsResponse.data.items]);
       }
-      setPageNumber((prevPageNumber) => prevPageNumber + 1);
+      pageNumber += 1;
     } catch (err) {
       console.error("Error fetching more data:", err);
       setErrorMore(err.message || "An unexpected error occurred.");
@@ -120,7 +120,7 @@ export default function ContentFeed() {
         ]);
         setRecipes(recipesResponse.data.items);
         setBlogs(blogsResponse.data.items);
-        setPageNumber(2);
+        pageNumber = 2;
       } catch (err) {
         console.error("Error fetching data:", err);
         setError(err.message || "An unexpected error occurred.");
