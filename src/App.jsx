@@ -1,6 +1,7 @@
 import "./App.css";
 import Navbar from "./components/Navbar";
 import BlogPage from "./components/BlogPage";
+import RecipePage from "./components/RecipePage";
 import EventPage from "./components/EventPage";
 import EventHub from "./components/EventHub";
 import ContentFeed from "./components/ContentFeed";
@@ -44,11 +45,15 @@ const router = createBrowserRouter([
         element: <BlogPage />
       },
       {
+        path: '/recipe',
+        element: <RecipePage />
+      },
+      {
         path: '/search',
         element: <SearchPage />
       },
       {
-        path: '/event/:eventid',
+        path: '/event',
         element: <EventPage />
       },
       {

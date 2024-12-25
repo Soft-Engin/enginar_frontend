@@ -11,7 +11,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 export default function EventCompressed() {
   return(
-    <Box sx={{ maxWidth: 700, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 3, pt: 3, pr: 3, pb: 3, borderRadius: 5, boxShadow: 5 }}>
+    <Box sx={{ maxWidth: { xs: 500, sm: 500, md: 600, lg: 490, xl: 630 }, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 3, pt: 3, pr: 3, pb: 3, borderRadius: 5, boxShadow: 5 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography variant="h5" fontWeight="bold" style={{ marginRight: '15px', maxWidth: '400px' }} noWrap>

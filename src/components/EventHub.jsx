@@ -14,8 +14,8 @@ function generate(element) {
 
 export default function EventHub() {
   return (
-    <Grid container spacing={4} sx={{ pt: 3, pb: 5, pl: 20, pr: 20 }}>
-      <Grid item size={12} sx={{ pl: 5 }}>
+    <Grid container rowSpacing={4} columnSpacing={2.5} sx={{ pt: 3, pb: 5, pl: 12, pr: 12 }} justifyContent="center" alignItems="center">
+      <Grid item size={12} display="flex" justifyContent="center">
         <Button variant="contained" style={{ backgroundColor: "#4B9023", borderRadius: 20, width: "200px", height: "50px", textTransform: "none", marginRight: 25 }}>
         <Typography variant="h5" noWrap>
           City: Istanbul
@@ -28,7 +28,7 @@ export default function EventHub() {
         </Button>
       </Grid>
       {generate(<EventCompressed />).map((event, index) => (
-        <Grid item size={6} key={index} display="flex" justifyContent="center" alignItems="center">
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6} key={index} display="flex" justifyContent="center" alignItems="center">
           {event}
         </Grid>
       ))}

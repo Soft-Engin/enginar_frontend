@@ -10,9 +10,12 @@ export default function EventPage() {
   const params = useParams();
   console.log(params);
   return(
-    <Box sx={{ m: 4, maxWidth: 900 }}>
-      <EventDetailed />
-      <CommentSection />
+    <Box sx={{ m: 4, maxWidth: 800 }}>
+      <Box sx={{ scale: { xs: "70%", sm: "70%", md: "80%", lg: "84%", xl: "100%" }, transformOrigin: "top", width: { lg: "90%", xl: "100%" }, margin: "0 auto" }}>
+        <EventDetailed />
+        <CommentSection />
+      </Box>
+
       <RecommendedUsers />
       <UpcomingEvents />
     </Box>

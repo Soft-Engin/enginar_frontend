@@ -40,32 +40,32 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
 export default function RecommendedUsers() {
   return (
     <Box sx={{ position: "fixed", top: 115, right: { lg: "1%", xl: "3%" }, width: 300, scale: { xs: "0%", sm: "0%", md: "0%", lg: "85%", xl: "95%" }, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#C8EFA5", boxShadow: 5}}>
-        <Typography
-          fontWeight="bold"
-          style={{ color: "#000000" }}
-          sx={{pt: 2, pl: 2, fontSize: 24, opacity: 0.7}}
-          variant="h5"
-          component="div"
-        >
-          Recommended Users
-        </Typography>
-        <List>
-          {generate(
-            <ListItem>
-              <ListItemAvatar>
-                <Avatar>{/* Buraya user profile picture gelecek*/}</Avatar>
-              </ListItemAvatar>
-              <ListItemText>
-                <Typography variant="h6" component="div" color="black">
-                  Kendrick{/* Buraya username gelecek*/}
-                </Typography>
-              </ListItemText>
-              <FollowButton variant="contained">
-                Follow
-              </FollowButton>
-            </ListItem>
-          )}
-        </List>
+      <Typography
+        fontWeight="bold"
+        style={{ color: "#000000" }}
+        sx={{pt: 2, pl: 2, fontSize: 24, opacity: 0.7}}
+        variant="h5"
+        component="div"
+      >
+        Recommended Users
+      </Typography>
+      <List>
+        {generate(
+          <ListItem>
+            <ListItemAvatar>
+              <Avatar>{/* Buraya user profile picture gelecek*/}</Avatar>
+            </ListItemAvatar>
+            <ListItemText>
+              <Typography variant="h6" component="div" color="black">
+                Kendrick{/* Buraya username gelecek*/}
+              </Typography>
+            </ListItemText>
+            <FollowButton variant="contained">
+              Follow
+            </FollowButton>
+          </ListItem>
+        )}
+      </List>
     </Box>
   );
 }
