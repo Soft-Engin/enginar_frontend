@@ -52,7 +52,7 @@ export default function ContentFeed() {
     setValue(newValue);
   };
   return (
-    <Box sx={{ width: { xs: "40%", sm: "60%", md: "65%", lg: "75%", xl: "85%" }, margin: "0 auto" }}>
+    <Box sx={{ width: { xs: "40%", sm: "60%", md: "70%", lg: "75%", xl: "85%" }, margin: "0 auto" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
         <Tabs
           centered
