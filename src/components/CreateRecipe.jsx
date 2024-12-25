@@ -223,7 +223,7 @@ const RecipeCreator = () => {
   const imageWidth = "100px";
 
   return (
-    <Box sx={{ p: 3, width: "90vmax", overflow: "hidden" }}>
+    <Box sx={{ p: 4, width: "90vmax", overflow: "hidden" }}>
       <Typography variant="h4" gutterBottom>
         Create a Recipe
       </Typography>

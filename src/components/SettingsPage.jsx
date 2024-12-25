@@ -4,6 +4,9 @@ import { Save as SaveIcon, Cancel as CancelIcon } from "@mui/icons-material";
 
 import SettingsIcon from "@mui/icons-material/Settings";
 
+import RecommendedUsers from "./RecommendedUsers";
+import UpcomingEvents from "./UpcomingEvents";
+
 const SettingsPage = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -22,7 +25,7 @@ const SettingsPage = () => {
   return (
     <Box
       maxWidth="md"
-      sx={{ marginTop: 4, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#BEDDA3", boxShadow: 5}}
+      sx={{ width: { xs: "40%", sm: "60%", md: "80%", lg: "80%", xl: "100%" }, margin: "0 auto", marginTop: 4, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#BEDDA3", boxShadow: 5 }}
     >
       <Box sx={{ display: "flex", pt: 2, pl: 2 }}>
         <SettingsIcon sx={{ fontSize: 40, mr: 1}} />
@@ -90,6 +93,8 @@ const SettingsPage = () => {
           Cancel
         </Button>
       </Box>
+      <RecommendedUsers />
+      <UpcomingEvents />
     </Box>
   );
 };

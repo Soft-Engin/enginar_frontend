@@ -23,18 +23,7 @@ function generate(element) {
 
 export default function UpcomingEvents() {
   return (
-    <Box
-      sx={{
-        position: "fixed",
-        top: 500,
-        right: 105,
-        width: 300,
-        borderRadius: 3,
-        outline: "1.5px solid #959595",
-        backgroundColor: "#C8EFA5",
-        boxShadow: 5
-      }}
-    >
+    <Box sx={{ position: "fixed", top: 425, right: { lg: "1%", xl: "3%" }, width: 300, scale: { xs: "0%", sm: "0%", md: "0%", lg: "85%", xl: "95%" }, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#C8EFA5", boxShadow: 5 }}>
       <Typography
         fontWeight="bold"
         style={{ color: "#000000" }}
