@@ -28,7 +28,7 @@ export default function EventHub() {
         </Button>
       </Grid>
       {generate(<EventCompressed />).map((event, index) => (
-        <Grid item xs={12} sm={12} md={12} lg={6} xl={6} key={index} display="flex" justifyContent="center" alignItems="center">
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: { xs: 500, sm: 500, md: 600, lg: 490, xl: 630 } }}>
           {event}
         </Grid>
       ))}
