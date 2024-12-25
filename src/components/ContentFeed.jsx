@@ -52,13 +52,14 @@ export default function ContentFeed() {
     setValue(newValue);
   };
   return (
-    <Box>
+    <Box sx={{ width: { xs: "40%", sm: "60%", md: "75%", lg: "75%", xl: "85%" }, margin: "0 auto" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
         <Tabs
           centered
           value={value}
           onChange={handleChange}
           aria-label="Feed Tabs"
+          variant="fullWidth"
           sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
         >
           <Tab
@@ -81,23 +82,23 @@ export default function ContentFeed() {
 
       <CustomTabPanel value={value} index={0}>
         {generate(<RecipeMini />).map((recipe, index) => (
-          <Box key={index} sx={{ width: 550, mb: 2 }}>
+          <Box key={index} sx={{ width: "100%", mb: 2 }}>
             {recipe}
           </Box>
         ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         {generate(<BlogMini />).map((blog, index) => (
-          <Box key={index} sx={{ width: 550, mb: 2 }}>
+          <Box key={index} sx={{ width: "100%", mb: 2 }}>
             {blog}
           </Box>
         ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        <Box sx={{ width: 550, mb: 2 }}>
+        <Box sx={{ width: "100%", mb: 2 }}>
           <BlogMini />
         </Box>
-        <Box sx={{ width: 550, mb: 2 }}>
+        <Box sx={{ width: "100%", mb: 2 }}>
           <RecipeMini />
         </Box>
       </CustomTabPanel>

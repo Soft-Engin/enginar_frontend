@@ -68,7 +68,7 @@ export default function SearchedUsers() {
 
       <CustomTabPanel value={value} index={0}>
         {generate(<UserMini />).map((user, index) => (
-          <Box key={index} sx={{ width: 650, mb: 2 }}>
+          <Box key={index} sx={{ width: "100%", mb: 2 }}>
             {user}
           </Box>
         ))}

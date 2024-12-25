@@ -73,14 +73,14 @@ export default function SearchedBlogs() {
 
       <CustomTabPanel value={value} index={0}>
         {generate(<BlogMini />).map((blog, index) => (
-          <Box key={index} sx={{ width: 550, mb: 2 }}>
+          <Box key={index} sx={{ width: "100%", mb: 2 }}>
             {blog}
           </Box>
         ))}
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         {generate(<BlogMini />).map((blog, index) => (
-          <Box key={index} sx={{ width: 550, mb: 2 }}>
+          <Box key={index} sx={{ width: "100%", mb: 2 }}>
             {blog}
           </Box>
         ))}

@@ -24,6 +24,8 @@ import ProfileEditDialog from "./ProfileEditDialog";
 import EventCompressed from "./EventCompressed";
 import FollowersListPopup from "./FollowersListPopup"
 import FollowingListPopup from "./FollowingListPopup";
+import RecommendedUsers from "./RecommendedUsers";
+import UpcomingEvents from "./UpcomingEvents";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
@@ -166,170 +168,177 @@ const UserProfile = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minWidth: "730px",
-        maxWidth: "730px",
-      }}
-    >
-      {/* Profile Edit Dialog */}
-      <ProfileEditDialog
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        profileData={profileData}
-        onProfileUpdate={handleUpdateProfile}
-      />
+    <Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          scale: { xs: "70%", sm: "70%", md: "80%", lg: "84%", xl: "100%" },
+          transformOrigin: "top",
+          width: { lg: "90%", xl: "100%" }, 
+          margin: "0 auto",
+          maxWidth: "730px"
+        }}
+      >
+        {/* Profile Edit Dialog */}
+        <ProfileEditDialog
+          open={editDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
+          profileData={profileData}
+          onProfileUpdate={handleUpdateProfile}
+        />
 
-      {/* Profile Column */}
-      <Box>
-        <Card
-          sx={{
-            position: "relative",
-            overflow: "visible",
-            backgroundColor: "#E9F6BC",
-          }}
-        >
-          {/* Cover Image */}
-          <Box
+        {/* Profile Column */}
+        <Box>
+          <Card
             sx={{
-              height: 200,
-              background: `url(${profileData.coverImage}) no-repeat center`,
-              backgroundSize: "cover",
+              position: "relative",
+              overflow: "visible",
+              backgroundColor: "#E9F6BC",
             }}
-          />
-
-          {/* Profile Header */}
-          <CardContent>
+          >
+            {/* Cover Image */}
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "flex-start",
-                position: "relative",
+                height: 200,
+                background: `url(${profileData.coverImage}) no-repeat center`,
+                backgroundSize: "cover",
               }}
-            >
-              <Avatar
-                src={profileData.profileImage}
-                sx={{
-                  width: 120,
-                  height: 120,
-                  border: "4px solid white",
-                  position: "absolute",
-                  top: -80,
-                  left: 0,
-                }}
-              />
-              <Box sx={{ mt: -2, ml: 17 }}>
-                <Box
-                  sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
-                >
-                  <Typography variant="h5" fontWeight="bold">
-                    {profileData.name}
-                  </Typography>
-                  <FollowButton variant="contained">Follow</FollowButton>
-                </Box>
-                <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                  <Typography variant="body2" onClick={handleFollowingPopupOpen} sx={{ cursor: "pointer" }}>
-                    <strong>{profileData.following}</strong> Following
-                  </Typography>
-                  <Typography variant="body2" onClick={handleFollowersPopupOpen} sx={{ cursor: "pointer" }}>
-                    <strong>{profileData.followers}</strong> Followers
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
-                <IconButton
-                  aria-label="more"
-                  id="menuButton"
-                  aria-controls={open ? "menu" : undefined}
-                  aria-expanded={open ? "true" : undefined}
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-                <Menu
-                  id="menu"
-                  MenuListProps={{
-                    "aria-labelledby": "menuButton",
-                  }}
-                  anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={open}
-                  onClose={handleClose}
-                >
-                  <MenuItem key="Edit" onClick={handleEditProfile}>
-                    Edit Profile
-                  </MenuItem>
-                  <MenuItem key="Ban" onClick={handleClose}>
-                    Ban
-                  </MenuItem>
-                </Menu>
-              </Box>
-            </Box>
+            />
 
-            {/* Profile Info */}
-            <Box>
-              <Typography sx={{ mt: 1, ml: 2 }}>{profileData.bio}</Typography>
-            </Box>
-          </CardContent>
-          {/* User Content */}
-          <Box sx={{ width: "100%", pb: 2 }}>
-            <Box sx={{ borderTop: 1, borderColor: "divider" }}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label="basic tabs example"
-                centered
-                textColor="secondary"
-                indicatorColor="secondary"
+            {/* Profile Header */}
+            <CardContent>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  position: "relative",
+                }}
               >
-                <Tab label="Blogs" {...a11yProps(0)} />
-                <Tab label="Events" {...a11yProps(1)} />
-                <Tab label="Recipes" {...a11yProps(2)} />
-              </Tabs>
+                <Avatar
+                  src={profileData.profileImage}
+                  sx={{
+                    width: 120,
+                    height: 120,
+                    border: "4px solid white",
+                    position: "absolute",
+                    top: -80,
+                    left: 0,
+                  }}
+                />
+                <Box sx={{ mt: -2, ml: 17 }}>
+                  <Box
+                    sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
+                  >
+                    <Typography variant="h5" fontWeight="bold">
+                      {profileData.name}
+                    </Typography>
+                    <FollowButton variant="contained">Follow</FollowButton>
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+                    <Typography variant="body2" onClick={handleFollowingPopupOpen} sx={{ cursor: "pointer" }}>
+                      <strong>{profileData.following}</strong> Following
+                    </Typography>
+                    <Typography variant="body2" onClick={handleFollowersPopupOpen} sx={{ cursor: "pointer" }}>
+                      <strong>{profileData.followers}</strong> Followers
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
+                  <IconButton
+                    aria-label="more"
+                    id="menuButton"
+                    aria-controls={open ? "menu" : undefined}
+                    aria-expanded={open ? "true" : undefined}
+                    aria-haspopup="true"
+                    onClick={handleClick}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    id="menu"
+                    MenuListProps={{
+                      "aria-labelledby": "menuButton",
+                    }}
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={open}
+                    onClose={handleClose}
+                  >
+                    <MenuItem key="Edit" onClick={handleEditProfile}>
+                      Edit Profile
+                    </MenuItem>
+                    <MenuItem key="Ban" onClick={handleClose}>
+                      Ban
+                    </MenuItem>
+                  </Menu>
+                </Box>
+              </Box>
+
+              {/* Profile Info */}
+              <Box>
+                <Typography sx={{ mt: 1, ml: 2 }}>{profileData.bio}</Typography>
+              </Box>
+            </CardContent>
+            {/* User Content */}
+            <Box sx={{ width: "100%", pb: 2 }}>
+              <Box sx={{ borderTop: 1, borderColor: "divider" }}>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  aria-label="basic tabs example"
+                  centered
+                  textColor="secondary"
+                  indicatorColor="secondary"
+                >
+                  <Tab label="Blogs" {...a11yProps(0)} />
+                  <Tab label="Events" {...a11yProps(1)} />
+                  <Tab label="Recipes" {...a11yProps(2)} />
+                </Tabs>
+              </Box>
+              <CustomTabPanel value={value} index={0}>
+                <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                  {randomPosts.map((post) => (
+                    <BlogMini
+                      key={post.id}
+                      content={post.content}
+                      likes={post.likes}
+                      comments={post.comments}
+                    />
+                  ))}
+                </Stack>
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={1}>
+                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                  <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                    <EventCompressed />
+                    <EventCompressed />
+                  </Stack>
+                </Box>
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={2}>
+                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                  <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                    <RecipeMini />
+                    <RecipeMini />
+                  </Stack>
+                </Box>
+              </CustomTabPanel>
             </Box>
-            <CustomTabPanel value={value} index={0}>
-              <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                {randomPosts.map((post) => (
-                  <BlogMini
-                    key={post.id}
-                    content={post.content}
-                    likes={post.likes}
-                    comments={post.comments}
-                  />
-                ))}
-              </Stack>
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                  <EventCompressed />
-                  <EventCompressed />
-                </Stack>
-              </Box>
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={2}>
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                  <RecipeMini />
-                  <RecipeMini />
-                </Stack>
-              </Box>
-            </CustomTabPanel>
-          </Box>
-        </Card>
+          </Card>
+        </Box>
       </Box>
       <FollowersListPopup open={followersPopupOpen} handleClose={handleFollowersPopupClose} />
       <FollowingListPopup open={followingPopupOpen} handleClose={handleFollowingPopupClose} />
+      <RecommendedUsers />
+      <UpcomingEvents />
     </Box>
   );
 };

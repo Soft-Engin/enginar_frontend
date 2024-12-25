@@ -51,8 +51,9 @@ export default function SavedLikedPosts() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  
   return (
-    <Box>
+    <Box sx={{ px: 10 }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs centered value={value} onChange={handleChange} aria-label="basic tabs example" sx={{ '& .MuiTabs-indicator': { backgroundColor: '#4B9023' }}} >
           <Tab label="Recipes" sx={{ '&.Mui-selected': { color: '#4B9023' } }} {...a11yProps(0)} />
@@ -62,7 +63,7 @@ export default function SavedLikedPosts() {
       <CustomTabPanel value={value} index={0}>
         <Grid container spacing={6} justifyContent="center" sx={{ pt: 2, pb: 5 }}>
           {generate(<RecipeMini />).map((recipe, index) => (
-            <Grid item size={4} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: 450 }}>
+            <Grid item xs={12} sm={12} md={6} lg={4} xl={4} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: 450 }}>
               {recipe}
             </Grid>
           ))}
@@ -71,7 +72,7 @@ export default function SavedLikedPosts() {
       <CustomTabPanel value={value} index={1}>
         <Grid container spacing={6} justifyContent="center" sx={{ pt: 2, pb: 5 }}>
           {generate(<BlogMini />).map((blog, index) => (
-            <Grid item size={4} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: 450 }}>
+            <Grid item xs={12} sm={12} md={6} lg={4} xl={4} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: 450 }}>
               {blog}
             </Grid>
           ))}
