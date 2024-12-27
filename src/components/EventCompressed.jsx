@@ -36,7 +36,7 @@ export default function EventCompressed() {
         </Typography>
         <Avatar sx={{ width: 34, height: 34, marginRight: 0.7 }}/>
         <Typography variant="body2" component="div" color="text.secondary" noWrap>
-          <b>Hoshino Ichika</b><br/>CEO
+          <b>Hoshino Ichika</b>
         </Typography>
       </Box>
         

@@ -195,6 +195,7 @@ const UserProfile = () => {
               position: "relative",
               overflow: "visible",
               backgroundColor: "#E9F6BC",
+              outline: "1px solid rgb(196, 196, 196)"
             }}
           >
             {/* Cover Image */}
@@ -203,6 +204,7 @@ const UserProfile = () => {
                 height: 200,
                 background: `url(${profileData.coverImage}) no-repeat center`,
                 backgroundSize: "cover",
+                boxShadow: 2
               }}
             />
 
@@ -218,24 +220,25 @@ const UserProfile = () => {
                 <Avatar
                   src={profileData.profileImage}
                   sx={{
-                    width: 120,
-                    height: 120,
+                    width: 130,
+                    height: 130,
                     border: "4px solid white",
                     position: "absolute",
                     top: -80,
                     left: 0,
+                    boxShadow: 2
                   }}
                 />
-                <Box sx={{ mt: -2, ml: 17 }}>
+                <Box sx={{ mt: -2, ml: 17.5 }}>
                   <Box
                     sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
                   >
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography variant="h4" fontWeight="bold">
                       {profileData.name}
                     </Typography>
                     <FollowButton variant="contained">Follow</FollowButton>
                   </Box>
-                  <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+                  <Box sx={{ display: "flex", gap: 2 }}>
                     <Typography variant="body2" onClick={handleFollowingPopupOpen} sx={{ cursor: "pointer" }}>
                       <strong>{profileData.following}</strong> Following
                     </Typography>
@@ -253,7 +256,7 @@ const UserProfile = () => {
                     aria-haspopup="true"
                     onClick={handleClick}
                   >
-                    <MoreVertIcon />
+                    <MoreVertIcon sx={{ fontSize: "30px" }} />
                   </IconButton>
                   <Menu
                     id="menu"
@@ -284,12 +287,12 @@ const UserProfile = () => {
 
               {/* Profile Info */}
               <Box>
-                <Typography sx={{ mt: 1, ml: 2 }}>{profileData.bio}</Typography>
+                <Typography sx={{ mt: 1.5, mx: 4 }}>{profileData.bio}</Typography>
               </Box>
             </CardContent>
             {/* User Content */}
             <Box sx={{ width: "100%", pb: 2 }}>
-              <Box sx={{ borderTop: 1, borderColor: "divider" }}>
+              <Box sx={{ borderTop: 1, borderColor: "divider", mb: 1.5 }}>
                 <Tabs
                   value={value}
                   onChange={handleChange}
@@ -303,34 +306,36 @@ const UserProfile = () => {
                   <Tab label="Recipes" {...a11yProps(2)} />
                 </Tabs>
               </Box>
-              <CustomTabPanel value={value} index={0}>
-                <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                  {randomPosts.map((post) => (
-                    <BlogMini
-                      key={post.id}
-                      content={post.content}
-                      likes={post.likes}
-                      comments={post.comments}
-                    />
-                  ))}
-                </Stack>
-              </CustomTabPanel>
-              <CustomTabPanel value={value} index={1}>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Box sx={{ px: 6 }}>
+                <CustomTabPanel value={value} index={0}>
                   <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                    <EventCompressed />
-                    <EventCompressed />
+                    {randomPosts.map((post) => (
+                      <BlogMini
+                        key={post.id}
+                        content={post.content}
+                        likes={post.likes}
+                        comments={post.comments}
+                      />
+                    ))}
                   </Stack>
-                </Box>
-              </CustomTabPanel>
-              <CustomTabPanel value={value} index={2}>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                    <RecipeMini />
-                    <RecipeMini />
-                  </Stack>
-                </Box>
-              </CustomTabPanel>
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={1}>
+                  <Box sx={{ display: "flex", justifyContent: "center" }}>
+                    <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                      <EventCompressed />
+                      <EventCompressed />
+                    </Stack>
+                  </Box>
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={2}>
+                  <Box sx={{ display: "flex", justifyContent: "center" }}>
+                    <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                      <RecipeMini />
+                      <RecipeMini />
+                    </Stack>
+                  </Box>
+                </CustomTabPanel>
+              </Box>
             </Box>
           </Card>
         </Box>
