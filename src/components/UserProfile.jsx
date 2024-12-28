@@ -201,7 +201,7 @@ const UserProfile = () => {
             {/* Cover Image */}
             <Box
               sx={{
-                height: 200,
+                height: 225,
                 background: `url(${profileData.coverImage}) no-repeat center`,
                 backgroundSize: "cover",
                 boxShadow: 2

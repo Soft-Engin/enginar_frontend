@@ -9,8 +9,22 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
 import ShareIcon from "@mui/icons-material/Share";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 export default function BlogDetailed() {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return(
     <Box sx={{ width: "100%", outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 4, pr: 4, pt: 2, pb: 1, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1.2, mb: 1.2, borderBottom: "1px solid #E0E0E0" }}>
@@ -25,7 +39,43 @@ export default function BlogDetailed() {
             </Typography>
           </Box>
         </Box>
-        <MoreHorizIcon sx={{ fontSize: '40px' }} />
+        <IconButton
+          aria-label="more"
+          id="menuButton"
+          aria-controls={open ? "menu" : undefined}
+          aria-expanded={open ? "true" : undefined}
+          aria-haspopup="true"
+          onClick={handleClick}
+        >
+          <MoreHorizIcon sx={{ fontSize: "40px" }} />
+        </IconButton>
+        <Menu
+          id="menu"
+          MenuListProps={{
+            "aria-labelledby": "menuButton",
+          }}
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={open}
+          onClose={handleClose}
+        >
+          <MenuItem key="Follow" onClick={handleClose}>
+            Follow User
+          </MenuItem>
+          <MenuItem key="Edit" onClick={handleClose}>
+            Edit Blog
+          </MenuItem>
+          <MenuItem key="Delete" onClick={handleClose}>
+            Delete Blog
+          </MenuItem>
+        </Menu>
       </Box>
       
       <Typography variant="body1" component="div" sx={{ lineHeight: "28px", mb: 2 }}>

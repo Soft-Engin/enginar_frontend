@@ -14,8 +14,22 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import LocalDiningIcon from '@mui/icons-material/LocalDining';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 export default function RecipeDetailed() {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return(
     <Box sx={{ width: "100%", outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", px: 4, pt: 2, pb: 1, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1.5, borderBottom: "1px solid #E0E0E0" }}>
@@ -30,7 +44,43 @@ export default function RecipeDetailed() {
             </Typography>
           </Box>
         </Box>
-        <MoreHorizIcon sx={{ fontSize: '40px' }} />
+        <IconButton
+          aria-label="more"
+          id="menuButton"
+          aria-controls={open ? "menu" : undefined}
+          aria-expanded={open ? "true" : undefined}
+          aria-haspopup="true"
+          onClick={handleClick}
+        >
+          <MoreHorizIcon sx={{ fontSize: "40px" }} />
+        </IconButton>
+        <Menu
+          id="menu"
+          MenuListProps={{
+            "aria-labelledby": "menuButton",
+          }}
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={open}
+          onClose={handleClose}
+        >
+          <MenuItem key="Follow" onClick={handleClose}>
+            Follow User
+          </MenuItem>
+          <MenuItem key="Edit" onClick={handleClose}>
+            Edit Recipe
+          </MenuItem>
+          <MenuItem key="Delete" onClick={handleClose}>
+            Delete Recipe
+          </MenuItem>
+        </Menu>
       </Box>
 
       <Box sx={{ mb: 2, position: "relative", overflow: "hidden", boxShadow: 2, mx: -4 }}>
