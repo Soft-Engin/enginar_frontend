@@ -1,29 +1,24 @@
-import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button, 
-  TextField, 
-  Avatar, 
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Avatar,
   Box,
-  IconButton
-} from '@mui/material';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import CloseIcon from '@mui/icons-material/Close';
+  IconButton,
+} from "@mui/material";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import CloseIcon from "@mui/icons-material/Close";
 
-const ProfileEditDialog = ({ 
-  open, 
-  onClose, 
-  profileData, 
-  onProfileUpdate 
-}) => {
+const ProfileEditDialog = ({ open, onClose, profileData, onProfileUpdate }) => {
   const [editedProfile, setEditedProfile] = useState({
     name: profileData.name,
     bio: profileData.bio,
     profileImage: profileData.profileImage,
-    coverImage: profileData.coverImage
+    coverImage: profileData.coverImage,
   });
 
   const handleChange = (prop) => (event) => {
@@ -34,9 +29,9 @@ const ProfileEditDialog = ({
     if (event.target.files && event.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setEditedProfile({ 
-          ...editedProfile, 
-          [prop]: e.target.result 
+        setEditedProfile({
+          ...editedProfile,
+          [prop]: e.target.result,
         });
       };
       reader.readAsDataURL(event.target.files[0]);
@@ -49,15 +44,15 @@ const ProfileEditDialog = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
+    <Dialog
+      open={open}
+      onClose={onClose}
       maxWidth="md"
       PaperProps={{
         sx: {
           width: { xs: 300, sm: 450, md: 580, lg: 620, xl: 620 },
           borderRadius: 4,
-          backgroundColor: "#C8EFA5", 
+          backgroundColor: "#C8EFA5",
           padding: 0.5,
         },
       }}
@@ -83,14 +78,14 @@ const ProfileEditDialog = ({
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {/* Cover Image Edit */}
-          <Box 
-            sx={{ 
-              height: 200, 
+          <Box
+            sx={{
+              height: 200,
               background: `url(${editedProfile.coverImage}) no-repeat center`,
-              backgroundSize: 'cover',
-              position: 'relative',
+              backgroundSize: "cover",
+              position: "relative",
               mb: 2,
               borderRadius: 2,
             }}
@@ -100,19 +95,19 @@ const ProfileEditDialog = ({
               accept="image/*"
               id="cover-image-upload"
               style={{ display: "none" }}
-              onChange={handleImageChange('coverImage')}
+              onChange={handleImageChange("coverImage")}
             />
             <label htmlFor="cover-image-upload">
               <Button
                 component="span"
-                sx={{ 
-                  position: 'absolute', 
-                  bottom: 10, 
+                sx={{
+                  position: "absolute",
+                  bottom: 10,
                   right: 10,
-                  backgroundColor: 'rgba(255,255,255,0.7)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.9)',
-                  }
+                  backgroundColor: "rgba(255,255,255,0.7)",
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.9)",
+                  },
                 }}
               >
                 Change Cover
@@ -121,67 +116,84 @@ const ProfileEditDialog = ({
           </Box>
 
           {/* Profile Picture Edit */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-start",
+              position: "relative",
+            }}
+          >
             <Avatar
               src={editedProfile.profileImage}
-              sx={{ width: 120, height: 120, border: '4px solid white' }}
+              sx={{
+                width: 125,
+                height: 125,
+                border: "4px solid white",
+                position: "absolute",
+                top: -100,
+                left: 18,
+                boxShadow: 2,
+              }}
             />
             <input
               type="file"
               accept="image/*"
               id="profile-image-upload"
               style={{ display: "none" }}
-              onChange={handleImageChange('profileImage')}
+              onChange={handleImageChange("profileImage")}
             />
             <label htmlFor="profile-image-upload">
               <IconButton
                 component="span"
-                sx={{ 
-                  position: 'absolute', 
-                  bottom: -10, 
-                  right: '40%',
-                  backgroundColor: 'white',
-                  '&:hover': { 
-                    backgroundColor: 'rgba(0,0,0,0.1)' 
-                  }
+                sx={{
+                  position: "absolute",
+                  bottom: -25,
+                  left: 100,
+                  backgroundColor: "white",
+                  "&:hover": {
+                    backgroundColor: "rgba(0,0,0,0.1)",
+                  },
                 }}
               >
                 <PhotoCameraIcon />
               </IconButton>
             </label>
-          </Box>
 
-          {/* Name Edit */}
-          <TextField
-            fullWidth
-            label="Name"
-            value={editedProfile.name}
-            onChange={handleChange('name')}
-            variant="outlined"
-            sx={{
-              backgroundColor: "#fff",
-              borderRadius: 2,
-            }}
-          />
+            {/* Name Edit */}
+            <TextField
+              label="Name"
+              value={editedProfile.name}
+              onChange={handleChange("name")}
+              variant="outlined"
+              sx={{
+                position: "absolute",
+                bottom: -28,
+                left: 155,
+                backgroundColor: "#fff",
+                borderRadius: 2,
+              }}
+            />
+          </Box>
 
           {/* Bio Edit */}
           <TextField
             fullWidth
             label="Bio"
             value={editedProfile.bio}
-            onChange={handleChange('bio')}
+            onChange={handleChange("bio")}
             multiline
             rows={4}
             variant="outlined"
             sx={{
               backgroundColor: "#fff",
               borderRadius: 2,
+              mt: 3,
             }}
           />
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button 
+        <Button
           onClick={onClose}
           sx={{
             color: "#4B9023",
@@ -190,8 +202,8 @@ const ProfileEditDialog = ({
         >
           Cancel
         </Button>
-        <Button 
-          onClick={handleSave} 
+        <Button
+          onClick={handleSave}
           variant="contained"
           sx={{
             backgroundColor: "#4B9023",

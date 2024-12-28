@@ -3,11 +3,12 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
+import Typography from "@mui/material/Typography";
 import DialogTitle from "@mui/material/DialogTitle";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+import AddReactionOutlinedIcon from '@mui/icons-material/AddReactionOutlined';
 import LinkIcon from "@mui/icons-material/Link";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -83,121 +84,107 @@ export default function PostPopup(props) {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box
-            display="flex"
-            alignItems="center"
-            sx={{
-              marginBottom: 2,
-            }}
-          >
+          <Box sx={{ display: 'flex' }}>
             <Box
               component="img"
               src="/pp3.jpeg" // Placeholder for profile image
               alt="Profile"
               sx={{
-                width: 40,
-                height: 40,
+                width: 50,
+                height: 50,
                 borderRadius: "50%",
                 marginRight: 2,
               }}
             />
-            <Box
-              sx={{
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-              }}
-            >
-              Shinonome Ena
+            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, pr: 3 }}>
+              <Typography variant="body1" fontWeight="bold" noWrap sx={{ mb: 1 }}>
+                Kusanagi Nene
+              </Typography>
+              <TextField
+                name="content"
+                autoFocus
+                fullWidth
+                multiline
+                rows={4}
+                placeholder="Write something..."
+                variant="outlined"
+                sx={{
+                  backgroundColor: "#fff",
+                  borderRadius: 2,
+                }}
+              />
+              {images.length > 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    marginTop: 2,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {images.map((image, index) => (
+                    <Box key={index} sx={{ position: "relative" }}>
+                      <Box
+                        component="img"
+                        src={image.preview}
+                        alt={`Preview ${index}`}
+                        sx={{
+                          width: 100,
+                          height: 100,
+                          borderRadius: 2,
+                          objectFit: "cover",
+                          border: "1px solid #ccc",
+                        }}
+                      />
+                      <IconButton
+                        onClick={() => handleRemoveImage(index)}
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          right: 0,
+                          backgroundColor: "rgba(255, 255, 255, 0.8)",
+                          "&:hover": {
+                            backgroundColor: "rgba(255, 255, 255, 1)",
+                          },
+                        }}
+                      >
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  ))}
+                </Box>
+                )}
             </Box>
           </Box>
-          <TextField
-            name="content"
-            autoFocus
-            fullWidth
-            multiline
-            rows={4}
-            placeholder="Write something..."
-            variant="outlined"
-            sx={{
-              backgroundColor: "#fff",
-              borderRadius: 2,
-            }}
-          />
-          {images.length > 0 && (
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                marginTop: 2,
-                flexWrap: "wrap",
-              }}
-            >
-              {images.map((image, index) => (
-                <Box key={index} sx={{ position: "relative" }}>
-                  <Box
-                    component="img"
-                    src={image.preview}
-                    alt={`Preview ${index}`}
-                    sx={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: 2,
-                      objectFit: "cover",
-                      border: "1px solid #ccc",
-                    }}
-                  />
-                  <IconButton
-                    onClick={() => handleRemoveImage(index)}
-                    sx={{
-                      position: "absolute",
-                      top: 0,
-                      right: 0,
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      "&:hover": {
-                        backgroundColor: "rgba(255, 255, 255, 1)",
-                      },
-                    }}
-                  >
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              ))}
+
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2, pt: 1, borderTop: "0.5px solid rgb(124, 124, 124)" }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                id="image-upload"
+                style={{ display: "none" }}
+                onChange={handleImageUpload}
+              />
+              <label htmlFor="image-upload">
+                <IconButton component="span">
+                  <AddPhotoAlternateOutlinedIcon sx={{ fontSize: '35px', color: "#417D1E" }}/>
+                </IconButton>
+              </label>
+              <IconButton>
+                <AddReactionOutlinedIcon sx={{ fontSize: '35px', color: "#417D1E" }}/>
+              </IconButton>
+              <IconButton>
+                <LinkIcon sx={{ fontSize: '35px', color: "#417D1E" }} />
+              </IconButton>
             </Box>
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            id="image-upload"
-            style={{ display: "none" }}
-            onChange={handleImageUpload}
-          />
-          <label htmlFor="image-upload">
-            <IconButton component="span">
-              <AddPhotoAlternateIcon sx={{ color: "#4caf50" }} />
-            </IconButton>
-          </label>
-          <IconButton>
-            <EmojiEmotionsIcon sx={{ color: "#fbc02d" }} />
-          </IconButton>
-          <IconButton>
-            <LinkIcon sx={{ color: "#2196f3" }} />
-          </IconButton>
-          <Button
-            variant="contained"
-            type="submit"
-            sx={{
-              backgroundColor: "#4B9023",
-              color: "#fff",
-              ":hover": {
-                backgroundColor: "#4B9023",
-              },
-              borderRadius: 20,
-              marginLeft: 46,
-            }}
-          >
-            Post
-          </Button>
+            <Button variant="contained" style={{ backgroundColor: "#4B9023", borderRadius: 30, width: "90px", height: "40px", textTransform: "none" }}>
+              <Typography variant="h6">
+                Post
+              </Typography>
+            </Button>
+          </Box>
         </DialogContent>
       </form>
     </Dialog>

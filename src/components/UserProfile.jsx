@@ -220,16 +220,16 @@ const UserProfile = () => {
                 <Avatar
                   src={profileData.profileImage}
                   sx={{
-                    width: 130,
-                    height: 130,
+                    width: 150,
+                    height: 150,
                     border: "4px solid white",
                     position: "absolute",
-                    top: -80,
+                    top: -90,
                     left: 0,
                     boxShadow: 2
                   }}
                 />
-                <Box sx={{ mt: -2, ml: 17.5 }}>
+                <Box sx={{ mt: -2, ml: 20 }}>
                   <Box
                     sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
                   >
@@ -287,7 +287,7 @@ const UserProfile = () => {
 
               {/* Profile Info */}
               <Box>
-                <Typography sx={{ mt: 1.5, mx: 4 }}>{profileData.bio}</Typography>
+                <Typography sx={{ mt: 2, mx: 4 }}>{profileData.bio}</Typography>
               </Box>
             </CardContent>
             {/* User Content */}
