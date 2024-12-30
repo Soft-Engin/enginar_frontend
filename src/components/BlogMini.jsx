@@ -317,14 +317,20 @@ export default function BlogMini({ blog }) {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton onClick={handleLikeToggle} style={{ padding: 0 }}>
+            <IconButton 
+              onClick={handleLikeToggle} 
+              style={{ padding: 0 }}
+              data-testid="like-button"
+            >
               {isLiked ? (
                 <FavoriteIcon
                   style={{ fontSize: "30px", marginRight: 4, color: "red" }}
+                  data-testid="liked-icon"
                 />
               ) : (
                 <FavoriteBorderIcon
                   style={{ fontSize: "30px", marginRight: 4 }}
+                  data-testid="not-liked-icon"
                 />
               )}
             </IconButton>
@@ -346,11 +352,21 @@ export default function BlogMini({ blog }) {
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <ShareIcon style={{ fontSize: "28px", marginRight: 6 }} />
-          <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+          <IconButton 
+            onClick={handleBookmarkToggle} 
+            style={{ padding: 0 }}
+            data-testid="bookmark-button"
+          >
             {isBookmarked ? (
-              <BookmarkIcon style={{ fontSize: "32px" }} />
+              <BookmarkIcon 
+                style={{ fontSize: "32px" }}
+                data-testid="bookmarked-icon"
+              />
             ) : (
-              <BookmarkBorderOutlinedIcon style={{ fontSize: "32px" }} />
+              <BookmarkBorderOutlinedIcon 
+                style={{ fontSize: "32px" }}
+                data-testid="not-bookmarked-icon"
+              />
             )}
           </IconButton>
         </Box>
