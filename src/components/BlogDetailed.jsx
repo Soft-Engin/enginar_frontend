@@ -1,3 +1,15 @@
+import * as React from "react";
+import {
+  Box,
+  Typography,
+  Avatar,
+  CircularProgress,
+  IconButton,
+} from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import ShareIcon from "@mui/icons-material/Share";
@@ -6,6 +18,7 @@ import { styled } from "@mui/material/styles";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 
 import { useNavigate, Link } from "react-router-dom";
+
 const StyledCardMedia = styled("img")({
   width: "100%",
   objectFit: "cover",
@@ -14,6 +27,7 @@ const StyledCardMedia = styled("img")({
   borderRadius: 10,
   border: "1px solid #C0C0C0",
 });
+
 export default function BlogDetailed({ blogId }) {
   const navigate = useNavigate();
   const [blogData, setBlogData] = React.useState(null);
@@ -33,6 +47,7 @@ export default function BlogDetailed({ blogId }) {
   const [isBookmarked, setIsBookmarked] = React.useState(false);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
+
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
       // Do nothing, don't set an error for 404. The image won't render, which is fine.
@@ -41,6 +56,7 @@ export default function BlogDetailed({ blogId }) {
       setErrorState(error.message || "An unexpected error occurred.");
     }
   };
+
   React.useEffect(() => {
     const fetchBlog = async () => {
       setLoading(true);
@@ -196,6 +212,7 @@ export default function BlogDetailed({ blogId }) {
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     }
   };
+
   if (loading) {
     return (
       <Box
@@ -208,6 +225,7 @@ export default function BlogDetailed({ blogId }) {
       </Box>
     );
   }
+
   if (error) {
     return (
       <Box
@@ -220,6 +238,7 @@ export default function BlogDetailed({ blogId }) {
       </Box>
     );
   }
+
   if (!blogData) {
     return <Typography>No blog data available.</Typography>;
   }
@@ -227,6 +246,7 @@ export default function BlogDetailed({ blogId }) {
     blogData.createdAt && format(parseISO(blogData.createdAt), "h:mm a");
   const formattedDate =
     blogData.createdAt && format(parseISO(blogData.createdAt), "MMM d, yyyy");
+
   return (
     <Box
       sx={{
