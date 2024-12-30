@@ -47,13 +47,14 @@ export default function ContentFeed() {
 
 
   return (
-    <Box>
+    <Box sx={{ width: { xs: "40%", sm: "60%", md: "75%", lg: "75%", xl: "85%" }, margin: "0 auto" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
         <Tabs
           centered
           value={value}
           onChange={handleChange}
           aria-label="Feed Tabs"
+          variant="fullWidth"
           sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
         >
           <Tab

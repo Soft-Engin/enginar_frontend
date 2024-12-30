@@ -21,7 +21,6 @@ import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import axios from "axios";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { styled } from "@mui/material/styles";
-
 import { useNavigate, Link } from "react-router-dom";
 
 const StyledCardMedia = styled("img")({
@@ -296,27 +295,8 @@ export default function RecipeDetailed({ recipeId }) {
   }
 
   return (
-    <Box
-      sx={{
-        maxWidth: 1500,
-        outline: "1.5px solid #C0C0C0",
-        backgroundColor: "#FFFFFF",
-        px: 4,
-        pt: 2,
-        pb: 1,
-        borderRadius: "20px 20px 0 0",
-        boxShadow: 3,
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          pb: 1.5,
-          borderBottom: "1px solid #E0E0E0",
-        }}
-      >
+    <Box sx={{ width: "100%", outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", px: 4, pt: 2, pb: 1, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1.5, borderBottom: "1px solid #E0E0E0" }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Link
             to={`/profile?id=${recipe.userId}`}

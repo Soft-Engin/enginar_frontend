@@ -1,6 +1,7 @@
 import "./App.css";
 import Navbar from "./components/Navbar";
 import BlogPage from "./components/BlogPage";
+import RecipePage from "./components/RecipePage";
 import EventPage from "./components/EventPage";
 import EventHub from "./components/EventHub";
 import ContentFeed from "./components/ContentFeed";

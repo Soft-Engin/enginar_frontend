@@ -44,29 +44,8 @@ export default function FollowingListPopup(props) {
   }
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth={"md"}
-      PaperProps={{
-        sx: {
-          width: 500,
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          px: 3,
-          py: 2,
-        },
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: "1px solid rgb(165, 165, 165)",
-          mb: 2,
-        }}
-      >
+    <Dialog open={props.open} onClose={handleClose} maxWidth={"md"} PaperProps={{ sx: { width: { xs: 400, sm: 400, md: 450, lg: 500, xl: 500 }, borderRadius: 4, backgroundColor: "#C8EFA5", px: 3, py: 2 } }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgb(165, 165, 165)", mb: 2 }}>
         <Typography variant="h6" fontWeight="bold">
           Following ({totalCount})
         </Typography>

@@ -361,7 +361,7 @@ const CreateRecipe = () => {
   }
 
   return (
-    <Box sx={{ p: 3, width: "90vmax", overflow: "hidden" }}>
+    <Box sx={{ p: 4, width: "90vmax", overflow: "hidden" }}>
       <Snackbar
         open={creationSuccess}
         autoHideDuration={6000}

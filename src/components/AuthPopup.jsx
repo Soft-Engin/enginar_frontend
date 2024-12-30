@@ -158,7 +158,7 @@ export default function AuthPopup(props) {
         onClose={handleClose}
         maxWidth={"xs"}
         PaperProps={{
-          sx: { borderRadius: "16px", backgroundColor: "#C8EFA5" },
+          sx: { width: { xs: 300, sm: 400, md: 600, lg: 600, xl: 650 }, borderRadius: "16px", backgroundColor: "#C8EFA5" },
           component: "form",
           onSubmit: handleSubmit,
         }}

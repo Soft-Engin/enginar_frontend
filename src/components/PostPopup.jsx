@@ -77,7 +77,7 @@ export default function PostPopup(props) {
       maxWidth={"md"}
       PaperProps={{
         sx: {
-          width: 620,
+          width: { xs: 250, sm: 400, md: 550, lg: 600, xl: 620 },
           borderRadius: 4,
           backgroundColor: "#C8EFA5",
           padding: 0.5,

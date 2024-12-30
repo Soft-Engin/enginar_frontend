@@ -265,7 +265,7 @@ export default function EventHub() {
   }, [handleScroll]); // Depend only on handleScroll
 
   return (
-    <Grid container spacing={4} sx={{ pt: 3, pb: 5, pl: 20, pr: 20 }}>
+    <Grid container rowSpacing={4} columnSpacing={2.5} sx={{ pt: 3, pb: 5, pl: 12, pr: 12 }} justifyContent="center" alignItems="center">
       <LoadingErrorDisplay
         loading={loading}
         error={error}
@@ -367,14 +367,7 @@ export default function EventHub() {
       </Grid>
 
       {events.map((event, index) => (
-        <Grid
-          item
-          size={6}
-          key={index}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
+        <Grid item xs={12} sm={12} md={12} lg={6} xl={6} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: { xs: 500, sm: 500, md: 600, lg: 490, xl: 630 } }}>
           <EventMini event={event} />
         </Grid>
       ))}

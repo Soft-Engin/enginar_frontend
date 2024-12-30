@@ -351,18 +351,11 @@ const UserProfile = () => {
         onProfileUpdate={handleUpdateProfile}
       />
 
-      {/* Profile Column */}
-      <Box>
-        <Card
-          sx={{
-            position: "relative",
-            overflow: "visible",
-            backgroundColor: "#E9F6BC",
-          }}
-        >
-          {/* Cover Image */}
-          <Box
+        {/* Profile Column */}
+        <Box>
+          <Card
             sx={{
+
               height: 200,
               background: `url(${
                 bannerPic || bannerPlaceholder
@@ -370,15 +363,13 @@ const UserProfile = () => {
               bgcolor: "#bbbbbb",
               backgroundSize: "cover",
             }}
-          />
-
-          {/* Profile Header */}
-          <CardContent>
+          >
+            {/* Cover Image */}
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "flex-start",
-                position: "relative",
+                height: 200,
+                background: `url(${profileData.coverImage}) no-repeat center`,
+                backgroundSize: "cover",
               }}
             >
               <Avatar

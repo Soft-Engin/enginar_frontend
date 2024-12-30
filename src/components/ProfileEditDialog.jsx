@@ -136,7 +136,7 @@ const ProfileEditDialog = ({
       maxWidth="md"
       PaperProps={{
         sx: {
-          width: 620,
+          width: { xs: 300, sm: 450, md: 580, lg: 620, xl: 620 },
           borderRadius: 4,
           backgroundColor: "#C8EFA5",
           padding: 0.5,

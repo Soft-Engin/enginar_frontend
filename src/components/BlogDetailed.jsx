@@ -307,7 +307,6 @@ export default function BlogDetailed({ blogId }) {
         </Box>
         <MoreHorizIcon sx={{ fontSize: "40px" }} />
       </Box>
-
       <Typography
         variant="body1"
         component="div"
