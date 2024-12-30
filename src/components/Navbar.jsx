@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
@@ -41,7 +41,8 @@ import SearchBar from "./SearchBar";
 import PostPopup from "./PostPopup";
 import EventPopup from "./EventPopup";
 
-import { useNavigate , Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const drawerWidth = 300;
 const drawerIconStyle = {
@@ -143,7 +144,7 @@ const RightSection = styled(Box)({
   alignItems: "center",
 });
 
-const navbarTitlesIcons = [
+const navbarTitlesIconsBase = [
   {
     text: (
       <Typography sx={{ fontWeight: "500", fontSize: "20px" }}>Home</Typography>
@@ -167,7 +168,7 @@ const navbarTitlesIcons = [
       </Typography>
     ),
     icon: <CasinoOutlinedIcon sx={drawerIconStyle} />,
-    link: "/profile",
+    action: () => {},
   },
   {
     text: (
@@ -178,6 +179,9 @@ const navbarTitlesIcons = [
     icon: <PeopleAltOutlinedIcon sx={drawerIconStyle} />,
     link: "/eventhub",
   },
+];
+
+const navbarTitlesIconsAuth = [
   {
     text: (
       <Typography sx={{ fontWeight: "500", fontSize: "20px" }}>
@@ -198,6 +202,12 @@ const navbarTitlesIcons = [
   },
 ];
 
+// Set axios base url and authorization header
+axios.defaults.baseURL = "http://localhost:8090";
+axios.defaults.headers.common["Authorization"] = localStorage.getItem("token")
+  ? `Bearer ${localStorage.getItem("token")}`
+  : "";
+
 export default function Navbar(props) {
   const navigate = useNavigate();
 
@@ -211,7 +221,16 @@ export default function Navbar(props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [speedDialOpen, setSpeedDialOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const [profilePic, setProfilePic] = useState(null);
+  const [user, setUser] = useState(
+    localStorage.getItem("userData")
+      ? JSON.parse(localStorage.getItem("userData"))
+      : null
+  );
 
+  const [navbarTitlesIcons, setNavbarTitlesIcons] = useState(
+    navbarTitlesIconsBase
+  );
   const drawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
@@ -226,6 +245,70 @@ export default function Navbar(props) {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  // Function to handle logout
+  const handleLogout = () => {
+    localStorage.setItem("userLogged", false);
+    setUserLogged(false);
+    localStorage.removeItem("userData");
+    setUser(null);
+    navigate("/");
+    setProfilePic(null);
+  };
+
+  useEffect(() => {
+    setNavbarTitlesIcons(
+      userLogged
+        ? [...navbarTitlesIconsBase, ...navbarTitlesIconsAuth]
+        : navbarTitlesIconsBase
+    );
+  }, [userLogged]);
+  // Function to fetch user data and profile pic
+  const fetchUserData = async () => {
+    if (userLogged) {
+      try {
+        const userResponse = await axios.get("/api/v1/users/me");
+        if (userResponse.status === 200) {
+          localStorage.setItem("userData", JSON.stringify(userResponse.data));
+          setUser(userResponse.data);
+          try {
+            const picResponse = await axios.get(
+              `/api/v1/users/${userResponse.data.userId}/profile-picture`,
+              { responseType: "blob" }
+            );
+            if (picResponse.status === 200) {
+              const imageUrl = URL.createObjectURL(picResponse.data);
+              setProfilePic(imageUrl);
+            } else {
+              setProfilePic(null);
+            }
+          } catch (picError) {
+            setProfilePic(null);
+            console.error("Error fetching profile picture:", picError);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        handleLogout();
+      }
+    } else {
+      localStorage.removeItem("userData");
+      setUser(null);
+      setProfilePic(null);
+    }
+  };
+
+  // Check session on page load
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array means this runs only once on mount
+
+  // Fetch user data and profile picture whenever the user logs in
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userLogged]);
 
   const [postPopupOpen, setPostPopupOpen] = React.useState(false);
   const [eventPopupOpen, setEventPopupOpen] = React.useState(false);
@@ -250,12 +333,31 @@ export default function Navbar(props) {
     setSpeedDialOpen(false);
   };
 
+  const handleFeelinHungry = async () => {
+    const randomSeed = Math.floor(Math.random() * 1000); // Generate a random seed
+    try {
+      const response = await axios.get(
+        `/api/v1/feed/recipe?pageSize=1&seed=${randomSeed}`
+      );
+      if (response.status === 200 && response.data.items.length > 0) {
+        const recipeId = response.data.items[0].id;
+        navigate(`/recipe?id=${recipeId}`);
+      }
+    } catch (error) {
+      console.error("Error fetching random recipe", error);
+    }
+  };
+
   const userActions = [
     {
       text: "Profile",
       icon: <AccountCircleIcon />,
-      action: handleCloseUserMenu,
-      link: "/profile",
+      action: () => {
+        handleCloseUserMenu();
+        if (user?.userId) {
+          navigate(`/profile?id=${user.userId}`);
+        }
+      },
     },
     {
       text: "Settings",
@@ -266,11 +368,7 @@ export default function Navbar(props) {
     {
       text: "Logout",
       icon: <LogoutIcon />,
-      action: () => {
-        localStorage.setItem("userLogged", false);
-        setUserLogged(false);
-        navigate("/");
-      },
+      action: handleLogout,
     },
   ];
 
@@ -297,7 +395,9 @@ export default function Navbar(props) {
                 sx={{
                   fontFamily: "'Jersey 25', sans-serif",
                   fontSize: "2.3rem",
+                  cursor: "pointer",
                 }}
+                onClick={() => navigate("/")}
               >
                 ENGINAR
               </Typography>
@@ -312,8 +412,12 @@ export default function Navbar(props) {
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu}>
                     <Avatar
-                      alt="Remy Sharp"
-                      src="/static/images/avatar/2.jpg"
+                      alt={
+                        user?.firstName
+                          ? `${user.firstName} ${user.lastName}`
+                          : "User"
+                      }
+                      src={profilePic || "/static/images/avatar/2.jpg"}
                     />
                   </IconButton>
                 </Tooltip>
@@ -333,44 +437,22 @@ export default function Navbar(props) {
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
                 >
-                  {userActions.map((action) =>
-                    action.link ? (
-                      <Link
-                        key={action.text}
-                        to={action.link}
-                        style={{ textDecoration: "none", color: "black" }}
-                      >
-                        <MenuItem
-                          onClick={action.action}
-                          style={{
-                            width: "140px",
-                            display: "flex",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <Typography sx={{ textAlign: "left" }}>
-                            {action.text}
-                          </Typography>
-                          {action.icon}
-                        </MenuItem>
-                      </Link>
-                    ) : (
-                      <MenuItem
-                        key={action.text}
-                        onClick={action.action}
-                        style={{
-                          width: "140px",
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography sx={{ textAlign: "left" }}>
-                          {action.text}
-                        </Typography>
-                        {action.icon}
-                      </MenuItem>
-                    )
-                  )}
+                  {userActions.map((action) => (
+                    <MenuItem
+                      key={action.text}
+                      onClick={action.action}
+                      style={{
+                        width: "140px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography sx={{ textAlign: "left" }}>
+                        {action.text}
+                      </Typography>
+                      {action.icon}
+                    </MenuItem>
+                  ))}
                 </Menu>
               </>
             ) : (
@@ -401,6 +483,11 @@ export default function Navbar(props) {
             >
               <ListItemButton
                 to={item.link}
+                onClick={
+                  item.text.props?.children === "Feelin' Hungry"
+                    ? handleFeelinHungry
+                    : undefined
+                }
                 sx={[
                   {
                     minHeight: 48,
@@ -502,7 +589,7 @@ export default function Navbar(props) {
           icon={<RestaurantMenuIcon />}
           tooltipTitle={"Tarif"}
           tooltipOpen
-          onClick={handleSpeedDialClose}
+          onClick={() => navigate("/createRecipe")}
           tooltipPlacement={isSmUp ? "right" : "left"}
         />
       </ActionSpeedDial>
