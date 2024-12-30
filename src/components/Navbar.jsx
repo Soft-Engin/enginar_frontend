@@ -1,3 +1,4 @@
+// Navbar.jsx
 import React, { useState, useEffect } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -73,7 +74,6 @@ const closedMixin = (theme) => ({
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -202,7 +202,6 @@ const navbarTitlesIconsAuth = [
   },
 ];
 
-// Set axios base url and authorization header
 axios.defaults.baseURL = "http://localhost:8090";
 axios.defaults.headers.common["Authorization"] = localStorage.getItem("token")
   ? `Bearer ${localStorage.getItem("token")}`
@@ -241,12 +240,10 @@ export default function Navbar(props) {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
-  // Function to handle logout
   const handleLogout = () => {
     localStorage.setItem("userLogged", false);
     setUserLogged(false);
@@ -263,7 +260,7 @@ export default function Navbar(props) {
         : navbarTitlesIconsBase
     );
   }, [userLogged]);
-  // Function to fetch user data and profile pic
+
   const fetchUserData = async () => {
     if (userLogged) {
       try {
@@ -298,13 +295,11 @@ export default function Navbar(props) {
     }
   };
 
-  // Check session on page load
   useEffect(() => {
     fetchUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array means this runs only once on mount
+  }, []);
 
-  // Fetch user data and profile picture whenever the user logs in
   useEffect(() => {
     fetchUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -317,24 +312,21 @@ export default function Navbar(props) {
     setEventPopupOpen(true);
     setSpeedDialOpen(false);
   };
-
   const handleEventPopupClose = () => {
     setEventPopupOpen(false);
     setSpeedDialOpen(false);
   };
-
   const handlePostPopupOpen = () => {
     setPostPopupOpen(true);
     setSpeedDialOpen(false);
   };
-
   const handlePostPopupClose = () => {
     setPostPopupOpen(false);
     setSpeedDialOpen(false);
   };
 
   const handleFeelinHungry = async () => {
-    const randomSeed = Math.floor(Math.random() * 1000); // Generate a random seed
+    const randomSeed = Math.floor(Math.random() * 1000);
     try {
       const response = await axios.get(
         `/api/v1/feed/recipe?pageSize=1&seed=${randomSeed}`
@@ -373,12 +365,13 @@ export default function Navbar(props) {
   ];
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex" }} data-testid="navbar-container">
       <CssBaseline />
-      <AppBar position="fixed" open={drawerOpen}>
-        <StyledToolbar>
+      <AppBar position="fixed" open={drawerOpen} data-testid="navbar-appbar">
+        <StyledToolbar data-testid="navbar-toolbar">
           <LeftSection>
             <IconButton
+              data-testid="navbar-drawer-button"
               color="inherit"
               aria-label="open drawer"
               onClick={drawerToggle}
@@ -404,13 +397,16 @@ export default function Navbar(props) {
             )}
           </LeftSection>
 
-          <SearchBar />
+          <SearchBar data-testid="navbar-search" />
 
-          <RightSection>
+          <RightSection data-testid="navbar-right-section">
             {userLogged ? (
               <>
                 <Tooltip title="Open settings">
-                  <IconButton onClick={handleOpenUserMenu}>
+                  <IconButton
+                    data-testid="user-avatar-button"
+                    onClick={handleOpenUserMenu}
+                  >
                     <Avatar
                       alt={
                         user?.firstName
@@ -422,6 +418,7 @@ export default function Navbar(props) {
                   </IconButton>
                 </Tooltip>
                 <Menu
+                  data-testid="user-menu"
                   sx={{ mt: "45px" }}
                   id="menu-appbar"
                   anchorEl={anchorElUser}
@@ -457,6 +454,7 @@ export default function Navbar(props) {
               </>
             ) : (
               <AuthPopup
+                data-testid="auth-popup"
                 setUserLogged={setUserLogged}
                 setAnchorElUser={setAnchorElUser}
               />
@@ -465,6 +463,7 @@ export default function Navbar(props) {
         </StyledToolbar>
       </AppBar>
       <Drawer
+        data-testid="navbar-drawer"
         variant="permanent"
         open={drawerOpen}
         PaperProps={{
@@ -476,11 +475,7 @@ export default function Navbar(props) {
         <DrawerHeader />
         <List sx={{ marginTop: "6px" }}>
           {navbarTitlesIcons.map((item) => (
-            <ListItem
-              key={item.text}
-              disablePadding
-              sx={{ display: "block", position: "relative" }}
-            >
+            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 to={item.link}
                 onClick={
@@ -547,12 +542,14 @@ export default function Navbar(props) {
           flexDirection: "column",
           alignItems: "center",
         }}
+        data-testid="navbar-main"
       >
         <DrawerHeader />
         {props.body}
       </Box>
       <ActionSpeedDial
-        ariaLabel="SpeedDial tooltip example"
+        data-testid="navbar-speed-dial"
+        ariaLabel="SpeedDial actions"
         icon={<SpeedDialIcon />}
         onClose={handleSpeedDialClose}
         onOpen={handleSpeedDialOpen}
