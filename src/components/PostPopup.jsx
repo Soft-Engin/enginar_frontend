@@ -70,10 +70,10 @@ export default function PostPopup(props) {
             alignItems: "center",
             fontWeight: "bold",
             color: "#333",
-            fontSize: "1.25rem",
+            fontSize: "1.5rem",
           }}
         >
-          Create New Post
+          Create New Blog
           <IconButton
             onClick={handleClose}
             sx={{
@@ -96,7 +96,7 @@ export default function PostPopup(props) {
                 marginRight: 2,
               }}
             />
-            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, pr: 3 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, pr: 3, mb: 1 }}>
               <Typography variant="body1" fontWeight="bold" noWrap sx={{ mb: 1 }}>
                 Kusanagi Nene
               </Typography>

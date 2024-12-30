@@ -56,10 +56,10 @@ export default function EventPopup(props) {
             alignItems: "center",
             fontWeight: "bold",
             color: "#333",
-            fontSize: "1.25rem",
+            fontSize: "1.5rem",
           }}
         >
-          Create Event
+          Create New Event
           <IconButton
             onClick={handleClose}
             sx={{
@@ -81,6 +81,7 @@ export default function EventPopup(props) {
               marginBottom: 2,
               backgroundColor: "#fff",
               borderRadius: 2,
+              mt: 1
             }}
           />
           <Box

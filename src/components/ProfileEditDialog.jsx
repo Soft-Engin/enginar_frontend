@@ -64,7 +64,7 @@ const ProfileEditDialog = ({ open, onClose, profileData, onProfileUpdate }) => {
           alignItems: "center",
           fontWeight: "bold",
           color: "#333",
-          fontSize: "1.25rem",
+          fontSize: "1.5rem",
         }}
       >
         Edit Profile
