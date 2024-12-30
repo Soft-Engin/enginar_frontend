@@ -20,9 +20,9 @@ import {
 import BannerImg from "../assets/bg2.jpeg";
 import RecipeMini from "./RecipeMini";
 import BlogMini from "./BlogMini";
-import ProfileEditDialog from "./ProfileEditDialog"; 
+import ProfileEditDialog from "./ProfileEditDialog";
 import EventCompressed from "./EventCompressed";
-import FollowersListPopup from "./FollowersListPopup"
+import FollowersListPopup from "./FollowersListPopup";
 import FollowingListPopup from "./FollowingListPopup";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
@@ -44,7 +44,7 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   },
   textTransform: "none",
   fontWeight: "bold",
-  variant: "subtitle1"
+  variant: "subtitle1",
 }));
 
 function CustomTabPanel(props) {
@@ -141,16 +141,16 @@ const UserProfile = () => {
   };
 
   const handleUpdateProfile = (updatedProfile) => {
-    setProfileData(prevData => ({
+    setProfileData((prevData) => ({
       ...updatedProfile,
       following: prevData.following,
-      followers: prevData.followers
+      followers: prevData.followers,
     }));
   };
 
   const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
   const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
-    
+
   const handleFollowingPopupOpen = () => {
     setFollowingPopupOpen(true);
   };
@@ -175,9 +175,9 @@ const UserProfile = () => {
           flexDirection: "column",
           scale: { xs: "70%", sm: "70%", md: "80%", lg: "84%", xl: "100%" },
           transformOrigin: "top",
-          width: { lg: "90%", xl: "100%" }, 
+          width: { lg: "90%", xl: "100%" },
           margin: "0 auto",
-          maxWidth: "730px"
+          maxWidth: "730px",
         }}
       >
         {/* Profile Edit Dialog */}
@@ -195,7 +195,7 @@ const UserProfile = () => {
               position: "relative",
               overflow: "visible",
               backgroundColor: "#E9F6BC",
-              outline: "1px solid rgb(196, 196, 196)"
+              outline: "1px solid rgb(196, 196, 196)",
             }}
           >
             {/* Cover Image */}
@@ -204,7 +204,7 @@ const UserProfile = () => {
                 height: 225,
                 background: `url(${profileData.coverImage}) no-repeat center`,
                 backgroundSize: "cover",
-                boxShadow: 2
+                boxShadow: 2,
               }}
             />
 
@@ -226,23 +226,43 @@ const UserProfile = () => {
                     position: "absolute",
                     top: -90,
                     left: 0,
-                    boxShadow: 2
+                    boxShadow: 2,
                   }}
                 />
                 <Box sx={{ mt: -2, ml: 20 }}>
                   <Box
-                    sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      mt: 1,
+                      alignItems: "center",
+                    }}
                   >
                     <Typography variant="h4" fontWeight="bold">
                       {profileData.name}
                     </Typography>
                     <FollowButton variant="contained">Follow</FollowButton>
                   </Box>
+                  <Typography
+                    variant="body1"
+                    color="textSecondary"
+                    sx={{ mt: -0.5, mb: 0.5 }}
+                  >
+                    @icchan_leoni
+                  </Typography>
                   <Box sx={{ display: "flex", gap: 2 }}>
-                    <Typography variant="body2" onClick={handleFollowingPopupOpen} sx={{ cursor: "pointer" }}>
+                    <Typography
+                      variant="body2"
+                      onClick={handleFollowingPopupOpen}
+                      sx={{ cursor: "pointer" }}
+                    >
                       <strong>{profileData.following}</strong> Following
                     </Typography>
-                    <Typography variant="body2" onClick={handleFollowersPopupOpen} sx={{ cursor: "pointer" }}>
+                    <Typography
+                      variant="body2"
+                      onClick={handleFollowersPopupOpen}
+                      sx={{ cursor: "pointer" }}
+                    >
                       <strong>{profileData.followers}</strong> Followers
                     </Typography>
                   </Box>
@@ -321,7 +341,11 @@ const UserProfile = () => {
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
                   <Box sx={{ display: "flex", justifyContent: "center" }}>
-                    <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                    <Stack
+                      spacing={2}
+                      direction={"column"}
+                      alignItems={"center"}
+                    >
                       <EventCompressed />
                       <EventCompressed />
                     </Stack>
@@ -329,7 +353,11 @@ const UserProfile = () => {
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={2}>
                   <Box sx={{ display: "flex", justifyContent: "center" }}>
-                    <Stack spacing={2} direction={"column"} alignItems={"center"}>
+                    <Stack
+                      spacing={2}
+                      direction={"column"}
+                      alignItems={"center"}
+                    >
                       <RecipeMini />
                       <RecipeMini />
                     </Stack>
@@ -340,8 +368,14 @@ const UserProfile = () => {
           </Card>
         </Box>
       </Box>
-      <FollowersListPopup open={followersPopupOpen} handleClose={handleFollowersPopupClose} />
-      <FollowingListPopup open={followingPopupOpen} handleClose={handleFollowingPopupClose} />
+      <FollowersListPopup
+        open={followersPopupOpen}
+        handleClose={handleFollowersPopupClose}
+      />
+      <FollowingListPopup
+        open={followingPopupOpen}
+        handleClose={handleFollowingPopupClose}
+      />
       <RecommendedUsers />
       <UpcomingEvents />
     </Box>

@@ -7,8 +7,8 @@ import Typography from "@mui/material/Typography";
 import DialogTitle from "@mui/material/DialogTitle";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
-import AddReactionOutlinedIcon from '@mui/icons-material/AddReactionOutlined';
+import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
+import AddReactionOutlinedIcon from "@mui/icons-material/AddReactionOutlined";
 import LinkIcon from "@mui/icons-material/Link";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -84,7 +84,7 @@ export default function PostPopup(props) {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex' }}>
+          <Box sx={{ display: "flex" }}>
             <Box
               component="img"
               src="/pp3.jpeg" // Placeholder for profile image
@@ -96,8 +96,21 @@ export default function PostPopup(props) {
                 marginRight: 2,
               }}
             />
-            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, pr: 3, mb: 1 }}>
-              <Typography variant="body1" fontWeight="bold" noWrap sx={{ mb: 1 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                pr: 3,
+                mb: 1,
+              }}
+            >
+              <Typography
+                variant="body1"
+                fontWeight="bold"
+                noWrap
+                sx={{ mb: 1 }}
+              >
                 Kusanagi Nene
               </Typography>
               <TextField
@@ -153,11 +166,20 @@ export default function PostPopup(props) {
                     </Box>
                   ))}
                 </Box>
-                )}
+              )}
             </Box>
           </Box>
 
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2, pt: 1, borderTop: "0.5px solid rgb(124, 124, 124)" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mt: 2,
+              pt: 1,
+              borderTop: "0.5px solid rgb(124, 124, 124)",
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <input
                 type="file"
@@ -169,20 +191,31 @@ export default function PostPopup(props) {
               />
               <label htmlFor="image-upload">
                 <IconButton component="span">
-                  <AddPhotoAlternateOutlinedIcon sx={{ fontSize: '35px', color: "#417D1E" }}/>
+                  <AddPhotoAlternateOutlinedIcon
+                    sx={{ fontSize: "35px", color: "#417D1E" }}
+                  />
                 </IconButton>
               </label>
               <IconButton>
-                <AddReactionOutlinedIcon sx={{ fontSize: '35px', color: "#417D1E" }}/>
+                <AddReactionOutlinedIcon
+                  sx={{ fontSize: "35px", color: "#417D1E" }}
+                />
               </IconButton>
               <IconButton>
-                <LinkIcon sx={{ fontSize: '35px', color: "#417D1E" }} />
+                <LinkIcon sx={{ fontSize: "35px", color: "#417D1E" }} />
               </IconButton>
             </Box>
-            <Button variant="contained" style={{ backgroundColor: "#4B9023", borderRadius: 30, width: "90px", height: "40px", textTransform: "none" }}>
-              <Typography variant="h6">
-                Post
-              </Typography>
+            <Button
+              variant="contained"
+              style={{
+                backgroundColor: "#4B9023",
+                borderRadius: 30,
+                width: "90px",
+                height: "40px",
+                textTransform: "none",
+              }}
+            >
+              <Typography variant="h6">Post</Typography>
             </Button>
           </Box>
         </DialogContent>

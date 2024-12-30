@@ -22,7 +22,7 @@ const SharedButton = styled(Button)(({ theme }) => ({
   height: "30px",
   minWidth: "110px",
   borderRadius: 5,
-  textTransform: "none"
+  textTransform: "none",
 }));
 
 const SignupButton = styled(SharedButton)(({ theme }) => ({
@@ -52,7 +52,7 @@ const SubmitButton = styled(Button)(({ theme }) => ({
   borderRadius: "25px",
   fontSize: "20px",
   fontWeight: "bold",
-  textTransform: "none"
+  textTransform: "none",
 }));
 
 export default function AuthPopup(props) {
@@ -104,7 +104,11 @@ export default function AuthPopup(props) {
         onClose={handleClose}
         maxWidth={"xs"}
         PaperProps={{
-          sx: { width: { xs: 300, sm: 400, md: 600, lg: 600, xl: 650 }, borderRadius: "16px", backgroundColor: "#C8EFA5" },
+          sx: {
+            width: { xs: 300, sm: 400, md: 600, lg: 600, xl: 650 },
+            borderRadius: "16px",
+            backgroundColor: "#C8EFA5",
+          },
           component: "form",
           onSubmit: handleSubmit,
         }}
@@ -115,6 +119,44 @@ export default function AuthPopup(props) {
         <DialogContent>
           {isSignup ? (
             <>
+              <Stack direction="row" spacing={2} sx={{ marginBottom: "4px" }}>
+                <TextField
+                  required
+                  margin="dense"
+                  id="firstName"
+                  name="firstName"
+                  placeholder="First Name"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <PersonIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  required
+                  margin="dense"
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Last Name"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <PersonIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Stack>
               <TextField
                 required
                 margin="dense"

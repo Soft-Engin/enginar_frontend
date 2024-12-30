@@ -6,15 +6,15 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 import CloseIcon from "@mui/icons-material/Close";
 
 export default function EventPopup(props) {
-  const [location, setLocation] = React.useState('');
+  const [location, setLocation] = React.useState("");
 
   const handleClose = () => {
     props.handleClose();
@@ -81,7 +81,7 @@ export default function EventPopup(props) {
               marginBottom: 2,
               backgroundColor: "#fff",
               borderRadius: 2,
-              mt: 1
+              mt: 1,
             }}
           />
           <Box
@@ -105,8 +105,10 @@ export default function EventPopup(props) {
               }}
             />
           </Box>
-          <FormControl fullWidth sx={{marginBottom: 2}}>
-            <InputLabel id="demo-simple-select-autowidth-label">Location </InputLabel>
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel id="demo-simple-select-autowidth-label">
+              Location{" "}
+            </InputLabel>
             <Select
               labelId="demo-simple-select-autowidth-label"
               id="demo-simple-select-autowidth"

@@ -177,11 +177,10 @@ const RecipeCreator = () => {
     }
   };
 
-   // Handle banner image removal
-    const handleRemoveBannerImage = () => {
-        setBannerImage("");
-    }
-
+  // Handle banner image removal
+  const handleRemoveBannerImage = () => {
+    setBannerImage("");
+  };
 
   // Handle image upload
   const handleImageUpload = (index, event) => {
@@ -318,7 +317,9 @@ const RecipeCreator = () => {
             <Divider variant="middle" sx={{ mt: 2, mb: 2 }} />
 
             {/* Banner Image Upload */}
-            <Box sx={{ mt: 2, mb: 2, display: "flex", flexDirection: "column" }}>
+            <Box
+              sx={{ mt: 2, mb: 2, display: "flex", flexDirection: "column" }}
+            >
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <input
                   type="file"
@@ -341,15 +342,15 @@ const RecipeCreator = () => {
                   </Button>
                 </label>
                 {bannerImage && (
-                 <Button
+                  <Button
                     variant="outlined"
-                     color="error"
+                    color="error"
                     component="span"
                     onClick={handleRemoveBannerImage}
-                    sx={{ml: 2}}
-                   >
-                     Remove
-                 </Button>
+                    sx={{ ml: 2 }}
+                  >
+                    Remove
+                  </Button>
                 )}
               </Box>
               {bannerImage && (
@@ -357,7 +358,11 @@ const RecipeCreator = () => {
                   <img
                     src={bannerImage}
                     alt="Banner Preview"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
                   />
                 </Box>
               )}

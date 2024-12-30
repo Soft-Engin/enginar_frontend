@@ -15,7 +15,10 @@ function generate(element) {
       key: value,
     })
   );
-} {/* Bu komple kaldırılacak */}
+}
+{
+  /* Bu komple kaldırılacak */
+}
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
@@ -34,16 +37,28 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   },
   textTransform: "none",
   fontWeight: "bold",
-  variant: "subtitle1"
+  variant: "subtitle1",
 }));
 
 export default function RecommendedUsers() {
   return (
-    <Box sx={{ position: "fixed", top: 115, right: { lg: "1%", xl: "3%" }, width: 300, scale: { xs: "0%", sm: "0%", md: "0%", lg: "85%", xl: "95%" }, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#C8EFA5", boxShadow: 5}}>
+    <Box
+      sx={{
+        position: "fixed",
+        top: 115,
+        right: { lg: "1%", xl: "3%" },
+        width: 300,
+        scale: { xs: "0%", sm: "0%", md: "0%", lg: "85%", xl: "95%" },
+        borderRadius: 3,
+        outline: "1.5px solid #959595",
+        backgroundColor: "#C8EFA5",
+        boxShadow: 5,
+      }}
+    >
       <Typography
         fontWeight="bold"
         style={{ color: "#000000" }}
-        sx={{pt: 2, pl: 2, fontSize: 24, opacity: 0.7}}
+        sx={{ pt: 2, pl: 2, fontSize: 24, opacity: 0.7 }}
         variant="h5"
         component="div"
       >
@@ -60,9 +75,7 @@ export default function RecommendedUsers() {
                 Kendrick{/* Buraya username gelecek*/}
               </Typography>
             </ListItemText>
-            <FollowButton variant="contained">
-              Follow
-            </FollowButton>
+            <FollowButton variant="contained">Follow</FollowButton>
           </ListItem>
         )}
       </List>

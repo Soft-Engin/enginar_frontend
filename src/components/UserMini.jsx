@@ -1,11 +1,6 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import {
-  Typography,
-  Box,
-  Avatar,
-  Button
-} from "@mui/material";
+import { Typography, Box, Avatar, Button } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -28,7 +23,7 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   },
   textTransform: "none",
   fontWeight: "bold",
-  variant: "subtitle1"
+  variant: "subtitle1",
 }));
 
 export default function UserMini() {
@@ -43,12 +38,46 @@ export default function UserMini() {
     setAnchorEl(null);
   };
 
-  return(
-    <Box sx={{ maxWidth: 700, outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 2, pt: 2, pr: 2, pb: 3, borderRadius: 5, boxShadow: 5 }}>
-      <Box sx={{ height: 180, background: `url(https://via.placeholder.com/400x225) no-repeat center`, backgroundSize: "cover", borderRadius: "12px 12px 0 0" }} />
+  return (
+    <Box
+      sx={{
+        maxWidth: 700,
+        outline: "1.5px solid #C0C0C0",
+        backgroundColor: "#FFFFFF",
+        pl: 2,
+        pt: 2,
+        pr: 2,
+        pb: 3,
+        borderRadius: 5,
+        boxShadow: 5,
+      }}
+    >
+      <Box
+        sx={{
+          height: 180,
+          background: `url(https://via.placeholder.com/400x225) no-repeat center`,
+          backgroundSize: "cover",
+          borderRadius: "12px 12px 0 0",
+        }}
+      />
 
-      <Box sx={{ display: "flex", justifyContent: "flex-start", position: "relative" }}>
-        <Avatar sx={{width: 130, height: 130, border: "4px solid white", position: "absolute", top: -65, left: 5 }} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-start",
+          position: "relative",
+        }}
+      >
+        <Avatar
+          sx={{
+            width: 130,
+            height: 130,
+            border: "4px solid white",
+            position: "absolute",
+            top: -65,
+            left: 5,
+          }}
+        />
         <Box sx={{ ml: 18 }}>
           <Box sx={{ display: "flex", gap: 2, mt: 0.6, alignItems: "center" }}>
             <Typography variant="h5" fontWeight="bold">
@@ -104,5 +133,5 @@ export default function UserMini() {
         biography biography biography biography
       </Typography>
     </Box>
-  )
+  );
 }

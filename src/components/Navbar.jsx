@@ -41,7 +41,7 @@ import SearchBar from "./SearchBar";
 import PostPopup from "./PostPopup";
 import EventPopup from "./EventPopup";
 
-import { useNavigate , Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const drawerWidth = 300;
 const drawerIconStyle = {
