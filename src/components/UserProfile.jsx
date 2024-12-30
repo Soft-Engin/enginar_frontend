@@ -302,6 +302,7 @@ const UserProfile = () => {
   if (loading) {
     return (
       <Box
+        data-testid="user-profile-loading"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -315,6 +316,7 @@ const UserProfile = () => {
   if (error) {
     return (
       <Box
+        data-testid="user-profile-error"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -334,6 +336,7 @@ const UserProfile = () => {
 
   return (
     <Box
+      data-testid="user-profile-container"
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -450,6 +453,7 @@ const UserProfile = () => {
               </Box>
               <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
                 <IconButton
+                  data-testid="profile-menu-button"
                   aria-label="more"
                   id="menuButton"
                   aria-controls={open ? "menu" : undefined}
