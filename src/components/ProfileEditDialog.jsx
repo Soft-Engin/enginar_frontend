@@ -244,20 +244,24 @@ const ProfileEditDialog = ({
                 <PhotoCameraIcon />
               </IconButton>
             </label>
-          </Box>
-          {/* User Name and Email Edit */}
-          <Stack direction="column" spacing={2}>
+
+            {/* Username Edit */}
             <TextField
-              fullWidth
               label="User Name"
               value={editedProfile.userName}
               onChange={handleChange("userName")}
               variant="outlined"
               sx={{
+                position: "absolute",
+                bottom: -29,
+                left: 155,
                 backgroundColor: "#fff",
                 borderRadius: 2,
               }}
             />
+          </Box>
+          {/* Email Edit */}
+          <Stack direction="column" spacing={2} sx={{ mt: 3 }}>
             <TextField
               fullWidth
               label="Email"
@@ -308,7 +312,6 @@ const ProfileEditDialog = ({
             sx={{
               backgroundColor: "#fff",
               borderRadius: 2,
-              mt: 3,
             }}
           />
         </Box>
