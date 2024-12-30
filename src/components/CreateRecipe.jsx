@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -18,11 +18,15 @@ import {
   styled,
   InputBase,
   InputAdornment,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
+import axios from "axios";
 
 // Styled Components for Quantity and Unit fields - Identical to the SearchBar
 const StyledSelect = styled(Select)(({ theme }) => ({
@@ -69,24 +73,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-// Sample Ingredients List
-const ingredientsList = [
-  { id: 1, name: "Apple" },
-  { id: 2, name: "Avocado" },
-  { id: 3, name: "Banana" },
-  { id: 4, name: "Blueberry" },
-  { id: 5, name: "Carrot" },
-  { id: 6, name: "Cabbage" },
-  { id: 7, name: "Date" },
-  { id: 8, name: "Eggplant" },
-  { id: 9, name: "Fig" },
-  { id: 10, name: "Grapes" },
-  { id: 11, name: "Garlic" },
-  { id: 12, name: "Honey" },
-  { id: 13, name: "Lemon" },
-  { id: 14, name: "Lettuce" },
-];
-
 // Group ingredients by their starting letter
 const categorizeIngredients = (ingredients) => {
   const categories = {};
@@ -100,7 +86,7 @@ const categorizeIngredients = (ingredients) => {
   return categories;
 };
 
-const RecipeCreator = () => {
+const CreateRecipe = () => {
   const [recipeName, setRecipeName] = useState("");
   const [servingSize, setServingSize] = useState("1");
   const [prepTime, setPrepTime] = useState("0-10 minutes");
@@ -111,8 +97,67 @@ const RecipeCreator = () => {
   // Initialize steps to be an array of objects each containing text and imageUrl
   const [steps, setSteps] = useState([{ text: "", imageUrl: "" }]);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [ingredientsList, setIngredientsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [creating, setCreating] = useState(false);
+  const [creationError, setCreationError] = useState(null);
+  const [creationSuccess, setCreationSuccess] = useState(false);
+  //New State for Images
+  const [ingredientImages, setIngredientImages] = useState({});
   // Filter and categorize ingredients
+
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get("/api/v1/ingredients", {
+          params: { pageSize: 999 },
+        });
+        if (response.data && response.data.items) {
+          const sortedIngredients = [...response.data.items].sort((a, b) =>
+            a.name.localeCompare(b.name)
+          );
+          setIngredientsList(sortedIngredients);
+          // Fetch images for all ingredients
+          await fetchIngredientImages(
+            sortedIngredients.map((ingredient) => ingredient.id)
+          );
+        }
+      } catch (err) {
+        console.error("Error fetching ingredients:", err);
+        setError(err.message || "An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchIngredients();
+  }, []);
+
+  const fetchIngredientImages = async (ingredientIds) => {
+    try {
+      const params = new URLSearchParams();
+      ingredientIds.forEach((id) => {
+        params.append("ingredientIds", id);
+      });
+
+      const response = await axios.get("/api/v1/ingredients/Images", {
+        params: params,
+      });
+
+      if (response.data) {
+        const images = response.data.reduce((acc, item) => {
+          acc[item.id] = item.image;
+          return acc;
+        }, {});
+        setIngredientImages(images);
+      }
+    } catch (error) {
+      console.error("Error fetching ingredient images:", error);
+    }
+  };
+
   const filteredIngredients = ingredientsList.filter((ingredient) =>
     ingredient.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -126,7 +171,7 @@ const RecipeCreator = () => {
     }
     const newIngredient = {
       ...ingredient,
-      quantity: "1/4", // Default quantity
+      quantity: "0.25", // Default quantity
       unit: "", // Default unit
     };
     setIngredients([...ingredients, newIngredient]);
@@ -166,33 +211,38 @@ const RecipeCreator = () => {
   };
 
   // Handle banner image upload
-  const handleBannerImageUpload = (event) => {
+  const handleBannerImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setBannerImage(e.target.result);
-      };
-      reader.readAsDataURL(file);
+      setLoading(true);
+      const base64Image = await convertToBase64(file);
+      setBannerImage(base64Image);
+      setLoading(false);
     }
   };
 
-   // Handle banner image removal
-    const handleRemoveBannerImage = () => {
-        setBannerImage("");
-    }
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
+  // Handle banner image removal
+  const handleRemoveBannerImage = () => {
+    setBannerImage("");
+  };
 
   // Handle image upload
-  const handleImageUpload = (index, event) => {
+  const handleImageUpload = async (index, event) => {
     const file = event.target.files[0];
     if (file) {
-      // Simulate a file upload
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        updateStep(index, "imageUrl", e.target.result);
-      };
-      reader.readAsDataURL(file);
+      setLoading(true);
+      const base64Image = await convertToBase64(file);
+      updateStep(index, "imageUrl", base64Image);
+      setLoading(false);
     }
   };
 
@@ -203,27 +253,141 @@ const RecipeCreator = () => {
   };
 
   // Predefined quantity options
-  const quantityOptions = ["1/4", "1/2", "1", "2", "3", "4", "5"];
+  const quantityOptions = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5];
 
   // Generate options for serving size and prep time from 1 to 10+, with "10+" as last option
   const numberOptions = Array.from({ length: 10 }, (_, i) => i + 1);
   const servingSizeOptions = [...numberOptions.map(String), "10+"];
-  const prepTimeOptions = [
-    "0-10 minutes",
-    "10-20 minutes",
-    "20-30 minutes",
-    "30-45 minutes",
-    "45-60 minutes",
-    "60-90 minutes",
-    "90-120 minutes",
-    "More than 2 hours",
-  ];
+  const prepTimeOptions = numberOptions.map((num) => `${num * 10} minutes`);
+  prepTimeOptions.push("More than 100 minutes");
+
+  const handleCreateRecipe = async () => {
+    setCreating(true);
+    setCreationError(null);
+    setCreationSuccess(false);
+
+    try {
+      const stepsWithTextOnly = steps.map((step) => step.text);
+      const transformedIngredients = ingredients.map((ingredient) => ({
+        ingredientId: ingredient.id,
+        quantity: parseFloat(ingredient.quantity),
+        unit: ingredient.unit,
+      }));
+
+      console.log("Transformed Ingredients", transformedIngredients);
+
+      const stepImages = steps
+        .map((step) => step.imageUrl)
+        .filter((imageUrl) => imageUrl !== "");
+      const recipeData = {
+        header: recipeName,
+        bodyText: description,
+        bannerImage: bannerImage || null,
+        stepImages: stepImages.length > 0 ? stepImages : null,
+        servingSize: parseInt(servingSize),
+        preparationTime:
+          prepTimeOptions.findIndex((option) => option === prepTime) * 10,
+        steps: stepsWithTextOnly,
+        ingredients: transformedIngredients,
+      };
+      console.log("Payload: ", recipeData);
+      const response = await axios.post("/api/v1/recipes", recipeData);
+
+      console.log("Response: ", response);
+      if (response.status === 201) {
+        setCreationSuccess(true);
+        setRecipeName("");
+        setServingSize("1");
+        setPrepTime("0-10 minutes");
+        setDescription("");
+        setBannerImage("");
+        setIngredients([]);
+        setSteps([{ text: "", imageUrl: "" }]);
+        console.log("Recipe created successfully:", response.data);
+      } else {
+        setCreationError(
+          response.data?.message || "Failed to create recipe. Please try again."
+        );
+        console.error("Failed to create recipe:", response);
+      }
+    } catch (error) {
+      setCreationError(
+        error.response?.data?.message ||
+          error.message ||
+          "An unexpected error occurred."
+      );
+      console.error("Error creating recipe:", error.response?.data?.message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setCreationSuccess(false);
+    setCreationError(null);
+  };
 
   // Constant image width
   const imageWidth = "100px";
 
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <Typography color="error">Error: {error}</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ p: 3, width: "90vmax", overflow: "hidden" }}>
+      <Snackbar
+        open={creationSuccess}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Recipe created successfully!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={creationError != null}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {creationError}
+        </Alert>
+      </Snackbar>
       <Typography variant="h4" gutterBottom>
         Create a Recipe
       </Typography>
@@ -318,7 +482,9 @@ const RecipeCreator = () => {
             <Divider variant="middle" sx={{ mt: 2, mb: 2 }} />
 
             {/* Banner Image Upload */}
-            <Box sx={{ mt: 2, mb: 2, display: "flex", flexDirection: "column" }}>
+            <Box
+              sx={{ mt: 2, mb: 2, display: "flex", flexDirection: "column" }}
+            >
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <input
                   type="file"
@@ -341,23 +507,27 @@ const RecipeCreator = () => {
                   </Button>
                 </label>
                 {bannerImage && (
-                 <Button
+                  <Button
                     variant="outlined"
-                     color="error"
+                    color="error"
                     component="span"
                     onClick={handleRemoveBannerImage}
-                    sx={{ml: 2}}
-                   >
-                     Remove
-                 </Button>
+                    sx={{ ml: 2 }}
+                  >
+                    Remove
+                  </Button>
                 )}
               </Box>
               {bannerImage && (
                 <Box sx={{ mt: 2, width: "200px", height: "200px" }}>
                   <img
-                    src={bannerImage}
+                    src={`data:image/png;base64,${bannerImage}`}
                     alt="Banner Preview"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
                   />
                 </Box>
               )}
@@ -410,7 +580,9 @@ const RecipeCreator = () => {
                   <CardMedia
                     component="img"
                     height="100"
-                    image="https://via.placeholder.com/150"
+                    image={`data:image/png;base64,${
+                      ingredientImages[ingredient.id]
+                    }`}
                     alt={ingredient.name}
                     sx={{ objectFit: "cover" }}
                   />
@@ -525,7 +697,7 @@ const RecipeCreator = () => {
                         <InputAdornment position="start">
                           <Box sx={{ width: "70px", height: "70px" }}>
                             <img
-                              src={step.imageUrl}
+                              src={`data:image/png;base64,${step.imageUrl}`}
                               alt={`step ${index + 1}`}
                               style={{
                                 height: "100%",
@@ -577,6 +749,15 @@ const RecipeCreator = () => {
               onClick={addStep}
             >
               Add Step
+            </Button>
+            <Button
+              variant="contained"
+              sx={{ mt: 2 }}
+              color="success"
+              onClick={handleCreateRecipe}
+              disabled={creating}
+            >
+              {creating ? "Creating..." : "Create Recipe"}
             </Button>
           </Box>
         </Grid>
@@ -639,7 +820,10 @@ const RecipeCreator = () => {
                     </Divider>
                     <div style={{ display: "flex" }}>
                       {categorizedIngredients[letter].map((ingredient) => (
-                        <div style={{ marginRight: 5, marginLeft: 5 }}>
+                        <div
+                          style={{ marginRight: 5, marginLeft: 5 }}
+                          key={ingredient.id}
+                        >
                           <Card
                             variant="outlined"
                             sx={{ backgroundColor: "#A5E072", width: "120px" }}
@@ -647,7 +831,9 @@ const RecipeCreator = () => {
                             <CardMedia
                               component="img"
                               height="100"
-                              image="https://via.placeholder.com/150"
+                              image={`data:image/png;base64,${
+                                ingredientImages[ingredient.id]
+                              }`}
                               alt={ingredient.name}
                             />
                             <CardContent
@@ -687,4 +873,4 @@ const RecipeCreator = () => {
   );
 };
 
-export default RecipeCreator;
+export default CreateRecipe;

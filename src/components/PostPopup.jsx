@@ -35,7 +35,7 @@ export default function PostPopup(props) {
 
     try {
       const response = await axios.post(
-        "/api/v1/blog",
+        "/api/v1/blogs",
         { bodyText, header: "" },
         {}
       );

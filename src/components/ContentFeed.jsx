@@ -1,15 +1,13 @@
 import * as React from "react";
-import BlogMini from "./BlogMini";
-import RecipeMini from "./RecipeMini";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import axios from "axios";
-import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress";
+import PopularRecipesTab from "./PopularRecipesTab";
+import PopularBlogsTab from "./PopularBlogsTab";
+import FollowingTab from "./FollowingTab";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -42,124 +40,11 @@ function a11yProps(index) {
 
 export default function ContentFeed() {
   const [value, setValue] = React.useState(0);
-  const [recipes, setRecipes] = React.useState([]);
-  const [blogs, setBlogs] = React.useState([]);
-  const [followingContent, setFollowingContent] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [loadingMore, setLoadingMore] = React.useState(false);
-  const [error, setError] = React.useState(null);
-  const [errorMore, setErrorMore] = React.useState(null);
-  let randSeed = (Math.random() + 1).toString(36).substring(7);
-  let pageNumber = 1;
-  let scrollTimeout = null;
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const fetchData = async () => {
-    if (loadingMore) return;
-    setLoadingMore(true);
-    setErrorMore(null);
-    try {
-      const [recipesResponse, blogsResponse] = await Promise.all([
-        axios.get("/api/v1/feed/recipe", {
-          params: { pageSize: 10, seed: randSeed, pageNumber: pageNumber },
-        }),
-        axios.get("/api/v1/feed/blog", {
-          params: { pageSize: 10, seed: randSeed, pageNumber: pageNumber },
-        }),
-      ]);
-      if (recipesResponse.data && recipesResponse.data.items) {
-        setRecipes((prevRecipes) => [
-          ...prevRecipes,
-          ...recipesResponse.data.items,
-        ]);
-      }
-      if (blogsResponse.data && blogsResponse.data.items) {
-        setBlogs((prevBlogs) => [...prevBlogs, ...blogsResponse.data.items]);
-      }
-      pageNumber += 1;
-    } catch (err) {
-      console.error("Error fetching more data:", err);
-      setErrorMore(err.message || "An unexpected error occurred.");
-    } finally {
-      setLoadingMore(false);
-    }
-  };
-
-  const handleScroll = () => {
-    if (scrollTimeout) {
-      clearTimeout(scrollTimeout);
-    }
-
-    scrollTimeout = setTimeout(() => {
-      if (loadingMore || errorMore) return;
-      const scrollPosition =
-        window.innerHeight + document.documentElement.scrollTop;
-      const totalContentHeight = document.documentElement.scrollHeight;
-      // Check if scrolled to the bottom
-      if (scrollPosition >= totalContentHeight - 300) {
-        fetchData();
-      }
-    }, 100);
-  };
-
-  React.useEffect(() => {
-    const initialFetch = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [recipesResponse, blogsResponse] = await Promise.all([
-          axios.get("/api/v1/feed/recipe", {
-            params: { pageSize: 10, seed: randSeed, pageNumber: 1 },
-          }),
-          axios.get("/api/v1/feed/blog", {
-            params: { pageSize: 10, seed: randSeed, pageNumber: 1 },
-          }),
-        ]);
-        setRecipes(recipesResponse.data.items);
-        setBlogs(blogsResponse.data.items);
-        pageNumber = 2;
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(err.message || "An unexpected error occurred.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    initialFetch();
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="200px"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="200px"
-      >
-        <Typography color="error">Error: {error}</Typography>
-      </Box>
-    );
-  }
 
   return (
     <Box>
@@ -190,48 +75,14 @@ export default function ContentFeed() {
       </Box>
 
       <CustomTabPanel value={value} index={0}>
-        {recipes.map((recipe, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
-            <RecipeMini recipe={recipe} />
-          </Box>
-        ))}
-        {loadingMore && (
-          <Box display="flex" justifyContent="center" my={2}>
-            <CircularProgress size={20} />
-          </Box>
-        )}
-        {errorMore && (
-          <Box display="flex" justifyContent="center" my={2}>
-            <Typography color="error">Error: {errorMore}</Typography>
-          </Box>
-        )}
+        <PopularRecipesTab />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        {blogs.map((blog, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
-            <BlogMini blog={blog} />
-          </Box>
-        ))}
-        {loadingMore && (
-          <Box display="flex" justifyContent="center" my={2}>
-            <CircularProgress size={20} />
-          </Box>
-        )}
-        {errorMore && (
-          <Box display="flex" justifyContent="center" my={2}>
-            <Typography color="error">Error: {errorMore}</Typography>
-          </Box>
-        )}
+        <PopularBlogsTab />
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        {followingContent.map((user, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
-            <BlogMini blog={user} />
-            <RecipeMini recipe={user} />
-          </Box>
-        ))}
+       <CustomTabPanel value={value} index={2}>
+        <FollowingTab />
       </CustomTabPanel>
-
       <RecommendedUsers />
       <UpcomingEvents />
     </Box>

@@ -75,7 +75,7 @@ export default function AuthPopup(props) {
 
   const handleSwitchToLogin = () => {
     setIsSignup(false);
-    setShowSuccess("true");
+    setShowSuccess(true);
     setFormError(null);
     setTimeout(() => {
       setShowSuccess(false);
@@ -189,6 +189,44 @@ export default function AuthPopup(props) {
           )}
           {isSignup ? (
             <>
+             <Stack direction="row" spacing={2} sx={{marginBottom:"10px"}}>
+                <TextField
+                  required
+                  margin="dense"
+                  id="firstName"
+                  name="firstName"
+                  placeholder="First Name"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <PersonIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  required
+                  margin="dense"
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Last Name"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  sx={{ backgroundColor: "#FFFFFF", borderRadius: "5px" }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <PersonIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                </Stack>
               <TextField
                 required
                 margin="dense"

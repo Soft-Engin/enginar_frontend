@@ -18,13 +18,13 @@ import {
   CircularProgress,
 } from "@mui/material";
 import axios from "axios";
-import BannerImg from "../assets/bg2.jpeg";
-import RecipeMini from "./RecipeMini";
-import BlogMini from "./BlogMini";
-import ProfileEditDialog from "./ProfileEditDialog"; 
-import EventCompressed from "./EventCompressed";
-import FollowersListPopup from "./FollowersListPopup"
+import ProfileEditDialog from "./ProfileEditDialog";
+import UserBlogsTab from "./UserBlogsTab";
+import UserEventsTab from "./UserEventsTab";
+import UserRecipesTab from "./UserRecipesTab";
+import FollowersListPopup from "./FollowersListPopup";
 import FollowingListPopup from "./FollowingListPopup";
+import { useSearchParams } from "react-router-dom";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
@@ -43,7 +43,7 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   },
   textTransform: "none",
   fontWeight: "bold",
-  variant: "subtitle1"
+  variant: "subtitle1",
 }));
 
 function CustomTabPanel(props) {
@@ -81,42 +81,65 @@ const UserProfile = () => {
   const userId = searchParams.get("id");
 
   const [profileData, setProfileData] = useState(null);
-  const [userPosts, setUserPosts] = useState([]);
-  const [userRecipes, setUserRecipes] = useState([]);
   const [value, setValue] = React.useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [following, setFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const open = Boolean(anchorEl);
+
+  const [loggedInUserData, setLoggedInUserData] = useState(
+    localStorage.getItem("userData")
+      ? JSON.parse(localStorage.getItem("userData"))
+      : null
+  );
+  const [profilePic, setProfilePic] = useState(null);
+  const [bannerPic, setBannerPic] = useState(null);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
+  const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
+  const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const [userResponse, blogsResponse, recipesResponse] =
-          await Promise.all([
-            axios.get(`/api/v1/user/GetUser/${userId}`),
-            axios.get(`/api/v1/blog/search`, {
-              params: { userId: userId, pageSize: 5 },
-            }),
-            axios.get("/api/v1/recipes/search", {
-              params: { userId: userId, pageSize: 5 },
-            }),
-          ]);
-
+        const userResponse = await axios.get(`/api/v1/users/${userId}`);
         setProfileData(userResponse.data);
-        setUserPosts(blogsResponse.data.items);
-        setUserRecipes(recipesResponse.data.items);
-
-        // Check if the user is already followed
-        const followedUser = blogsResponse.data.items?.find(
-          (item) => item.id === userId
-        );
-        if (followedUser) {
-          setFollowing(true);
+        try {
+          const picResponse = await axios.get(
+            `/api/v1/users/${userId}/profile-picture`,
+            { responseType: "blob" }
+          );
+          if (picResponse.status === 200) {
+            const imageUrl = URL.createObjectURL(picResponse.data);
+            setProfilePic(imageUrl);
+          } else {
+            setProfilePic(null);
+          }
+        } catch (error) {
+          console.error("error fetching profile pic", error);
+          setProfilePic(null);
+        }
+        try {
+          const bannerResponse = await axios.get(
+            `/api/v1/users/${userId}/banner`,
+            {
+              responseType: "blob",
+            }
+          );
+          if (bannerResponse.status === 200) {
+            const imageUrl = URL.createObjectURL(bannerResponse.data);
+            setBannerPic(imageUrl);
+          } else {
+            setBannerPic(null);
+          }
+        } catch (error) {
+          console.error("error fetching profile pic", error);
+          setBannerPic(null);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -126,16 +149,74 @@ const UserProfile = () => {
       }
     };
 
+    const fetchFollowCounts = async () => {
+      try {
+        const followersResponse = await axios.get(
+          `/api/v1/users/${userId}/followers?pageSize=1`
+        );
+        if (followersResponse.status === 200) {
+          setFollowersCount(followersResponse.data.totalCount);
+        }
+        const followingResponse = await axios.get(
+          `/api/v1/users/${userId}/following?pageSize=1`
+        );
+        if (followingResponse.status === 200) {
+          setFollowingCount(followingResponse.data.totalCount);
+        }
+      } catch (error) {
+        console.error("Error fetching follow counts: ", error);
+      }
+    };
+
     fetchUserData();
+    fetchFollowCounts();
   }, [userId]);
+
+  useEffect(() => {
+    const fetchLoggedInUserFollowing = async () => {
+      if (loggedInUserData?.userId) {
+        try {
+          const response = await axios.get(
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+          );
+          if (response.status === 200) {
+            setLoggedInUserFollowing(response.data.items);
+          }
+        } catch (error) {
+          console.error(
+            "error fetching logged in user's following list: ",
+            error
+          );
+        }
+      }
+    };
+    fetchLoggedInUserFollowing();
+  }, [loggedInUserData]);
+
+  useEffect(() => {
+    if (
+      loggedInUserData?.userId &&
+      userId !== loggedInUserData?.userId &&
+      loggedInUserFollowing
+    ) {
+      const isFollowing = loggedInUserFollowing.some(
+        (following) => following.userId === userId
+      );
+      setIsFollowing(isFollowing);
+    } else {
+      setIsFollowing(false);
+    }
+  }, [loggedInUserFollowing, userId, loggedInUserData]);
 
   const handleFollowUser = async () => {
     try {
       const response = await axios.post(
-        `/api/v1/user/follow?targetUserld=${userId}`
+        `/api/v1/users/follow?targetUserId=${userId}`
       );
       if (response.status === 200) {
-        setFollowing(true);
+        setIsFollowing(true);
+        setFollowersCount((prev) => prev + 1);
+        setLoggedInUserFollowing((prev) => [...prev, { userId }]);
       }
     } catch (error) {
       console.error("Error follow user:", error);
@@ -150,10 +231,14 @@ const UserProfile = () => {
   const handleUnfollowUser = async () => {
     try {
       const response = await axios.delete(
-        `/api/v1/user/unfollow?targetUserld=${userId}`
+        `/api/v1/users/unfollow?targetUserId=${userId}`
       );
       if (response.status === 200) {
-        setFollowing(false);
+        setIsFollowing(false);
+        setFollowersCount((prev) => prev - 1);
+        setLoggedInUserFollowing((prev) =>
+          prev.filter((following) => following.userId !== userId)
+        );
       }
     } catch (error) {
       console.error("Error unfollow user:", error);
@@ -179,7 +264,7 @@ const UserProfile = () => {
 
   const handleEditProfile = () => {
     setEditDialogOpen(true);
-    handleClose(); // Close the options menu
+    handleClose();
   };
 
   const handleUpdateProfile = (updatedProfile) => {
@@ -190,9 +275,6 @@ const UserProfile = () => {
     }));
   };
 
-  const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
-  const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
-    
   const handleFollowingPopupOpen = () => {
     setFollowingPopupOpen(true);
   };
@@ -209,6 +291,47 @@ const UserProfile = () => {
     setFollowersPopupOpen(false);
   };
 
+  useEffect(() => {
+    // This runs when the component unmounts or userId changes
+    return () => {
+      setFollowersPopupOpen(false);
+      setFollowingPopupOpen(false);
+    };
+  }, [userId]);
+
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <Typography color="error">Error: {error}</Typography>
+      </Box>
+    );
+  }
+  const isOwnProfile =
+    JSON.parse(localStorage.getItem("userData"))?.userId === userId;
+
+  const profilePlaceholder = profileData?.firstName
+    ? profileData.firstName.charAt(0).toUpperCase()
+    : "?";
+  const bannerPlaceholder = "#ffffff";
+
   return (
     <Box
       sx={{
@@ -223,6 +346,8 @@ const UserProfile = () => {
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         profileData={profileData}
+        profilePic={profilePic}
+        bannerPic={bannerPic}
         onProfileUpdate={handleUpdateProfile}
       />
 
@@ -240,8 +365,9 @@ const UserProfile = () => {
             sx={{
               height: 200,
               background: `url(${
-                profileData?.coverImage || BannerImg
+                bannerPic || bannerPlaceholder
               }) no-repeat center`,
+              bgcolor: "#bbbbbb",
               backgroundSize: "cover",
             }}
           />
@@ -256,7 +382,6 @@ const UserProfile = () => {
               }}
             >
               <Avatar
-                src={profileData?.profileImage || "/pp3.jpeg"}
                 sx={{
                   width: 120,
                   height: 120,
@@ -264,8 +389,17 @@ const UserProfile = () => {
                   position: "absolute",
                   top: -80,
                   left: 0,
+                  bgcolor: profilePic ? "transparent" : "#bdbdbd",
                 }}
-              />
+              >
+                {!profilePic && profilePlaceholder}
+                {profilePic && (
+                  <Avatar
+                    src={profilePic}
+                    sx={{ width: "100%", height: "100%" }}
+                  />
+                )}
+              </Avatar>
               <Box sx={{ mt: -2, ml: 17 }}>
                 <Box
                   sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
@@ -273,8 +407,8 @@ const UserProfile = () => {
                   <Typography variant="h5" fontWeight="bold">
                     {profileData.firstName} {profileData.lastName}
                   </Typography>
-                  {userId !== localStorage.getItem("userId") ? (
-                    following ? (
+                  {!isOwnProfile &&
+                    (isFollowing ? (
                       <FollowButton
                         variant="contained"
                         onClick={handleUnfollowUser}
@@ -288,15 +422,29 @@ const UserProfile = () => {
                       >
                         Follow
                       </FollowButton>
-                    )
-                  ) : null}
+                    ))}
                 </Box>
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  sx={{ ml: 0.2 }}
+                >
+                  {profileData.userName}
+                </Typography>
                 <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                  <Typography variant="body2" onClick={handleFollowingPopupOpen} sx={{ cursor: "pointer" }}>
-                    <strong>{profileData.following}</strong> Following
+                  <Typography
+                    variant="body2"
+                    onClick={handleFollowingPopupOpen}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <strong>{followingCount}</strong> Following
                   </Typography>
-                  <Typography variant="body2" onClick={handleFollowersPopupOpen} sx={{ cursor: "pointer" }}>
-                    <strong>{profileData.followers}</strong> Followers
+                  <Typography
+                    variant="body2"
+                    onClick={handleFollowersPopupOpen}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <strong>{followersCount}</strong> Followers
                   </Typography>
                 </Box>
               </Box>
@@ -328,7 +476,7 @@ const UserProfile = () => {
                   open={open}
                   onClose={handleClose}
                 >
-                  {userId === localStorage.getItem("userId") || true ? (
+                  {isOwnProfile ? (
                     <MenuItem key="Edit" onClick={handleEditProfile}>
                       Edit Profile
                     </MenuItem>
@@ -362,38 +510,27 @@ const UserProfile = () => {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                {randomPosts.map((post) => (
-                  <BlogMini
-                    key={post.id}
-                    content={post.content}
-                    likes={post.likes}
-                    comments={post.comments}
-                  />
-                ))}
-              </Stack>
+              <UserBlogsTab />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                  <EventCompressed />
-                  <EventCompressed />
-                </Stack>
-              </Box>
+              <UserEventsTab />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Stack spacing={2} direction={"column"} alignItems={"center"}>
-                  <RecipeMini />
-                  <RecipeMini />
-                </Stack>
-              </Box>
+              <UserRecipesTab />
             </CustomTabPanel>
           </Box>
         </Card>
       </Box>
-      <FollowersListPopup open={followersPopupOpen} handleClose={handleFollowersPopupClose} />
-      <FollowingListPopup open={followingPopupOpen} handleClose={handleFollowingPopupClose} />
+      <FollowersListPopup
+        open={followersPopupOpen}
+        handleClose={handleFollowersPopupClose}
+        userId={userId}
+      />
+      <FollowingListPopup
+        open={followingPopupOpen}
+        handleClose={handleFollowingPopupClose}
+        userId={userId}
+      />
     </Box>
   );
 };

@@ -31,12 +31,24 @@ export default function RecipeMini({ recipe }) {
   const [loadingProfile, setLoadingProfile] = React.useState(true);
   const [loadingLikesComments, setLoadingLikesComments] = React.useState(true);
   const [loadingIsLiked, setLoadingIsLiked] = React.useState(true);
+  const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [errorProfile, setErrorProfile] = React.useState(null);
   const [errorLikesComments, setErrorLikesComments] = React.useState(null);
   const [errorIsLiked, setErrorIsLiked] = React.useState(null);
+  const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
+  const [showBanner, setShowBanner] = React.useState(false);
+
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
+
+  const handleImageError = (error, setErrorState) => {
+    if (error.response && error.response.status === 404) {
+      setErrorState(null);
+    } else {
+      setErrorState(error.message || "An unexpected error occurred.");
+    }
+  };
 
   React.useEffect(() => {
     if (recipe && recipe.id) {
@@ -51,12 +63,17 @@ export default function RecipeMini({ recipe }) {
           if (response.data) {
             const imageUrl = URL.createObjectURL(response.data);
             setBannerUrl(imageUrl);
+            setShowBanner(true);
           } else {
             setBannerUrl(null);
+            setShowBanner(false);
           }
         } catch (err) {
           console.error("Error fetching banner image:", err);
-          setError(err.message || "An unexpected error occurred.");
+          handleImageError(err, (errorMessage) => {
+            setBannerUrl(null);
+            setShowBanner(false);
+          });
         } finally {
           setLoading(false);
         }
@@ -87,7 +104,7 @@ export default function RecipeMini({ recipe }) {
           }
         } catch (err) {
           console.error("Error fetching profile picture:", err);
-          setErrorProfile(err.message || "An unexpected error occurred.");
+          handleImageError(err, setErrorProfile);
         } finally {
           setLoadingProfile(false);
         }
@@ -141,6 +158,26 @@ export default function RecipeMini({ recipe }) {
         }
       };
       fetchIsLiked();
+    }
+  }, [recipe, userLogged]);
+  React.useEffect(() => {
+    if (recipe && recipe.id && userLogged) {
+      const fetchIsBookmarked = async () => {
+        setLoadingIsBookmarked(true);
+        setErrorIsBookmarked(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${recipe.id}/is-bookmarked`
+          );
+          setIsBookmarked(response.data.isBookmarked || false);
+        } catch (err) {
+          console.error("Error fetching isBookmarked:", err);
+          setErrorIsBookmarked(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingIsBookmarked(false);
+        }
+      };
+      fetchIsBookmarked();
     }
   }, [recipe, userLogged]);
 
@@ -275,19 +312,21 @@ export default function RecipeMini({ recipe }) {
           {recipe.bodyText}
         </Typography>
         <Box sx={{ mb: 0.5 }}>
-          {bannerUrl && !loading && (
+          {showBanner && bannerUrl && !loading && (
             <StyledCardMedia
               src={bannerUrl}
               alt="Recipe Banner"
               onError={() => setBannerUrl(null)}
             />
           )}
-          {error && (
-            <Box display="flex" justifyContent="center" my={2}>
-              <Typography color="error">Error: {error}</Typography>
-            </Box>
-          )}
         </Box>
+        {error && (
+          <Box display="flex" justifyContent="center" my={2}>
+            {error !== null && (
+              <Typography color="error">Error: {error}</Typography>
+            )}
+          </Box>
+        )}
       </Box>
 
       <Box

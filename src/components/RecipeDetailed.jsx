@@ -36,12 +36,14 @@ export default function RecipeDetailed({ recipeId }) {
   const [recipe, setRecipe] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
   const [bannerUrl, setBannerUrl] = React.useState(null);
+  const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
   const [loadingProfile, setLoadingProfile] = React.useState(true);
   const [loadingBanner, setLoadingBanner] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [errorProfile, setErrorProfile] = React.useState(null);
   const [errorBanner, setErrorBanner] = React.useState(null);
+  const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
   const [stepImages, setStepImages] = React.useState({});
   const [isLiked, setIsLiked] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(0);
@@ -49,6 +51,16 @@ export default function RecipeDetailed({ recipeId }) {
   const [isBookmarked, setIsBookmarked] = React.useState(false);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
+  const [showBanner, setShowBanner] = React.useState(false);
+
+  const handleImageError = (error, setErrorState) => {
+    if (error.response && error.response.status === 404) {
+      // Do nothing, don't set an error for 404. The image won't render, which is fine.
+      setErrorState(null);
+    } else {
+      setErrorState(error.message || "An unexpected error occurred.");
+    }
+  };
 
   React.useEffect(() => {
     const fetchRecipe = async () => {
@@ -84,7 +96,7 @@ export default function RecipeDetailed({ recipeId }) {
           }
         } catch (err) {
           console.error("Error fetching profile picture:", err);
-          setErrorProfile(err.message || "An unexpected error occurred.");
+          handleImageError(err, setErrorProfile);
         } finally {
           setLoadingProfile(false);
         }
@@ -110,12 +122,17 @@ export default function RecipeDetailed({ recipeId }) {
           if (response.data) {
             const imageUrl = URL.createObjectURL(response.data);
             setBannerUrl(imageUrl);
+            setShowBanner(true);
           } else {
             setBannerUrl(null);
+            setShowBanner(false);
           }
         } catch (err) {
           console.error("Error fetching banner image:", err);
-          setErrorBanner(err.message || "An unexpected error occurred.");
+          handleImageError(err, (errorMessage) => {
+            setBannerUrl(null);
+            setShowBanner(false);
+          });
         } finally {
           setLoadingBanner(false);
         }
@@ -146,7 +163,10 @@ export default function RecipeDetailed({ recipeId }) {
             }
           } catch (error) {
             console.error(`Error fetching image for step ${i}:`, error);
-            images[i] = null;
+            handleImageError(error, (errorMessage) => {
+              //If there was an error, we set the error state for this particular image
+              images[i] = null;
+            });
           }
         }
         setStepImages(images);
@@ -176,6 +196,26 @@ export default function RecipeDetailed({ recipeId }) {
         }
       };
       fetchIsLiked();
+    }
+  }, [recipe, userLogged]);
+  React.useEffect(() => {
+    if (recipe && recipe.id && userLogged) {
+      const fetchIsBookmarked = async () => {
+        setLoadingIsBookmarked(true);
+        setErrorIsBookmarked(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${recipe.id}/is-bookmarked`
+          );
+          setIsBookmarked(response.data.isBookmarked || false);
+        } catch (err) {
+          console.error("Error fetching isBookmarked:", err);
+          setErrorIsBookmarked(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingIsBookmarked(false);
+        }
+      };
+      fetchIsBookmarked();
     }
   }, [recipe, userLogged]);
 
@@ -312,7 +352,7 @@ export default function RecipeDetailed({ recipeId }) {
         </Box>
         <MoreHorizIcon sx={{ fontSize: "40px" }} />
       </Box>
-      {bannerUrl && !loadingBanner && (
+      {
         <Box
           sx={{
             mb: 2,
@@ -322,11 +362,7 @@ export default function RecipeDetailed({ recipeId }) {
             mx: -4,
           }}
         >
-          <StyledCardMedia
-            src={bannerUrl}
-            alt={recipe.header}
-            onError={() => setBannerUrl(null)}
-          />
+          <StyledCardMedia src={bannerUrl} />
           <Box
             sx={{
               position: "absolute",
@@ -394,10 +430,12 @@ export default function RecipeDetailed({ recipeId }) {
             </Box>
           </Box>
         </Box>
-      )}
+      }
       {errorBanner && (
         <Box display="flex" justifyContent="center" my={2}>
-          <Typography color="error">Error: {errorBanner}</Typography>
+          {errorBanner !== null && (
+            <Typography color="error">Error: {errorBanner}</Typography>
+          )}
         </Box>
       )}
       <Typography variant="body1" sx={{ lineHeight: "30px", mb: 2, px: 2 }}>
@@ -426,18 +464,21 @@ export default function RecipeDetailed({ recipeId }) {
           ))}
         </Grid>
       </List>
-      <img
-        src={bannerUrl}
-        alt={recipe.header}
-        style={{
-          width: "100%",
-          height: "450px",
-          display: "block",
-          objectFit: "cover",
-          borderRadius: 10,
-          border: "1px solid #C0C0C0",
-        }}
-      />
+      {showBanner && bannerUrl && (
+        <img
+          src={bannerUrl}
+          alt={recipe.header}
+          style={{
+            width: "100%",
+            height: "450px",
+            display: "block",
+            objectFit: "cover",
+            borderRadius: 10,
+            border: "1px solid #C0C0C0",
+          }}
+        />
+      )}
+
       <Typography
         variant="h4"
         fontWeight="bold"

@@ -1,19 +1,12 @@
 import * as React from "react";
 import RecipeMini from "./RecipeMini";
 import BlogMini from "./BlogMini";
-import PropTypes from 'prop-types';
-import Grid from '@mui/material/Grid2';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-
-function generate(element) {
-  return [0, 1, 2, 3, 4, 5, 6, 7].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    })
-  );
-}
+import PropTypes from "prop-types";
+import Grid from "@mui/material/Grid2";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import axios from "axios";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -37,46 +30,210 @@ CustomTabPanel.propTypes = {
   value: PropTypes.number.isRequired,
 };
 
-
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
 export default function SavedLikedPosts() {
   const [value, setValue] = React.useState(0);
+  const [recipes, setRecipes] = React.useState([]);
+  const [blogs, setBlogs] = React.useState([]);
+  const [loadingRecipes, setLoadingRecipes] = React.useState(true);
+  const [loadingBlogs, setLoadingBlogs] = React.useState(true);
+  const [loadingMoreRecipes, setLoadingMoreRecipes] = React.useState(false);
+  const [loadingMoreBlogs, setLoadingMoreBlogs] = React.useState(false);
+  const [errorRecipes, setErrorRecipes] = React.useState(null);
+  const [errorBlogs, setErrorBlogs] = React.useState(null);
+  const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
+
+  let recipesPageNumber = 1;
+  let blogsPageNumber = 1;
+  let recipesTotalPages = 0;
+  let blogsTotalPages = 0;
+  let scrollTimeout = null;
+  let pageSize = 8;
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const fetchRecipes = async () => {
+    if (loadingMoreRecipes) return;
+    setLoadingMoreRecipes(true);
+    setErrorRecipes(null);
+    try {
+      const params = { page: recipesPageNumber, pageSize: pageSize };
+      const response = await axios.get(
+        `/api/v1/users/${userId}/likes/recipes`,
+        { params }
+      );
+      if (response.data && response.data.items) {
+        setRecipes((prevRecipes) => [...prevRecipes, ...response.data.items]);
+      }
+      recipesTotalPages = Math.ceil(response.data.totalCount / pageSize);
+      recipesPageNumber += 1;
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+      setErrorRecipes(error.message || "An unexpected error occurred.");
+    } finally {
+      setLoadingMoreRecipes(false);
+    }
+  };
+
+  const fetchBlogs = async () => {
+    if (loadingMoreBlogs) return;
+    setLoadingMoreBlogs(true);
+    setErrorBlogs(null);
+    try {
+      const params = { page: blogsPageNumber, pageSize: pageSize };
+      const response = await axios.get(`/api/v1/users/${userId}/likes/blogs`, {
+        params,
+      });
+      if (response.data && response.data.items) {
+        setBlogs((prevBlogs) => [...prevBlogs, ...response.data.items]);
+      }
+      blogsTotalPages = Math.ceil(response.data.totalCount / pageSize);
+      blogsPageNumber += 1;
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+      setErrorBlogs(error.message || "An unexpected error occurred.");
+    } finally {
+      setLoadingMoreBlogs(false);
+    }
+  };
+
+  const handleScroll = () => {
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+    }
+
+    scrollTimeout = setTimeout(() => {
+      const scrollPosition =
+        window.innerHeight + document.documentElement.scrollTop;
+      const totalContentHeight = document.documentElement.scrollHeight;
+      if (scrollPosition >= totalContentHeight - 300) {
+        if (value === 0 && recipesPageNumber <= recipesTotalPages) {
+          fetchRecipes();
+        } else if (value === 1 && blogsPageNumber <= blogsTotalPages) {
+          fetchBlogs();
+        }
+      }
+    }, 100);
+  };
+
+  React.useEffect(() => {
+    const fetchInitialData = async () => {
+      setLoadingRecipes(true);
+      setLoadingBlogs(true);
+      try {
+        const recipesResponse = await axios.get(
+          `/api/v1/users/${userId}/likes/recipes`,
+          { params: { page: 1, pageSize: pageSize } }
+        );
+        if (recipesResponse.data && recipesResponse.data.items) {
+          setRecipes(recipesResponse.data.items);
+          recipesTotalPages = Math.ceil(
+            recipesResponse.data.totalCount / pageSize
+          );
+          recipesPageNumber = 2;
+        }
+        const blogsResponse = await axios.get(
+          `/api/v1/users/${userId}/likes/blogs`,
+          { params: { page: 1, pageSize: pageSize } }
+        );
+        if (blogsResponse.data && blogsResponse.data.items) {
+          setBlogs(blogsResponse.data.items);
+          blogsTotalPages = Math.ceil(blogsResponse.data.totalCount / pageSize);
+          blogsPageNumber = 2;
+        }
+      } catch (error) {
+        console.error("Error fetching initial data:", error);
+        setErrorRecipes(error.message || "An unexpected error occurred.");
+        setErrorBlogs(error.message || "An unexpected error occurred.");
+      } finally {
+        setLoadingRecipes(false);
+        setLoadingBlogs(false);
+      }
+    };
+    fetchInitialData();
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs centered value={value} onChange={handleChange} aria-label="basic tabs example" sx={{ '& .MuiTabs-indicator': { backgroundColor: '#4B9023' }}} >
-          <Tab label="Recipes" sx={{ '&.Mui-selected': { color: '#4B9023' } }} {...a11yProps(0)} />
-          <Tab label="Blogs" sx={{ '&.Mui-selected': { color: '#4B9023' } }} {...a11yProps(1)} />
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Tabs
+          centered
+          value={value}
+          onChange={handleChange}
+          aria-label="basic tabs example"
+          sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
+        >
+          <Tab
+            label="Recipes"
+            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
+            {...a11yProps(0)}
+          />
+          <Tab
+            label="Blogs"
+            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
+            {...a11yProps(1)}
+          />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <Grid container spacing={6} justifyContent="center" sx={{ pt: 2, pb: 5 }}>
-          {generate(<RecipeMini />).map((recipe, index) => (
-            <Grid item size={4} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: 450 }}>
-              {recipe}
+        <Grid
+          container
+          spacing={6}
+          justifyContent="center"
+          sx={{ pt: 2, pb: 5 }}
+        >
+          {loadingRecipes && <div>Loading recipes...</div>}
+          {errorRecipes && <div>Error loading recipes: {errorRecipes}</div>}
+          {recipes.map((recipe, index) => (
+            <Grid
+              item
+              size={4}
+              key={index}
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              sx={{ maxWidth: 450 }}
+            >
+              <RecipeMini recipe={recipe} />
             </Grid>
           ))}
         </Grid>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        <Grid container spacing={6} justifyContent="center" sx={{ pt: 2, pb: 5 }}>
-          {generate(<BlogMini />).map((blog, index) => (
-            <Grid item size={4} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: 450 }}>
-              {blog}
+        <Grid
+          container
+          spacing={6}
+          justifyContent="center"
+          sx={{ pt: 2, pb: 5 }}
+        >
+          {loadingBlogs && <div>Loading blogs...</div>}
+          {errorBlogs && <div>Error loading blogs: {errorBlogs}</div>}
+          {blogs.map((blog, index) => (
+            <Grid
+              item
+              size={4}
+              key={index}
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              sx={{ maxWidth: 450 }}
+            >
+              <BlogMini blog={blog} />
             </Grid>
           ))}
         </Grid>
       </CustomTabPanel>
     </Box>
-  )
+  );
 }

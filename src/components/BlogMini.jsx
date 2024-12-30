@@ -32,12 +32,23 @@ export default function BlogMini({ blog }) {
   const [loadingProfile, setLoadingProfile] = React.useState(true);
   const [loadingLikesComments, setLoadingLikesComments] = React.useState(true);
   const [loadingIsLiked, setLoadingIsLiked] = React.useState(true);
+  const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [errorProfile, setErrorProfile] = React.useState(null);
   const [errorLikesComments, setErrorLikesComments] = React.useState(null);
   const [errorIsLiked, setErrorIsLiked] = React.useState(null);
+  const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
+
+  const handleImageError = (error, setErrorState) => {
+    if (error.response && error.response.status === 404) {
+      // Do nothing, don't set an error for 404. The image won't render, which is fine.
+      setErrorState(null);
+    } else {
+      setErrorState(error.message || "An unexpected error occurred.");
+    }
+  };
 
   React.useEffect(() => {
     if (blog && blog.id) {
@@ -56,7 +67,7 @@ export default function BlogMini({ blog }) {
           }
         } catch (err) {
           console.error("Error fetching banner image:", err);
-          setError(err.message || "An unexpected error occurred.");
+          handleImageError(err, setError);
         } finally {
           setLoading(false);
         }
@@ -87,7 +98,7 @@ export default function BlogMini({ blog }) {
           }
         } catch (err) {
           console.error("Error fetching profile picture:", err);
-          setErrorProfile(err.message || "An unexpected error occurred.");
+          handleImageError(err, setErrorProfile);
         } finally {
           setLoadingProfile(false);
         }
@@ -139,6 +150,26 @@ export default function BlogMini({ blog }) {
         }
       };
       fetchIsLiked();
+    }
+  }, [blog, userLogged]);
+  React.useEffect(() => {
+    if (blog && blog.id && userLogged) {
+      const fetchIsBookmarked = async () => {
+        setLoadingIsBookmarked(true);
+        setErrorIsBookmarked(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/blogs/${blog.id}/is-bookmarked`
+          );
+          setIsBookmarked(response.data.isBookmarked || false);
+        } catch (err) {
+          console.error("Error fetching isBookmarked:", err);
+          setErrorIsBookmarked(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingIsBookmarked(false);
+        }
+      };
+      fetchIsBookmarked();
     }
   }, [blog, userLogged]);
 
@@ -267,12 +298,14 @@ export default function BlogMini({ blog }) {
               onError={() => setBannerUrl(null)}
             />
           )}
-          {error && (
-            <Box display="flex" justifyContent="center" my={2}>
-              <Typography color="error">Error: {error}</Typography>
-            </Box>
-          )}
         </Box>
+        {error && (
+          <Box display="flex" justifyContent="center" my={2}>
+            {error !== null && (
+              <Typography color="error">Error: {error}</Typography>
+            )}
+          </Box>
+        )}
       </Box>
 
       <Box

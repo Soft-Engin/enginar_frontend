@@ -10,6 +10,7 @@ import SearchPage from "./components/SearchPage";
 import SettingsPage from "./components/SettingsPage";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import RecipePage from "./components/RecipePage";
+import CreateRecipe from "./components/CreateRecipe"
 
 // Create a root layout component that includes the Navbar
 const RootLayout = () => {
@@ -48,7 +49,7 @@ const router = createBrowserRouter([
         element: <SearchPage />,
       },
       {
-        path: "/event/:eventid",
+        path: "/event",
         element: <EventPage />,
       },
       {
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
         path: "/recipe",
         element: <RecipePage />,
       },
+      {
+        path: "/createRecipe",
+        element: <CreateRecipe />
+      }
     ],
   },
 ]);

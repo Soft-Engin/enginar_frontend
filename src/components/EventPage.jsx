@@ -4,15 +4,15 @@ import CommentSection from "./CommentSection";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 
-import {useParams} from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom'
 
 export default function EventPage() {
-  const params = useParams();
-  console.log(params);
+  const [searchParams, setSearchParams] = useSearchParams();
+  console.log(searchParams.get('id'));
   return(
     <Box sx={{ m: 4, maxWidth: 900 }}>
-      <EventDetailed />
-      <CommentSection />
+      <EventDetailed eventId={searchParams.get('id')}/>
+      <CommentSection type="event" contentId={searchParams.get('id')}/>
       <RecommendedUsers />
       <UpcomingEvents />
     </Box>

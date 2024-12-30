@@ -34,9 +34,11 @@ export default function BlogDetailed({ blogId }) {
   const [loading, setLoading] = React.useState(true);
   const [loadingProfile, setLoadingProfile] = React.useState(true);
   const [loadingBanner, setLoadingBanner] = React.useState(true);
+  const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [errorProfile, setErrorProfile] = React.useState(null);
   const [errorBanner, setErrorBanner] = React.useState(null);
+  const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
   const [bannerUrl, setBannerUrl] = React.useState(null);
   const [isLiked, setIsLiked] = React.useState(false);
@@ -45,6 +47,15 @@ export default function BlogDetailed({ blogId }) {
   const [isBookmarked, setIsBookmarked] = React.useState(false);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
+
+  const handleImageError = (error, setErrorState) => {
+    if (error.response && error.response.status === 404) {
+      // Do nothing, don't set an error for 404. The image won't render, which is fine.
+      setErrorState(null);
+    } else {
+      setErrorState(error.message || "An unexpected error occurred.");
+    }
+  };
 
   React.useEffect(() => {
     const fetchBlog = async () => {
@@ -79,7 +90,7 @@ export default function BlogDetailed({ blogId }) {
           }
         } catch (err) {
           console.error("Error fetching profile picture:", err);
-          setErrorProfile(err.message || "An unexpected error occurred.");
+          handleImageError(err, setErrorProfile);
         } finally {
           setLoadingProfile(false);
         }
@@ -110,7 +121,7 @@ export default function BlogDetailed({ blogId }) {
           }
         } catch (err) {
           console.error("Error fetching banner image:", err);
-          setErrorBanner(err.message || "An unexpected error occurred.");
+          handleImageError(err, setErrorBanner);
         } finally {
           setLoadingBanner(false);
         }
@@ -137,6 +148,26 @@ export default function BlogDetailed({ blogId }) {
         }
       };
       fetchIsLiked();
+    }
+  }, [blogData, userLogged]);
+  React.useEffect(() => {
+    if (blogData && blogData.id && userLogged) {
+      const fetchIsBookmarked = async () => {
+        setLoadingIsBookmarked(true);
+        setErrorIsBookmarked(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/blogs/${blogData.id}/is-bookmarked`
+          );
+          setIsBookmarked(response.data.isBookmarked || false);
+        } catch (err) {
+          console.error("Error fetching isBookmarked:", err);
+          setErrorIsBookmarked(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingIsBookmarked(false);
+        }
+      };
+      fetchIsBookmarked();
     }
   }, [blogData, userLogged]);
   const handleLikeToggle = async () => {
@@ -295,7 +326,9 @@ export default function BlogDetailed({ blogId }) {
       )}
       {errorBanner && (
         <Box display="flex" justifyContent="center" my={2}>
-          <Typography color="error">Error: {errorBanner}</Typography>
+          {errorBanner !== null && (
+            <Typography color="error">Error: {errorBanner}</Typography>
+          )}
         </Box>
       )}
 
