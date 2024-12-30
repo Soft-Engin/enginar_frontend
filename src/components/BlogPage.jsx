@@ -1,5 +1,5 @@
-import BlogDetailed from "./BlogDetailed"
-import Box from '@mui/material/Box';
+import BlogDetailed from "./BlogDetailed";
+import Box from "@mui/material/Box";
 import CommentSection from "./CommentSection";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
@@ -16,5 +16,5 @@ export default function BlogPage() {
       <RecommendedUsers />
       <UpcomingEvents />
     </Box>
-  )
+  );
 }

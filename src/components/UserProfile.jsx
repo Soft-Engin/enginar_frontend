@@ -358,17 +358,19 @@ const UserProfile = () => {
             position: "relative",
             overflow: "visible",
             backgroundColor: "#E9F6BC",
+            outline: "1px solid rgb(196, 196, 196)",
           }}
         >
           {/* Cover Image */}
           <Box
             sx={{
-              height: 200,
+              height: 225,
               background: `url(${
                 bannerPic || bannerPlaceholder
               }) no-repeat center`,
               bgcolor: "#bbbbbb",
               backgroundSize: "cover",
+              boxShadow: 2,
             }}
           />
 
@@ -383,13 +385,14 @@ const UserProfile = () => {
             >
               <Avatar
                 sx={{
-                  width: 120,
-                  height: 120,
-                  border: "4px solid white",
-                  position: "absolute",
-                  top: -80,
-                  left: 0,
+                  width: 150,
+                    height: 150,
+                    border: "4px solid white",
+                    position: "absolute",
+                    top: -90,
+                    left: 0,
                   bgcolor: profilePic ? "transparent" : "#bdbdbd",
+                  boxShadow: 2,
                 }}
               >
                 {!profilePic && profilePlaceholder}
@@ -400,7 +403,7 @@ const UserProfile = () => {
                   />
                 )}
               </Avatar>
-              <Box sx={{ mt: -2, ml: 17 }}>
+              <Box sx={{ mt: -2, ml: 20 }}>
                 <Box
                   sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
                 >
@@ -457,7 +460,7 @@ const UserProfile = () => {
                   aria-haspopup="true"
                   onClick={handleClick}
                 >
-                  <MoreVertIcon />
+                  <MoreVertIcon sx={{ fontSize: "30px" }} />
                 </IconButton>
                 <Menu
                   id="menu"

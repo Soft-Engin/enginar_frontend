@@ -165,25 +165,11 @@ export default function SavedLikedPosts() {
   }, []);
 
   return (
-    <Box>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          centered
-          value={value}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-          sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
-        >
-          <Tab
-            label="Recipes"
-            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
-            {...a11yProps(0)}
-          />
-          <Tab
-            label="Blogs"
-            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
-            {...a11yProps(1)}
-          />
+    <Box sx={{ px: 10 }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs centered value={value} onChange={handleChange} aria-label="basic tabs example" sx={{ '& .MuiTabs-indicator': { backgroundColor: '#4B9023' }}} >
+          <Tab label="Recipes" sx={{ '&.Mui-selected': { color: '#4B9023' } }} {...a11yProps(0)} />
+          <Tab label="Blogs" sx={{ '&.Mui-selected': { color: '#4B9023' } }} {...a11yProps(1)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -197,13 +183,17 @@ export default function SavedLikedPosts() {
           {errorRecipes && <div>Error loading recipes: {errorRecipes}</div>}
           {recipes.map((recipe, index) => (
             <Grid
-              item
-              size={4}
-              key={index}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              sx={{ maxWidth: 450 }}
+            item
+            xs={12}
+            sm={12}
+            md={6}
+            lg={4}
+            xl={4}
+            key={index}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            sx={{ maxWidth: 450 }}
             >
               <RecipeMini recipe={recipe} />
             </Grid>
@@ -221,13 +211,17 @@ export default function SavedLikedPosts() {
           {errorBlogs && <div>Error loading blogs: {errorBlogs}</div>}
           {blogs.map((blog, index) => (
             <Grid
-              item
-              size={4}
-              key={index}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              sx={{ maxWidth: 450 }}
+            item
+            xs={12}
+            sm={12}
+            md={6}
+            lg={4}
+            xl={4}
+            key={index}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            sx={{ maxWidth: 450 }}
             >
               <BlogMini blog={blog} />
             </Grid>

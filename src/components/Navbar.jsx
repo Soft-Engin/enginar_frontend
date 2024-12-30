@@ -569,25 +569,25 @@ export default function Navbar(props) {
         }}
       >
         <SpeedDialAction
-          key={"Post"}
+          key={"Blog"}
           icon={<PostAddIcon />}
-          tooltipTitle={"Post"}
+          tooltipTitle={"Blog"}
           tooltipOpen
           onClick={handlePostPopupOpen}
           tooltipPlacement={isSmUp ? "right" : "left"}
         />
         <SpeedDialAction
-          key={"Etkinlik"}
+          key={"Event"}
           icon={<GroupAddIcon />}
-          tooltipTitle={"Etkinlik"}
+          tooltipTitle={"Event"}
           tooltipOpen
           onClick={handleEventPopupOpen}
           tooltipPlacement={isSmUp ? "right" : "left"}
         />
         <SpeedDialAction
-          key={"Tarif"}
+          key={"Recipe"}
           icon={<RestaurantMenuIcon />}
-          tooltipTitle={"Tarif"}
+          tooltipTitle={"Recipe"}
           tooltipOpen
           onClick={() => navigate("/createRecipe")}
           tooltipPlacement={isSmUp ? "right" : "left"}

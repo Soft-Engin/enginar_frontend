@@ -25,15 +25,23 @@ const SettingsPage = () => {
   return (
     <Box
       maxWidth="md"
-      sx={{ width: { xs: "40%", sm: "60%", md: "80%", lg: "80%", xl: "100%" }, margin: "0 auto", marginTop: 4, borderRadius: 3, outline: "1.5px solid #959595", backgroundColor: "#BEDDA3", boxShadow: 5 }}
+      sx={{
+        width: { xs: "40%", sm: "60%", md: "80%", lg: "80%", xl: "100%" },
+        margin: "0 auto",
+        marginTop: 4,
+        borderRadius: 3,
+        outline: "1.5px solid #959595",
+        backgroundColor: "#BEDDA3",
+        boxShadow: 5,
+      }}
     >
       <Box sx={{ display: "flex", pt: 2, pl: 2 }}>
-        <SettingsIcon sx={{ fontSize: 40, mr: 1}} />
+        <SettingsIcon sx={{ fontSize: 40, mr: 1 }} />
       </Box>
 
       <Box sx={{ pt: 2, pl: 2 }}>
         <Typography variant="h6">Profile Settings</Typography>
-        <Divider sx={{ marginBottom: 2}} />
+        <Divider sx={{ marginBottom: 2 }} />
 
         <TextField
           label="Change Username"

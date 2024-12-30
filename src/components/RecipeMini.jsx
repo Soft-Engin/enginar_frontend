@@ -277,7 +277,43 @@ export default function RecipeMini({ recipe }) {
               })}
           </Typography>
         </Box>
-        <MoreHorizIcon style={{ fontSize: "30px" }} />
+        <IconButton
+          aria-label="more"
+          id="menuButton"
+          aria-controls={open ? "menu" : undefined}
+          aria-expanded={open ? "true" : undefined}
+          aria-haspopup="true"
+          onClick={handleClick}
+        >
+          <MoreHorizIcon sx={{ fontSize: "30px" }} />
+        </IconButton>
+        <Menu
+          id="menu"
+          MenuListProps={{
+            "aria-labelledby": "menuButton",
+          }}
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={open}
+          onClose={handleClose}
+        >
+          <MenuItem key="Follow" onClick={handleClose}>
+            Follow User
+          </MenuItem>
+          <MenuItem key="Edit" onClick={handleClose}>
+            Edit Recipe
+          </MenuItem>
+          <MenuItem key="Delete" onClick={handleClose}>
+            Delete Recipe
+          </MenuItem>
+        </Menu>
       </Box>
 
       <Box

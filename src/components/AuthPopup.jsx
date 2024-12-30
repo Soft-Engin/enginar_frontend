@@ -7,6 +7,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -54,6 +55,7 @@ const SubmitButton = styled(Button)(({ theme }) => ({
   borderRadius: "25px",
   fontSize: "20px",
   fontWeight: "bold",
+  textTransform: "none",
 }));
 
 export default function AuthPopup(props) {
@@ -158,7 +160,11 @@ export default function AuthPopup(props) {
         onClose={handleClose}
         maxWidth={"xs"}
         PaperProps={{
-          sx: { width: { xs: 300, sm: 400, md: 600, lg: 600, xl: 650 }, borderRadius: "16px", backgroundColor: "#C8EFA5" },
+          sx: {
+            width: { xs: 300, sm: 400, md: 600, lg: 600, xl: 650 },
+            borderRadius: "16px",
+            backgroundColor: "#C8EFA5",
+          },
           component: "form",
           onSubmit: handleSubmit,
         }}
@@ -189,7 +195,7 @@ export default function AuthPopup(props) {
           )}
           {isSignup ? (
             <>
-             <Stack direction="row" spacing={2} sx={{marginBottom:"10px"}}>
+              <Stack direction="row" spacing={2} sx={{ marginBottom: "4px" }}>
                 <TextField
                   required
                   margin="dense"
@@ -226,7 +232,7 @@ export default function AuthPopup(props) {
                     ),
                   }}
                 />
-                </Stack>
+              </Stack>
               <TextField
                 required
                 margin="dense"
@@ -326,16 +332,18 @@ export default function AuthPopup(props) {
           )}
 
           {!isSignup && (
-            <Typography noWrap component="div" color="#535353">
-              <Link
-                onClick={() => console.log("Forgot Password")}
-                color="#4B9023"
-                underline="hover"
-                sx={{ cursor: "pointer", position: "absolute", right: "6%" }}
-              >
-                Forgot password?
-              </Link>
-            </Typography>
+            <Box sx={{ display: "flex", justifyContent: "right" }}>
+              <Typography noWrap component="div" color="#535353">
+                <Link
+                  onClick={() => console.log("Forgot Password")}
+                  color="#4B9023"
+                  underline="hover"
+                  sx={{ cursor: "pointer" }}
+                >
+                  Forgot password?
+                </Link>
+              </Typography>
+            </Box>
           )}
         </DialogContent>
         <DialogActions
@@ -348,7 +356,7 @@ export default function AuthPopup(props) {
           <SubmitButton type="submit">
             {isSignup ? "Sign Up" : "Log In"}
           </SubmitButton>
-          <Typography noWrap component="div" color="#535353">
+          <Typography noWrap component="div" color="#535353" sx={{ my: 1 }}>
             {isSignup ? "Already have an account? " : "Don't have an account? "}
             <Link
               onClick={isSignup ? handleSwitchToLogin : handleSwitchToSignup}
