@@ -1,133 +1,99 @@
 import * as React from "react";
-import { Box, Typography, Avatar } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  CircularProgress,
+  IconButton,
+} from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 import ShareIcon from "@mui/icons-material/Share";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 
 export default function BlogDetailed() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        outline: "1.5px solid #C0C0C0",
-        backgroundColor: "#FFFFFF",
-        pl: 4,
-        pr: 4,
-        pt: 2,
-        pb: 1,
-        borderRadius: "20px 20px 0 0",
-        boxShadow: 3,
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          pb: 1.2,
-          mb: 1.2,
-          borderBottom: "1px solid #E0E0E0",
-        }}
-      >
+  return(
+    <Box sx={{ width: "100%", outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", pl: 4, pr: 4, pt: 2, pb: 1, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1.2, mb: 1.2, borderBottom: "1px solid #E0E0E0" }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Avatar sx={{ width: 50, height: 50, marginRight: 1.5 }} />
-          <Box>
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              sx={{ marginRight: 0.5 }}
-              noWrap
-            >
-              Hoshino Ichika
-            </Typography>
-            <Typography variant="body2" color="text.secondary" noWrap>
-              5 days ago
-            </Typography>
-          </Box>
+          {/* Placeholder avatar */}
+          <Link
+            to={`/profile?id=${blogData.userId}`}
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Avatar
+              src={profilePictureUrl}
+              sx={{ width: 50, height: 50, marginRight: 1.5 }}
+              onError={() => setProfilePictureUrl(null)}
+            />
+            <Box>
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                sx={{ marginRight: 0.5 }}
+                noWrap
+              >
+                {blogData.userName}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" noWrap>
+                {blogData.createdAt &&
+                  formatDistanceToNow(parseISO(blogData.createdAt), {
+                    addSuffix: true,
+                  })}
+              </Typography>
+            </Box>
+          </Link>
         </Box>
-        <IconButton
-          aria-label="more"
-          id="menuButton"
-          aria-controls={open ? "menu" : undefined}
-          aria-expanded={open ? "true" : undefined}
-          aria-haspopup="true"
-          onClick={handleClick}
-        >
-          <MoreHorizIcon sx={{ fontSize: "40px" }} />
-        </IconButton>
-        <Menu
-          id="menu"
-          MenuListProps={{
-            "aria-labelledby": "menuButton",
-          }}
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "left",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={open}
-          onClose={handleClose}
-        >
-          <MenuItem key="Follow" onClick={handleClose}>
-            Follow User
-          </MenuItem>
-          <MenuItem key="Edit" onClick={handleClose}>
-            Edit Blog
-          </MenuItem>
-          <MenuItem key="Delete" onClick={handleClose}>
-            Delete Blog
-          </MenuItem>
-        </Menu>
+        <MoreHorizIcon sx={{ fontSize: "40px" }} />
       </Box>
-
       <Typography
         variant="body1"
         component="div"
         sx={{ lineHeight: "28px", mb: 2 }}
       >
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-        mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
-        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-        magna aliqua.
+        {blogData.bodyText}
       </Typography>
+      {bannerUrl && !loadingBanner && (
+        <Box sx={{ mb: 2 }}>
+          <StyledCardMedia
+            src={bannerUrl}
+            alt={blogData.header}
+            onError={() => setBannerUrl(null)}
+          />
+        </Box>
+      )}
+      {errorBanner && (
+        <Box display="flex" justifyContent="center" my={2}>
+          {errorBanner !== null && (
+            <Typography color="error">Error: {errorBanner}</Typography>
+          )}
+        </Box>
+      )}
 
-      <img
-        src="https://via.placeholder.com/400x225"
-        alt="Enginar Yemeği"
-        style={{
-          width: "100%",
-          height: "450px",
-          display: "block",
-          objectFit: "cover",
-          borderRadius: 10,
-          border: "1px solid #C0C0C0",
-        }}
-      />
+      {blogData.recipeId && (
+        <Link
+          to={`/recipe?id=${blogData.recipeId}`}
+          style={{
+            textDecoration: "none",
+            color: "inherit",
+            display: "block",
+            textAlign: "center",
+            marginBottom: 2,
+          }}
+        >
+          <Typography variant="body1" fontWeight={"bold"}>
+            Click here to see related recipe
+          </Typography>
+        </Link>
+      )}
 
       <Box
         sx={{
@@ -145,10 +111,10 @@ export default function BlogDetailed() {
           sx={{ marginRight: 0.5 }}
           noWrap
         >
-          11:35 PM
+          {formattedTime}
         </Typography>
         <Typography variant="body1" color="text.secondary" noWrap>
-          · Dec 15, 2024
+          · {formattedDate}
         </Typography>
       </Box>
 
@@ -161,9 +127,19 @@ export default function BlogDetailed() {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <FavoriteBorderIcon style={{ fontSize: "45px", marginRight: 4 }} />
+            <IconButton onClick={handleLikeToggle} style={{ padding: 0 }}>
+              {isLiked ? (
+                <FavoriteIcon
+                  style={{ fontSize: "45px", marginRight: 4, color: "red" }}
+                />
+              ) : (
+                <FavoriteBorderIcon
+                  style={{ fontSize: "45px", marginRight: 4 }}
+                />
+              )}
+            </IconButton>
             <Typography variant="body1" color="text.secondary">
-              39,500
+              {likeCount}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -171,14 +147,20 @@ export default function BlogDetailed() {
               style={{ fontSize: "42px", marginRight: 4 }}
             />
             <Typography variant="body1" color="text.secondary">
-              14
+              {commentCount}
             </Typography>
           </Box>
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <ShareIcon style={{ fontSize: "42px", marginRight: 6 }} />
-          <BookmarkBorderOutlinedIcon style={{ fontSize: "48px" }} />
+          <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+            {isBookmarked ? (
+              <BookmarkIcon style={{ fontSize: "48px" }} />
+            ) : (
+              <BookmarkBorderOutlinedIcon style={{ fontSize: "48px" }} />
+            )}
+          </IconButton>
         </Box>
       </Box>
     </Box>

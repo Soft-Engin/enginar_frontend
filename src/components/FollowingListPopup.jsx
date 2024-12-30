@@ -1,28 +1,47 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-
 import CloseIcon from "@mui/icons-material/Close";
 import UserListItem from "./UserListItem";
-
-function generate(element) {
-  return [
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-    21, 22,
-  ].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    })
-  );
-}
+import axios from "axios";
 
 export default function FollowingListPopup(props) {
-  const handleClose = () => {
-    props.handleClose();
-  };
+  const { open, handleClose, userId } = props;
+  const [following, setFollowing] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchFollowing = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(
+          `/api/v1/users/${userId}/following?pageSize=100`
+        );
+        if (response.status === 200) {
+          setFollowing(response.data.items);
+          setTotalCount(response.data.totalCount);
+        }
+      } catch (error) {
+        console.error("Error fetching following:", error);
+        setError(error.message || "Failed to load following.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (open) {
+      fetchFollowing();
+    }
+  }, [open, userId]);
+
+  if (!open || totalCount === 0) {
+    return null; // Do not render the dialog if not open or there are no following
+  }
 
   return (
     <Dialog
@@ -49,23 +68,27 @@ export default function FollowingListPopup(props) {
         }}
       >
         <Typography variant="h6" fontWeight="bold">
-          Following (42)
+          Following ({totalCount})
         </Typography>
         <IconButton onClick={handleClose} sx={{ color: "#555" }}>
           <CloseIcon />
         </IconButton>
       </Box>
       <DialogContent sx={{ px: 1.5, py: 0 }}>
-        {generate(<UserListItem />).map((user, index) => (
-          <Box
-            key={index}
-            justifyContent="center"
-            alignItems="center"
-            sx={{ mt: 0.5, mb: 1.5 }}
-          >
-            {user}
-          </Box>
-        ))}
+        {loading && <Typography>Loading following...</Typography>}
+        {error && <Typography color="error">{error}</Typography>}
+        {!loading &&
+          !error &&
+          following.map((user) => (
+            <Box
+              key={user.userId}
+              justifyContent="center"
+              alignItems="center"
+              sx={{ mt: 0.5, mb: 1.5 }}
+            >
+              <UserListItem user={user} />
+            </Box>
+          ))}
       </DialogContent>
     </Dialog>
   );

@@ -1,53 +1,81 @@
-import { Typography, Box, Avatar, Button } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
 import { styled } from "@mui/material/styles";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const SharedButton = styled(Button)(({ theme }) => ({
-  border: "#888888",
-  borderStyle: "solid",
-  borderWidth: "2px",
-  height: "30px",
-  minWidth: "90px",
-  borderRadius: "20px",
-}));
-
-const FollowButton = styled(SharedButton)(({ theme }) => ({
-  color: "#453E3E",
+const UserListItemContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
   backgroundColor: "#FFFFFF",
-  "&:hover": {
-    backgroundColor: "#FFFFFF",
-  },
-  textTransform: "none",
-  fontWeight: "bold",
-  variant: "subtitle1",
+  borderRadius: 5,
+  boxShadow: 2,
+  padding: theme.spacing(1), // Increased padding for better spacing
+  outline: "1.5px solid #C0C0C0",
+    cursor: 'pointer', // Change cursor to pointer on hover
+    transition: 'background-color 0.1s ease', // Smooth transition for hover
+    "&:hover": { // Add hover effect
+        backgroundColor: '#f0f0f0', // Slight background color change on hover
+    },
 }));
 
-export default function UserListItem() {
+const UserListItem = ({ user }) => {
+  const [profilePic, setProfilePic] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfilePic = async () => {
+      try {
+        const picResponse = await axios.get(
+          `/api/v1/users/${user.userId}/profile-picture`,
+          { responseType: "blob" }
+        );
+        if (picResponse.status === 200) {
+          const imageUrl = URL.createObjectURL(picResponse.data);
+          setProfilePic(imageUrl);
+        } else {
+          setProfilePic(null);
+        }
+      } catch (error) {
+        console.error("Error fetching profile pic:", error);
+        setProfilePic(null);
+      }
+    };
+    fetchProfilePic();
+  }, [user.userId]);
+
+  const handleUserClick = () => {
+    navigate(`/profile?id=${user.userId}`);
+  };
+
+  const profilePlaceholder = user?.userName
+    ? user.userName.charAt(0).toUpperCase()
+    : "?";
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        backgroundColor: "#FFFFFF",
-        borderRadius: 5,
-        boxShadow: 2,
-        py: 0.8,
-        px: 2,
-        outline: "1.5px solid #C0C0C0",
-      }}
-    >
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Avatar sx={{ width: 38, height: 38, marginRight: 0.7 }} />
-        <Typography
-          variant="body1"
-          component="div"
-          color="text.secondary"
-          noWrap
+    <UserListItemContainer onClick={handleUserClick}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Avatar
+          sx={{
+            width: 40,
+            height: 40,
+            bgcolor: profilePic ? "transparent" : "grey",
+          }}
         >
-          <b>Kusanagi Nene</b>
+          {!profilePic && profilePlaceholder}
+          {profilePic && (
+            <Avatar src={profilePic} sx={{ width: "100%", height: "100%" }} />
+          )}
+        </Avatar>
+        <Typography sx={{ fontWeight: "medium", fontSize: "18px" }}>
+          {user.userName}
         </Typography>
       </Box>
-      <FollowButton variant="contained">Follow</FollowButton>
-    </Box>
+    </UserListItemContainer>
   );
-}
+};
+
+export default UserListItem;
