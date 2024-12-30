@@ -337,6 +337,7 @@ const CreateRecipe = () => {
   if (loading) {
     return (
       <Box
+        data-testid="create-recipe-loading"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -350,6 +351,7 @@ const CreateRecipe = () => {
   if (error) {
     return (
       <Box
+        data-testid="create-recipe-error"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -361,7 +363,7 @@ const CreateRecipe = () => {
   }
 
   return (
-    <Box sx={{ p: 4, width: "90vmax", overflow: "hidden" }}>
+    <Box data-testid="create-recipe-form" sx={{ p: 4, width: "90vmax", overflow: "hidden" }}>
       <Snackbar
         open={creationSuccess}
         autoHideDuration={6000}
@@ -406,6 +408,8 @@ const CreateRecipe = () => {
           <Box>
             {/* Recipe Name */}
             <TextField
+              data-testid="recipe-name-input"
+              inputProps={{ "data-testid": "recipe-name-input-field" }}  // Add this line
               label="Recipe Name"
               variant="outlined"
               fullWidth
@@ -751,6 +755,7 @@ const CreateRecipe = () => {
               Add Step
             </Button>
             <Button
+              data-testid="create-recipe-button"
               variant="contained"
               sx={{ mt: 2 }}
               color="success"
@@ -767,8 +772,10 @@ const CreateRecipe = () => {
           <Box sx={{ height: "80%", display: "flex", flexDirection: "column" }}>
             {/* Search Bar */}
             <TextField
+              data-testid="ingredient-search-input"
               variant="outlined"
               placeholder="Search Ingredients"
+              inputProps={{ "data-testid": "ingredient-search-input-field" }}  // Add this line
               fullWidth
               InputProps={{
                 startAdornment: <SearchIcon sx={{ mr: 1 }} />,
@@ -786,6 +793,7 @@ const CreateRecipe = () => {
 
             {/* Ingredient List */}
             <Box
+              data-testid="ingredient-list"
               sx={{
                 overflowY: "auto",
                 maxHeight: "90vh",
