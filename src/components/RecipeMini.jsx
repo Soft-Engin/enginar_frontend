@@ -11,6 +11,8 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 const StyledCardMedia = styled("img")({
   width: "100%",
@@ -222,6 +224,17 @@ export default function RecipeMini({ recipe }) {
       console.error("Error toggling bookmark", err);
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     }
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (

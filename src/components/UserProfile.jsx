@@ -407,7 +407,7 @@ const UserProfile = () => {
                 <Box
                   sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
                 >
-                  <Typography variant="h5" fontWeight="bold">
+                  <Typography variant="h4" fontWeight="bold">
                     {profileData.firstName} {profileData.lastName}
                   </Typography>
                   {!isOwnProfile &&
