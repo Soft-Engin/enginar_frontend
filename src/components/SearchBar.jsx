@@ -5,6 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 
 const Search = styled("div")(({ theme }) => ({
@@ -76,7 +77,6 @@ const MenuProps = {
       marginTop: -6,
       minWidth: "95px",
       boxShadow: "none",
-      paddingLeft: 3.5,
     },
   },
   anchorOrigin: {
@@ -138,7 +138,7 @@ export default function SearchBar() {
                 value={option.value}
                 sx={{ display: isSelected ? "none" : "block" }}
               >
-                {option.label}
+                <Typography sx={{ ml: 0.5 }}>{option.label}</Typography>
               </StyledMenuItem>
             );
           })}
