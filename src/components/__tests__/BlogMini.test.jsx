@@ -184,44 +184,77 @@ describe('BlogMini Component', () => {
   /* is this test necessary? */
   // it is testing by adil and will be removed in the future, propably
   /*
-  test('cleans up resources on unmount', async () => {
+  it('cleans up resources on unmount', async () => {
+    // Mock URLs
     const mockUrls = ['mock-url-1', 'mock-url-2'];
     let urlIndex = 0;
-  
-    // Mock URL.createObjectURL
-    URL.createObjectURL.mockImplementation(() => mockUrls[urlIndex++]);
-  
-    // Mock API responses
+    global.URL.createObjectURL.mockImplementation(() => mockUrls[urlIndex++]);
+
+    // Mock successful API responses
     axios.get.mockImplementation((url) => {
-      if (url.includes('/banner') || url.includes('/profile-picture')) {
-        return Promise.resolve({ data: new Blob(['test'], { type: 'image/jpeg' }) });
+      const blob = new Blob(['test'], { type: 'image/jpeg' });
+      if (url.includes('/banner')) {
+        return Promise.resolve({
+          status: 200,
+          data: blob
+        });
+      }
+      if (url.includes('/profile-picture')) {
+        return Promise.resolve({
+          status: 200,
+          data: blob
+        });
+      }
+      // Mock other required endpoints
+      if (url.includes('/like-count')) {
+        return Promise.resolve({ data: { likeCount: 0 } });
+      }
+      if (url.includes('/comments')) {
+        return Promise.resolve({ data: { totalCount: 0 } });
+      }
+      if (url.includes('/is-liked')) {
+        return Promise.resolve({ data: { isLiked: false } });
+      }
+      if (url.includes('/is-bookmarked')) {
+        return Promise.resolve({ data: { isBookmarked: false } });
       }
       return Promise.resolve({ data: {} });
     });
-  
+
+    // Render and wait for images to load
     const { unmount } = render(
       <BrowserRouter>
-        <BlogMini blog={mockBlog} />
+        <BlogMini 
+          blog={{
+            id: '123',
+            userId: 'user123',
+            userName: 'Test User',
+            bodyText: 'Test content'
+          }}
+        />
       </BrowserRouter>
     );
-  
-    // Wait for the banner and profile picture URLs to be set
+
+    // Wait for the createObjectURL calls
     await waitFor(() => {
       expect(URL.createObjectURL).toHaveBeenCalledTimes(2);
     });
-  
-    // Log to confirm the URLs are set
-    console.log('Mock URLs:', mockUrls);
-  
-    // Unmount the component
+
+    // Store the actual created URLs
+    const calls = URL.createObjectURL.mock.results.map(result => result.value);
+
+    // Unmount to trigger cleanup
     unmount();
-  
-    // Ensure URLs are cleaned up
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith(mockUrls[0]);
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith(mockUrls[1]);
+
+    // Wait for cleanup and verify each URL was revoked
+    await waitFor(() => {
+      calls.forEach(url => {
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith(url);
+      });
+    });
   });
   */
-  
+
   test('toggles like icon when clicked', async () => {
     localStorage.setItem('userLogged', 'true');
     axios.post.mockResolvedValueOnce({});
