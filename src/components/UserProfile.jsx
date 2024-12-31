@@ -167,7 +167,7 @@ const UserProfile = () => {
         console.error("Error fetching follow counts: ", error);
       }
     };
-
+  
     fetchUserData();
     fetchFollowCounts();
   }, [userId]);
@@ -439,6 +439,7 @@ const UserProfile = () => {
                     variant="body2"
                     onClick={handleFollowingPopupOpen}
                     sx={{ cursor: "pointer" }}
+                    data-testid="following-count"
                   >
                     <strong>{followingCount}</strong> Following
                   </Typography>
@@ -446,6 +447,7 @@ const UserProfile = () => {
                     variant="body2"
                     onClick={handleFollowersPopupOpen}
                     sx={{ cursor: "pointer" }}
+                    data-testid="followers-count"
                   >
                     <strong>{followersCount}</strong> Followers
                   </Typography>

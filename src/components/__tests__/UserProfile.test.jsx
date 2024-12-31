@@ -10,6 +10,17 @@ import UserProfile from "../UserProfile"; // Adjust path as needed
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
 vi.mock("axios");
+vi.mock("../UserBlogsTab", () => ({
+  default: () => <div>Blog 1</div>
+}));
+
+vi.mock("../UserEventsTab", () => ({
+  default: () => <div>Event 1</div>
+}));
+
+vi.mock("../UserRecipesTab", () => ({
+  default: () => <div>Recipe 1</div>
+}));
 
 describe("UserProfile Component", () => {
   // A helper to render <UserProfile /> in a Router context
@@ -55,89 +66,128 @@ describe("UserProfile Component", () => {
   });
 
   it("renders user profile details after successful fetch", async () => {
-    // 1) Mock GET /api/v1/users/abc123
-    axios.get.mockResolvedValueOnce({
-      status: 200,
-      data: {
-        userId: "abc123",
-        firstName: "John",
-        lastName: "Doe",
-        userName: "johndoe",
-        bio: "Hello from John",
-      },
+    let followingCount = 5;
+    let followersCount = 12;
+
+    // Mock API responses
+    axios.get.mockImplementation((url) => {
+      if (url.includes('/api/v1/users/abc123') && !url.includes('followers') && !url.includes('following')) {
+        return Promise.resolve({
+          status: 200,
+          data: {
+            userId: "abc123",
+            firstName: "John",
+            lastName: "Doe",
+            userName: "johndoe",
+            bio: "Hello from John",
+          },
+        });
+      }
+      if (url.includes('/profile-picture')) {
+        return Promise.resolve({ status: 200, data: new Blob(["img"]) });
+      }
+      if (url.includes('/banner')) {
+        return Promise.resolve({ status: 200, data: new Blob(["banner"]) });
+      }
+      if (url.includes('/followers')) {
+        return Promise.resolve({ 
+          status: 200, 
+          data: { totalCount: followersCount } 
+        });
+      }
+      if (url.includes('/following')) {
+        return Promise.resolve({ 
+          status: 200, 
+          data: { 
+            items: [],
+            totalCount: followingCount 
+          } 
+        });
+      }
+      return Promise.reject(new Error('Unhandled URL in test'));
     });
-    // 2) Mock GET /api/v1/users/abc123/profile-picture
-    axios.get.mockResolvedValueOnce({ status: 200, data: new Blob(["img"]) });
-    // 3) Mock GET /api/v1/users/abc123/banner
-    axios.get.mockResolvedValueOnce({ status: 200, data: new Blob(["banner"]) });
-    // 4) Mock GET /api/v1/users/abc123/followers
-    axios.get.mockResolvedValueOnce({ status: 200, data: { totalCount: 12 } });
-    // 5) Mock GET /api/v1/users/abc123/following
-    axios.get.mockResolvedValueOnce({ status: 200, data: { totalCount: 5 } });
 
     renderUserProfile();
 
-    // Wait for data
-    await waitFor(() =>
-      expect(screen.queryByTestId("user-profile-loading")).not.toBeInTheDocument()
-    );
+    // Wait for data and verify initial state
+    await waitFor(() => {
+      expect(screen.queryByTestId("user-profile-loading")).not.toBeInTheDocument();
+      expect(screen.getByText("John Doe")).toBeInTheDocument();
+      expect(screen.getByText("johndoe")).toBeInTheDocument();
+      expect(screen.getByText("Hello from John")).toBeInTheDocument();
+    });
 
-    // Check user info
-    expect(screen.getByText("John Doe")).toBeInTheDocument();
-    expect(screen.getByText("johndoe")).toBeInTheDocument();
-    expect(screen.getByText("Hello from John")).toBeInTheDocument();
     // Check follower/following counts
-    expect(screen.getByText("5 Following")).toBeInTheDocument();
-    expect(screen.getByText("12 Followers")).toBeInTheDocument();
+    expect(screen.getByTestId("following-count")).toHaveTextContent(`${followingCount} Following`);
+    expect(screen.getByTestId("followers-count")).toHaveTextContent(`${followersCount} Followers`);
   });
 
   it("displays follow/unfollow buttons if not own profile and toggles follow state", async () => {
-    // Suppose the logged-in user is "xyz456"
     localStorage.setItem("userData", JSON.stringify({ userId: "xyz456" }));
 
-    // 1) Mock GET /api/v1/users/abc123
-    axios.get.mockResolvedValueOnce({
-      status: 200,
-      data: {
-        userId: "abc123",
-        firstName: "John",
-        lastName: "Doe",
-        userName: "johndoe",
-        bio: "Hello from John",
-      },
-    });
-    // 2) profile pic
-    axios.get.mockResolvedValueOnce({ status: 200, data: new Blob(["img"]) });
-    // 3) banner
-    axios.get.mockResolvedValueOnce({ status: 200, data: new Blob(["banner"]) });
-    // 4) GET /api/v1/users/abc123/followers
-    axios.get.mockResolvedValueOnce({ status: 200, data: { totalCount: 12 } });
-    // 5) GET /api/v1/users/abc123/following
-    axios.get.mockResolvedValueOnce({ status: 200, data: { totalCount: 5 } });
-    // 6) GET /api/v1/users/xyz456/following => check if we are following "abc123" or not
-    axios.get.mockResolvedValueOnce({
-      status: 200,
-      data: { items: [] }, // not following initially
+    let followerCount = 12;
+
+    // Mock API responses handling URL patterns
+    axios.get.mockImplementation((url) => {
+      if (url.includes('/api/v1/users/abc123') && !url.includes('followers') && !url.includes('following')) {
+        return Promise.resolve({
+          status: 200,
+          data: {
+            userId: "abc123",
+            firstName: "John",
+            lastName: "Doe",
+            userName: "johndoe",
+            bio: "Hello from John",
+          },
+        });
+      }
+      if (url.includes('/profile-picture')) {
+        return Promise.resolve({ status: 200, data: new Blob(["img"]) });
+      }
+      if (url.includes('/banner')) {
+        return Promise.resolve({ status: 200, data: new Blob(["banner"]) });
+      }
+      if (url.includes('/followers')) {
+        return Promise.resolve({ 
+          status: 200, 
+          data: { totalCount: followerCount } 
+        });
+      }
+      if (url.includes('/following')) {
+        if (url.includes('xyz456/following')) {
+          return Promise.resolve({
+            status: 200,
+            data: { items: [], totalCount: 0 }
+          });
+        }
+        return Promise.resolve({ status: 200, data: { totalCount: 5 } });
+      }
+      return Promise.reject(new Error('Unhandled URL in test'));
     });
 
     renderUserProfile();
 
-    await waitFor(() =>
-      expect(screen.getByText("John Doe")).toBeInTheDocument()
-    );
+    // Wait for initial render
+    await waitFor(() => {
+      expect(screen.getByText("John Doe")).toBeInTheDocument();
+      expect(screen.getByTestId("followers-count")).toHaveTextContent("12 Followers");
+    });
 
-    // We see the "Follow" button (because we are not following)
-    const followButton = screen.getByRole("button", { name: /Follow/i });
-    expect(followButton).toBeInTheDocument();
-
-    // Now mock the POST /api/v1/users/follow to succeed
+    // Mock the follow API call
     axios.post.mockResolvedValueOnce({ status: 200 });
+    
+    // Update follower count for next API call
+    followerCount = 13;
+    
+    // Find and click Follow button
+    const followButton = screen.getByRole("button", { name: /Follow/i });
     fireEvent.click(followButton);
 
-    // We'll wait for the button to change to "Unfollow"
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Unfollow/i })).toBeInTheDocument()
-    );
+    // Wait for the Unfollow button and updated follower count
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Unfollow/i })).toBeInTheDocument();
+      expect(screen.getByTestId("followers-count")).toHaveTextContent("13 Followers");
+    });
   });
 
   it("does not display follow button if the profile belongs to the logged-in user", async () => {
@@ -216,37 +266,51 @@ describe("UserProfile Component", () => {
   });
 
   it("can switch tabs (Blogs, Events, Recipes)", async () => {
-    // For brevity, we won't detail the entire fetch chain
-    axios.get.mockResolvedValue({ status: 200, data: { userId: "abc123" } });
-    axios.get.mockResolvedValue({ status: 200, data: new Blob(["pp"]) });
-    axios.get.mockResolvedValue({ status: 200, data: new Blob(["banner"]) });
-    axios.get.mockResolvedValue({ status: 200, data: { totalCount: 1 } });
-    axios.get.mockResolvedValue({ status: 200, data: { totalCount: 2 } });
+    // Mock user profile data
+    axios.get.mockImplementation((url) => {
+      if (url.includes('/users/abc123')) {
+        return Promise.resolve({ 
+          status: 200, 
+          data: { userId: "abc123", firstName: "John" } 
+        });
+      }
+      if (url.includes('/profile-picture')) {
+        return Promise.resolve({ status: 200, data: new Blob(["pp"]) });
+      }
+      if (url.includes('/banner')) {
+        return Promise.resolve({ status: 200, data: new Blob(["banner"]) });
+      }
+      if (url.includes('/followers')) {
+        return Promise.resolve({ status: 200, data: { totalCount: 1 } });
+      }
+      if (url.includes('/following')) {
+        return Promise.resolve({ 
+          status: 200, 
+          data: { 
+            items: [],  // Initialize as empty array
+            totalCount: 2 
+          } 
+        });
+      }
+    });
 
     renderUserProfile();
 
     await waitFor(() => screen.getByTestId("user-profile-container"));
 
-    // Tab is presumably at index=0 (Blogs)
-    expect(screen.getByText("Blogs")).toBeInTheDocument();
+    // Test tab switching
+    // Verify initial tab (Blogs)
+    expect(screen.getByText("Blog 1")).toBeInTheDocument();
 
-    // Find the tab with label "Events"
+    // Switch to Events tab
     const eventsTab = screen.getByRole("tab", { name: /Events/i });
     fireEvent.click(eventsTab);
+    expect(screen.getByText("Event 1")).toBeInTheDocument();
 
-    // We can check if the "UserEventsTab" content is visible
-    // For instance, if that tab component has some text "No events found" or something
-    await waitFor(() => {
-      expect(screen.getByText("UserEventsTab")).toBeInTheDocument(); 
-      // If your actual "UserEventsTab" text is different, adapt accordingly.
-    });
-
-    // Switch to "Recipes" tab
+    // Switch to Recipes tab
     const recipesTab = screen.getByRole("tab", { name: /Recipes/i });
     fireEvent.click(recipesTab);
-    await waitFor(() => {
-      expect(screen.getByText("UserRecipesTab")).toBeInTheDocument();
-    });
+    expect(screen.getByText("Recipe 1")).toBeInTheDocument();
   });
 });
 
