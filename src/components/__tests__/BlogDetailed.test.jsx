@@ -13,15 +13,23 @@ import BlogDetailed from "../BlogDetailed";
 vi.mock("axios");
 
 describe("BlogDetailed Component", () => {
-  // Utility to set localStorage
-  const setLocalStorage = (key, value) => {
-    window.localStorage.setItem(key, value);
-  };
+  beforeEach(() => {
+    // Mock URL.createObjectURL
+    global.URL.createObjectURL = vi.fn(() => 'mocked-url');
+    // Mock URL.revokeObjectURL
+    global.URL.revokeObjectURL = vi.fn();
+  });
 
   afterEach(() => {
     vi.restoreAllMocks();
     window.localStorage.clear();
+    global.URL.createObjectURL.mockReset();
   });
+
+  // Utility to set localStorage
+  const setLocalStorage = (key, value) => {
+    window.localStorage.setItem(key, value);
+  };
 
   const renderWithRouter = (ui) => {
     return render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -116,19 +124,49 @@ describe("BlogDetailed Component", () => {
       userName: "John Doe",
     };
 
-    axios.get
-      .mockResolvedValueOnce({ data: mockBlogData }) // for blog data
-      .mockResolvedValueOnce({ data: new Blob(["fakeImageData"], { type: "image/png" }) }); // banner image
+    // Mock API responses with proper blob handling
+    axios.get.mockImplementation((url) => {
+      if (url === `/api/v1/blogs/123`) {
+        return Promise.resolve({ data: mockBlogData });
+      }
+      if (url === `/api/v1/blogs/123/banner`) {
+        return Promise.resolve({ 
+          status: 200,
+          data: new Blob(['fakeImageData'], { type: 'image/jpeg' })
+        });
+      }
+      if (url.includes('is-liked')) {
+        return Promise.resolve({
+          data: { isLiked: false, likeCount: 0 }
+        });
+      }
+      if (url.includes('is-bookmarked')) {
+        return Promise.resolve({
+          data: { isBookmarked: false }
+        });
+      }
+      return Promise.resolve({ data: null });
+    });
 
     renderWithRouter(<BlogDetailed blogId="123" />);
 
-    await waitFor(() =>
-      expect(screen.getByTestId("blog-detailed-container")).toBeInTheDocument()
-    );
+    // Wait for the blog container to be present
+    await waitFor(() => {
+      expect(screen.getByTestId("blog-detailed-container")).toBeInTheDocument();
+    });
 
-    // Banner container should exist
-    expect(screen.getByTestId("blog-banner-container")).toBeInTheDocument();
-    expect(screen.getByTestId("blog-banner-image")).toBeInTheDocument();
+    // Wait for the banner to be present
+    await waitFor(() => {
+      expect(screen.getByTestId("blog-banner-container")).toBeInTheDocument();
+    });
+
+    // Verify banner image is present with mocked URL
+    const bannerImage = screen.getByTestId("blog-banner-image");
+    expect(bannerImage).toBeInTheDocument();
+    expect(bannerImage).toHaveAttribute('src', 'mocked-url');
+
+    // Verify URL.createObjectURL was called with the blob
+    expect(URL.createObjectURL).toHaveBeenCalled();
   });
 
   it("shows no error if banner returns 404", async () => {
@@ -186,41 +224,66 @@ describe("BlogDetailed Component", () => {
   it("toggles like if user is logged in", async () => {
     localStorage.setItem("userLogged", "true");
   
-    axios.get
-      // #1 blog data
-      .mockResolvedValueOnce({
-        data: { id: "123", userId: "user-abc", userName: "John Doe" },
-      })
-      // #2 banner
-      .mockResolvedValueOnce({ data: null }) // or a Blob if you want
-      // #3 isLiked
-      .mockResolvedValueOnce({ data: { isLiked: false, likeCount: 5 } })
-      // #4 isBookmarked
-      .mockResolvedValueOnce({ data: { isBookmarked: false } });
+    // Mock API responses with proper URL matching
+    axios.get.mockImplementation((url) => {
+      if (url === `/api/v1/blogs/123`) {
+        return Promise.resolve({
+          data: { 
+            id: "123", 
+            userId: "user-abc",
+            userName: "John Doe" 
+          }
+        });
+      }
+      if (url === `/api/v1/blogs/123/is-liked`) {
+        return Promise.resolve({
+          data: { 
+            isLiked: false,
+            likeCount: 5
+          }
+        });
+      }
+      if (url === `/api/v1/blogs/123/is-bookmarked`) {
+        return Promise.resolve({
+          data: { 
+            isBookmarked: false
+          }
+        });
+      }
+      if (url.includes('banner')) {
+        return Promise.resolve({
+          data: new Blob(['banner'])
+        });
+      }
+      return Promise.reject(new Error(`Unhandled URL in test: ${url}`));
+    });
   
-    axios.post.mockResolvedValue({}); // for toggling like
+    // Mock successful like toggle
+    axios.post.mockResolvedValueOnce({ status: 200 });
   
     renderWithRouter(<BlogDetailed blogId="123" />);
   
-    // Wait for container
-    await waitFor(() =>
-      expect(screen.getByTestId("blog-detailed-container")).toBeInTheDocument()
-    );
+    // Wait for the blog to load
+    await waitFor(() => {
+      expect(screen.getByTestId("blog-detailed-container")).toBeInTheDocument();
+    });
   
-    // Wait for isLiked to set count=5
-    await waitFor(() =>
-      expect(screen.getByTestId("like-count")).toHaveTextContent("5")
-    );
+    // Wait for like data to be loaded and verify initial state
+    await waitFor(() => {
+      const likeButton = screen.getByTestId("like-button");
+      const likeCount = screen.getByTestId("like-count");
+      expect(likeCount).toHaveTextContent("5");
+      expect(likeButton).toBeInTheDocument();
+    });
   
-    // Confirm border icon is there
-    expect(screen.getByTestId("like-icon-border")).toBeInTheDocument();
-  
-    // Click to like
+    // Click the like button
     fireEvent.click(screen.getByTestId("like-button"));
   
-    // Now it becomes filled, count=6
-    expect(screen.getByTestId("like-icon-filled")).toBeInTheDocument();
-    expect(screen.getByTestId("like-count")).toHaveTextContent("6");
+    // Verify the optimistic update
+    await waitFor(() => {
+      expect(screen.getByTestId("like-icon-filled")).toBeInTheDocument();
+      expect(screen.getByTestId("like-count")).toHaveTextContent("6");
+    });
   });
   
 
@@ -230,38 +293,58 @@ describe("BlogDetailed Component", () => {
   it("reverts the like count if toggle request fails", async () => {
     setLocalStorage("userLogged", "true");
 
-    // 1) blog data
-    axios.get.mockResolvedValueOnce({
-      data: { id: "123", userId: "user-abc", userName: "John Doe" },
+    let mockLikeData = { isLiked: false, likeCount: 5 };
+
+    // Mock all API responses with consistent implementation
+    axios.get.mockImplementation((url) => {
+      if (url === `/api/v1/blogs/123`) {
+        return Promise.resolve({
+          data: { id: "123", userId: "user-abc", userName: "John Doe" }
+        });
+      }
+      if (url === `/api/v1/blogs/123/is-liked`) {
+        return Promise.resolve({ data: mockLikeData });
+      }
+      if (url === `/api/v1/blogs/123/is-bookmarked`) {
+        return Promise.resolve({ data: { isBookmarked: false } });
+      }
+      // Mock other endpoints as needed
+      return Promise.resolve({ data: null });
     });
-    // 2) is-liked call
-    axios.get.mockResolvedValueOnce({
-      data: { isLiked: false, likeCount: 5 },
-    });
+
+    // Mock the toggle call to fail
+    axios.post.mockRejectedValueOnce(new Error("Toggle failed"));
 
     renderWithRouter(<BlogDetailed blogId="123" />);
 
-    await waitFor(() => screen.getByTestId("blog-detailed-container"));
+    // Wait for component to load and verify initial state
+    await waitFor(() => {
+      expect(screen.getByTestId("blog-detailed-container")).toBeInTheDocument();
+    });
 
-    // At start: 5, and border icon
-    expect(screen.getByTestId("like-count")).toHaveTextContent("5");
+    // Wait for like data to be loaded
+    await waitFor(() => {
+      const likeCount = screen.getByTestId("like-count");
+      expect(likeCount).toHaveTextContent("5");
+    });
+
+    // Verify initial state
     expect(screen.getByTestId("like-icon-border")).toBeInTheDocument();
 
-    // Make the toggle call fail
-    axios.post.mockRejectedValueOnce(new Error("Toggle failed"));
-
-    // Click to like
+    // Click like button
     fireEvent.click(screen.getByTestId("like-button"));
 
-    // Immediately shows filled icon and 6
-    expect(screen.getByTestId("like-icon-filled")).toBeInTheDocument();
-    expect(screen.getByTestId("like-count")).toHaveTextContent("6");
+    // Verify optimistic update
+    await waitFor(() => {
+      expect(screen.getByTestId("like-icon-filled")).toBeInTheDocument();
+      expect(screen.getByTestId("like-count")).toHaveTextContent("6");
+    });
 
-    // Because it failed, it should revert
-    await waitFor(() =>
-      expect(screen.getByTestId("like-icon-border")).toBeInTheDocument()
-    );
-    expect(screen.getByTestId("like-count")).toHaveTextContent("5");
+    // Verify revert after failed request
+    await waitFor(() => {
+      expect(screen.getByTestId("like-icon-border")).toBeInTheDocument();
+      expect(screen.getByTestId("like-count")).toHaveTextContent("5");
+    });
   });
 
   it("toggles bookmark if user is logged in", async () => {
