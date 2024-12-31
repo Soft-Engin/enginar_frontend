@@ -56,9 +56,10 @@ const UserListItem = ({ user }) => {
     : "?";
 
   return (
-    <UserListItemContainer onClick={handleUserClick}>
+    <UserListItemContainer data-testid="user-list-item" onClick={handleUserClick}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         <Avatar
+          data-testid="user-avatar"
           sx={{
             width: 40,
             height: 40,
@@ -67,10 +68,10 @@ const UserListItem = ({ user }) => {
         >
           {!profilePic && profilePlaceholder}
           {profilePic && (
-            <Avatar src={profilePic} sx={{ width: "100%", height: "100%" }} />
+            <Avatar data-testid="user-avatar-image" src={profilePic} sx={{ width: "100%", height: "100%" }} />
           )}
         </Avatar>
-        <Typography sx={{ fontWeight: "medium", fontSize: "18px" }}>
+        <Typography data-testid="user-username" sx={{ fontWeight: "medium", fontSize: "18px" }}>
           {user.userName}
         </Typography>
       </Box>
