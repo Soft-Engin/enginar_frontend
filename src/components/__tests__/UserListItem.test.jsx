@@ -28,9 +28,10 @@ describe("UserListItem Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate = vi.fn();
-    (useNavigate as vi.Mock).mockReturnValue(mockNavigate);
+    useNavigate.mockReturnValue(mockNavigate);  // Remove TypeScript casting
 
-    mockGet = axios.get as vi.Mock;
+    mockGet = axios.get;  // Remove TypeScript casting
+    mockGet.mockImplementation(() => Promise.resolve({ data: {} }));
   });
 
   it("renders user name", () => {
