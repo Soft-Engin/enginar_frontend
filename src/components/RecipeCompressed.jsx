@@ -15,10 +15,11 @@ const RecipeCompressed = () => {
   const toggleBookmark = () => setBookmarked((prev) => !prev);
 
   return (
-    <Card sx={{ maxWidth: 700, margin: "auto", boxShadow: 3, borderRadius: 2 }}>
+    <Card data-testid="recipe-compressed" sx={{ maxWidth: 700, margin: "auto", boxShadow: 3, borderRadius: 2 }}>
       <CardHeader
         avatar={
           <Box
+            data-testid="recipe-avatar"
             component="img"
             src="/pp3.jpeg"
             alt="Shiraishi An"
@@ -30,14 +31,25 @@ const RecipeCompressed = () => {
         sx={{ pb: 0 }}
       />
       <CardContent>
-        <Typography variant="h6" component="div" gutterBottom>
+        <Typography 
+          data-testid="recipe-title"
+          variant="h6" 
+          component="div" 
+          gutterBottom
+        >
           Enginar Yemeği Tarifim
         </Typography>
-        <Typography variant="body2" color="text.secondary" noWrap>
+        <Typography 
+          data-testid="recipe-description"
+          variant="body2" 
+          color="text.secondary" 
+          noWrap
+        >
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu dictum ligula, et dignissim augue...
         </Typography>
       </CardContent>
       <CardMedia
+        data-testid="recipe-media"
         component="img"
         height="194"
         image="https://via.placeholder.com/400x200" // Replace with the actual image URL
@@ -46,6 +58,7 @@ const RecipeCompressed = () => {
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", px: 2, py: 1 }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
         <IconButton
+          data-testid="like-button"
                 onClick={toggleLike}
                 sx={{
                   transition: "transform 0.3s ease",
@@ -53,15 +66,15 @@ const RecipeCompressed = () => {
                 }}
               >
                 {liked ? (
-                  <FavoriteIcon color="error" />
+                  <FavoriteIcon color="error" data-testid="liked-icon" />
                 ) : (
-                  <FavoriteBorderIcon />
+                  <FavoriteBorderIcon data-testid="not-liked-icon" />
                 )}
               </IconButton>
-              <Typography variant="body2" sx={{ ml: 0 }}>
+              <Typography data-testid="likes-count" variant="body2" sx={{ ml: 0 }}>
                 {liked ? "40k" : "39k"} {/* Update count dynamically */}
               </Typography>
-              <IconButton>
+              <IconButton data-testid="comment-button">
                 <ChatBubbleOutlineIcon />
               </IconButton>
               <Typography variant="body2" sx={{ ml: 0 }}>
@@ -70,6 +83,7 @@ const RecipeCompressed = () => {
             </Box>
             <Box>
               <IconButton
+                data-testid="bookmark-button"
                 onClick={toggleBookmark}
                 sx={{
                   transition: "transform 0.3s ease",
@@ -77,12 +91,12 @@ const RecipeCompressed = () => {
                 }}
               >
                 {bookmarked ? (
-                  <BookmarkIcon color="secondary" />
+                  <BookmarkIcon data-testid="bookmarked-icon" color="secondary" />
                 ) : (
-                  <BookmarkBorderIcon />
+                  <BookmarkBorderIcon data-testid="not-bookmarked-icon" />
                 )}
               </IconButton>
-              <IconButton>
+              <IconButton data-testid="share-button">
                 <ShareIcon />
               </IconButton>
         </Box>
