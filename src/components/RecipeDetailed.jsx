@@ -263,6 +263,7 @@ export default function RecipeDetailed({ recipeId }) {
   if (loading) {
     return (
       <Box
+        data-testid="recipe-detailed-loading"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -276,6 +277,7 @@ export default function RecipeDetailed({ recipeId }) {
   if (error) {
     return (
       <Box
+        data-testid="recipe-detailed-error"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -288,14 +290,14 @@ export default function RecipeDetailed({ recipeId }) {
 
   if (!recipe) {
     return (
-      <Typography color="error" textAlign={"center"}>
+      <Typography data-testid="recipe-detailed-nodata" color="error" textAlign={"center"}>
         No recipe information available for this ID
       </Typography>
     );
   }
 
   return (
-    <Box sx={{ width: "100%", outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", px: 4, pt: 2, pb: 1, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
+    <Box data-testid="recipe-detailed-container" sx={{ width: "100%", outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", px: 4, pt: 2, pb: 1, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1.5, borderBottom: "1px solid #E0E0E0" }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Link
@@ -535,18 +537,20 @@ export default function RecipeDetailed({ recipeId }) {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton onClick={handleLikeToggle} style={{ padding: 0 }}>
+            <IconButton data-testid="like-button" onClick={handleLikeToggle} style={{ padding: 0 }}>
               {isLiked ? (
                 <FavoriteIcon
+                  data-testid="like-icon-filled"
                   style={{ fontSize: "45px", marginRight: 4, color: "red" }}
                 />
               ) : (
                 <FavoriteBorderIcon
+                  data-testid="like-icon-border"
                   style={{ fontSize: "45px", marginRight: 4 }}
                 />
               )}
             </IconButton>
-            <Typography variant="body1" color="text.secondary">
+            <Typography data-testid="like-count" variant="body1" color="text.secondary">
               {likeCount}
             </Typography>
           </Box>
@@ -562,7 +566,7 @@ export default function RecipeDetailed({ recipeId }) {
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <ShareIcon style={{ fontSize: "42px", marginRight: 6 }} />
-          <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
               <BookmarkIcon style={{ fontSize: "48px" }} />
             ) : (
