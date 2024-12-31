@@ -568,9 +568,9 @@ export default function RecipeDetailed({ recipeId }) {
           <ShareIcon style={{ fontSize: "42px", marginRight: 6 }} />
           <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
-              <BookmarkIcon style={{ fontSize: "48px" }} />
+              <BookmarkIcon data-testid="bookmark-icon-filled" style={{ fontSize: "48px" }} />
             ) : (
-              <BookmarkBorderOutlinedIcon style={{ fontSize: "48px" }} />
+              <BookmarkBorderOutlinedIcon data-testid="bookmark-icon-border" style={{ fontSize: "48px" }} />
             )}
           </IconButton>
         </Box>

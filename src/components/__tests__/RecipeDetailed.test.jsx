@@ -372,4 +372,116 @@ describe("RecipeDetailed Component", () => {
       // or check your "isBookmarked" boolean in the component
     });
   });
+
+  it("prompts user to log in if they click the Bookmark button when not logged in", async () => {
+    // Ensure user is not logged in
+    window.localStorage.setItem("userLogged", "false");
+
+    mockGetImplementation = (url) => {
+      if (url === `/api/v1/recipes/abc123`) {
+        return Promise.resolve({
+          status: 200,
+          data: {
+            id: "abc123",
+            header: "Test Recipe",
+            bodyText: "Recipe content",
+            userId: "user999",
+            userName: "ChefTest",
+            ingredients: [],
+            steps: []
+          }
+        });
+      }
+      // Add other necessary mock responses
+      return Promise.resolve({ status: 200, data: new Blob(['']) });
+    };
+
+    renderRecipeDetailed("abc123");
+
+    // Wait for component to load
+    await waitFor(() => {
+      expect(screen.getByTestId("recipe-detailed-container")).toBeInTheDocument();
+    });
+
+    // Set up mock login button
+    const mockClick = vi.fn();
+    const loginButton = document.createElement("button");
+    loginButton.id = "loginButton";
+    loginButton.addEventListener("click", mockClick);
+    document.body.appendChild(loginButton);
+
+    // Click bookmark button
+    const bookmarkButton = screen.getByTestId("bookmark-button");
+    fireEvent.click(bookmarkButton);
+
+    // Should trigger login
+    expect(mockClick).toHaveBeenCalledTimes(1);
+
+    // Cleanup
+    document.body.removeChild(loginButton);
+  });
+
+  it("toggles bookmark icon when bookmarking/unbookmarking", async () => {
+    // Ensure user is logged in
+    window.localStorage.setItem("userLogged", "true");
+
+    let isBookmarked = false;
+
+    mockGetImplementation = (url) => {
+      if (url === `/api/v1/recipes/abc123`) {
+        return Promise.resolve({
+          status: 200,
+          data: {
+            id: "abc123",
+            header: "Test Recipe",
+            userId: "user999",
+            ingredients: [],
+            steps: []
+          }
+        });
+      }
+      if (url.includes('is-bookmarked')) {
+        return Promise.resolve({ data: { isBookmarked } });
+      }
+      // Add other necessary mock responses
+      return Promise.resolve({ status: 200, data: new Blob(['']) });
+    };
+
+    // Mock bookmark toggle endpoint
+    mockPostImplementation = (url) => {
+      if (url.includes("/bookmark")) {
+        isBookmarked = !isBookmarked;
+        return Promise.resolve({ status: 200 });
+      }
+      return Promise.reject(new Error("Unhandled POST"));
+    };
+
+    renderRecipeDetailed("abc123");
+
+    // Wait for component to load
+    await waitFor(() => {
+      expect(screen.getByTestId("recipe-detailed-container")).toBeInTheDocument();
+    });
+
+    const bookmarkButton = screen.getByTestId("bookmark-button");
+
+    // Initially not bookmarked
+    expect(screen.getByTestId("bookmark-icon-border")).toBeInTheDocument();
+
+    // Click to bookmark
+    fireEvent.click(bookmarkButton);
+
+    // Should show filled bookmark icon
+    await waitFor(() => {
+      expect(screen.getByTestId("bookmark-icon-filled")).toBeInTheDocument();
+    });
+
+    // Click again to unbookmark
+    fireEvent.click(bookmarkButton);
+
+    // Should show border bookmark icon again
+    await waitFor(() => {
+      expect(screen.getByTestId("bookmark-icon-border")).toBeInTheDocument();
+    });
+  });
 });
