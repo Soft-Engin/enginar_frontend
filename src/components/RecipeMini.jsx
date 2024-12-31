@@ -240,6 +240,7 @@ export default function RecipeMini({ recipe }) {
       }}
     >
       <Box
+        data-testid="recipe-mini-header"
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -258,11 +259,13 @@ export default function RecipeMini({ recipe }) {
             }}
           >
             <Avatar
+              data-testid="recipe-avatar"
               src={profilePictureUrl}
               sx={{ width: 30, height: 30, marginRight: 1 }}
               onError={() => setProfilePictureUrl(null)}
             />
             <Typography
+              data-testid="recipe-username"
               variant="body2"
               fontWeight="bold"
               sx={{ marginRight: 0.5 }}
@@ -271,17 +274,18 @@ export default function RecipeMini({ recipe }) {
               {recipe.userName}
             </Typography>
           </Link>
-          <Typography variant="body2" color="text.secondary" noWrap>
+          <Typography data-testid="recipe-created-ago" variant="body2" color="text.secondary" noWrap>
             {recipe.createdAt &&
               formatDistanceToNow(parseISO(recipe.createdAt), {
                 addSuffix: true,
               })}
           </Typography>
         </Box>
-        <MoreHorizIcon style={{ fontSize: "30px" }} />
+        <MoreHorizIcon style={{ fontSize: "30px" }} data-testid="menu-button" />
       </Box>
 
       <Box
+        data-testid="recipe-mini-clickable"
         onClick={() => navigate(`/recipe?id=${recipe.id}`)}
         sx={{ cursor: "pointer" }}
       >
@@ -300,6 +304,7 @@ export default function RecipeMini({ recipe }) {
         </Typography>
 
         <Typography
+          data-testid="recipe-bodyText"
           variant="body2"
           sx={{
             display: "-webkit-box",
@@ -316,6 +321,7 @@ export default function RecipeMini({ recipe }) {
         <Box sx={{ mb: 0.5 }}>
           {showBanner && bannerUrl && !loading && (
             <StyledCardMedia
+              data-testid="recipe-banner"
               src={bannerUrl}
               alt="Recipe Banner"
               onError={() => setBannerUrl(null)}
@@ -323,7 +329,7 @@ export default function RecipeMini({ recipe }) {
           )}
         </Box>
         {error && (
-          <Box display="flex" justifyContent="center" my={2}>
+          <Box data-testid="recipe-error" display="flex" justifyContent="center" my={2}>
             {error !== null && (
               <Typography color="error">Error: {error}</Typography>
             )}
@@ -332,6 +338,7 @@ export default function RecipeMini({ recipe }) {
       </Box>
 
       <Box
+        data-testid="recipe-mini-actions"
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -340,18 +347,18 @@ export default function RecipeMini({ recipe }) {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton onClick={handleLikeToggle} style={{ padding: 0 }}>
+            <IconButton data-testid="like-button" onClick={handleLikeToggle} style={{ padding: 0 }}>
               {isLiked ? (
-                <FavoriteIcon
+                <FavoriteIcon data-testid="like-icon-filled"
                   style={{ fontSize: "30px", marginRight: 4, color: "red" }}
                 />
               ) : (
-                <FavoriteBorderIcon
+                <FavoriteBorderIcon data-testid="like-icon-border"
                   style={{ fontSize: "30px", marginRight: 4 }}
                 />
               )}
             </IconButton>
-            <Typography variant="body2" color="text.secondary">
+            <Typography data-testid="like-count" variant="body2" color="text.secondary">
               {likeCount}
             </Typography>
           </Box>
@@ -359,19 +366,19 @@ export default function RecipeMini({ recipe }) {
             <ChatBubbleOutlineIcon
               style={{ fontSize: "28px", marginRight: 4 }}
             />
-            <Typography variant="body2" color="text.secondary">
+            <Typography data-testid="comment-count" variant="body2" color="text.secondary">
               {commentCount}
             </Typography>
           </Box>
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ShareIcon style={{ fontSize: "28px", marginRight: 6 }} />
-          <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+          <ShareIcon data-testid="share-icon" style={{ fontSize: "28px", marginRight: 6 }} />
+          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
-              <BookmarkIcon style={{ fontSize: "32px" }} />
+              <BookmarkIcon data-testid="bookmark-icon-filled" style={{ fontSize: "32px" }} />
             ) : (
-              <BookmarkBorderOutlinedIcon style={{ fontSize: "32px" }} />
+              <BookmarkBorderOutlinedIcon data-testid="bookmark-icon-border" style={{ fontSize: "32px" }} />
             )}
           </IconButton>
         </Box>
