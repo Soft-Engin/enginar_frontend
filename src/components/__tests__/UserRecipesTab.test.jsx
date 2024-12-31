@@ -160,4 +160,83 @@ describe("UserRecipesTab Component", () => {
     });
   });
   */
+
+  it("fetches recipes with correct user ID from URL params", async () => {
+    const userId = "test123";
+    mockGet.mockImplementationOnce((url) => {
+      if (url === `/api/v1/users/${userId}/recipes`) {
+        return Promise.resolve({
+          status: 200,
+          data: {
+            items: [],
+            totalCount: 0
+          }
+        });
+      }
+      return Promise.reject(new Error(`Unexpected URL: ${url}`));
+    });
+
+    renderRecipesTab(`/profile?id=${userId}`);
+
+    // Verify the API was called with correct user ID
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(
+        `/api/v1/users/${userId}/recipes`,
+        expect.any(Object)
+      );
+    });
+  });
+
+  it("shows no recipes message when user has no recipes", async () => {
+    mockGet.mockResolvedValueOnce({
+      status: 200,
+      data: {
+        items: [],
+        totalCount: 0
+      }
+    });
+
+    renderRecipesTab();
+    
+    await waitFor(() => {
+      const recipesStack = screen.getByTestId("recipes-stack");
+      expect(recipesStack).toBeInTheDocument();
+      expect(recipesStack.children.length).toBe(0);
+    });
+  });
+
+  it("properly handles loading states during fetch", async () => {
+    // Delay the API response to test loading state
+    mockGet.mockImplementationOnce(() => 
+      new Promise(resolve => 
+        setTimeout(() => 
+          resolve({ 
+            status: 200, 
+            data: { 
+              items: [], 
+              totalCount: 0 
+            } 
+          }), 100)
+      )
+    );
+
+    renderRecipesTab();
+
+    // Initially should show loading
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+
+    // After loading completes, spinner should disappear
+    await waitFor(() => {
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows error state when user ID is missing", async () => {
+    renderRecipesTab("/profile"); // No ID in params
+
+    await waitFor(() => {
+      const recipesStack = screen.getByTestId("recipes-stack");
+      expect(recipesStack.children.length).toBe(0);
+    });
+  });
 });
