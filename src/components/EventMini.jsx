@@ -216,6 +216,7 @@ export default function EventMini({ event }) {
 
   return (
     <Box
+      data-testid={`event-mini-${event.id}`}
       sx={{
         maxWidth: 700,
         outline: "1.5px solid #C0C0C0",
