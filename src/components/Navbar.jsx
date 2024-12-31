@@ -362,8 +362,10 @@ export default function Navbar(props) {
     {
       text: "Settings",
       icon: <SettingsApplicationsIcon />,
-      action: handleCloseUserMenu,
-      link: "/settings",
+      action: () => {
+        handleCloseUserMenu;
+        navigate("/settings");
+      }
     },
     {
       text: "Logout",
@@ -409,7 +411,7 @@ export default function Navbar(props) {
           <RightSection>
             {userLogged ? (
               <>
-                <Tooltip title="Open settings">
+                <Tooltip title="Profile Menu">
                   <IconButton onClick={handleOpenUserMenu}>
                     <Avatar
                       alt={
