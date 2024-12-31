@@ -216,7 +216,8 @@ export default function BlogMini({ blog }) {
     }
   };
   return (
-    <Box
+    <Box 
+      data-testid={`blog-mini-${blog.id}`}
       sx={{
         maxWidth: 700,
         outline: "1.5px solid #C0C0C0",

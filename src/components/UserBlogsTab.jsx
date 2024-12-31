@@ -84,14 +84,15 @@ function UserBlogsTab() {
   }, [userId]);
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
+    <Box data-testid="user-blogs-tab-container" sx={{ display: "flex", justifyContent: "center" }}>
       <LoadingErrorDisplay
+        data-testid="loading-error-display"
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      <Stack spacing={2} direction={"column"} alignItems={"center"}>
+      <Stack data-testid="blogs-stack" spacing={2} direction={"column"} alignItems={"center"}>
         {blogs.map((post) => (
           <BlogMini key={post.id} blog={post} />
         ))}
