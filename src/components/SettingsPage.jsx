@@ -15,6 +15,9 @@ import AllergenSelector from "./AllergenPick";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+import RecommendedUsers from "./RecommendedUsers";
+import UpcomingEvents from "./UpcomingEvents";
+
 const SettingsPage = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -49,26 +52,24 @@ const SettingsPage = () => {
 
   return (
     <Box
+      maxWidth="md"
       sx={{
-        width: '100%',
-        maxWidth: '800px',
-        margin: '2rem auto',
-        padding: '2rem',
+        width: { xs: "40%", sm: "60%", md: "80%", lg: "80%", xl: "100%" },
+        margin: "0 auto",
+        marginTop: 4,
         borderRadius: 3,
         outline: "1.5px solid #959595",
         backgroundColor: "#BEDDA3",
-        boxShadow: 5
+        boxShadow: 5,
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <SettingsIcon sx={{ fontSize: 40, mr: 2 }} />
-        <Typography variant="h4" component="h1">Settings</Typography>
+      <Box sx={{ display: "flex", pt: 2, pl: 2 }}>
+        <SettingsIcon sx={{ fontSize: 40, mr: 1 }} />
       </Box>
 
-      <Paper elevation={3} sx={{ p: 3, mb: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>Profile Settings</Typography>
-        <Divider sx={{ marginBottom: 3 }} />
-
+      <Box sx={{ pt: 2, pl: 2 }}>
+        <Typography variant="h6">Profile Settings</Typography>
+        <Divider sx={{ marginBottom: 2 }} />
         <TextField
           label="Change Username"
           variant="outlined"
@@ -206,6 +207,8 @@ const SettingsPage = () => {
           Cancel
         </Button>
       </Box>
+      <RecommendedUsers />
+      <UpcomingEvents />
     </Box>
   );
 };

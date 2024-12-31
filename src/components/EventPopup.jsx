@@ -6,15 +6,15 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 import CloseIcon from "@mui/icons-material/Close";
 
 export default function EventPopup(props) {
-  const [location, setLocation] = React.useState('');
+  const [location, setLocation] = React.useState("");
 
   const handleClose = () => {
     props.handleClose();
@@ -41,7 +41,7 @@ export default function EventPopup(props) {
       maxWidth={"md"}
       PaperProps={{
         sx: {
-          width: 620,
+          width: { xs: 250, sm: 400, md: 550, lg: 600, xl: 620 },
           borderRadius: 4,
           backgroundColor: "#C8EFA5",
           padding: 0.5,
@@ -56,10 +56,10 @@ export default function EventPopup(props) {
             alignItems: "center",
             fontWeight: "bold",
             color: "#333",
-            fontSize: "1.25rem",
+            fontSize: "1.5rem",
           }}
         >
-          Create Event
+          Create New Event
           <IconButton
             onClick={handleClose}
             sx={{
@@ -81,6 +81,7 @@ export default function EventPopup(props) {
               marginBottom: 2,
               backgroundColor: "#fff",
               borderRadius: 2,
+              mt: 1,
             }}
           />
           <Box
@@ -104,8 +105,10 @@ export default function EventPopup(props) {
               }}
             />
           </Box>
-          <FormControl fullWidth sx={{marginBottom: 2}}>
-            <InputLabel id="demo-simple-select-autowidth-label">Location </InputLabel>
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel id="demo-simple-select-autowidth-label">
+              Location{" "}
+            </InputLabel>
             <Select
               labelId="demo-simple-select-autowidth-label"
               id="demo-simple-select-autowidth"

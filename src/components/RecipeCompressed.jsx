@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Card, CardHeader, CardContent, CardMedia, Typography, IconButton, Box } from "@mui/material";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardMedia,
+  Typography,
+  IconButton,
+  Box,
+} from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
@@ -34,7 +42,8 @@ const RecipeCompressed = () => {
           Enginar Yemeği Tarifim
         </Typography>
         <Typography variant="body2" color="text.secondary" noWrap>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu dictum ligula, et dignissim augue...
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu
+          dictum ligula, et dignissim augue...
         </Typography>
       </CardContent>
       <CardMedia
@@ -43,48 +52,52 @@ const RecipeCompressed = () => {
         image="https://via.placeholder.com/400x200" // Replace with the actual image URL
         alt="Enginar Yemeği"
       />
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", px: 2, py: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 2,
+          py: 1,
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-        <IconButton
-                onClick={toggleLike}
-                sx={{
-                  transition: "transform 0.3s ease",
-                  transform: liked ? "scale(1.2)" : "scale(1)",
-                }}
-              >
-                {liked ? (
-                  <FavoriteIcon color="error" />
-                ) : (
-                  <FavoriteBorderIcon />
-                )}
-              </IconButton>
-              <Typography variant="body2" sx={{ ml: 0 }}>
-                {liked ? "40k" : "39k"} {/* Update count dynamically */}
-              </Typography>
-              <IconButton>
-                <ChatBubbleOutlineIcon />
-              </IconButton>
-              <Typography variant="body2" sx={{ ml: 0 }}>
-                827
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton
-                onClick={toggleBookmark}
-                sx={{
-                  transition: "transform 0.3s ease",
-                  transform: bookmarked ? "scale(1.2)" : "scale(1)",
-                }}
-              >
-                {bookmarked ? (
-                  <BookmarkIcon color="secondary" />
-                ) : (
-                  <BookmarkBorderIcon />
-                )}
-              </IconButton>
-              <IconButton>
-                <ShareIcon />
-              </IconButton>
+          <IconButton
+            onClick={toggleLike}
+            sx={{
+              transition: "transform 0.3s ease",
+              transform: liked ? "scale(1.2)" : "scale(1)",
+            }}
+          >
+            {liked ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
+          </IconButton>
+          <Typography variant="body2" sx={{ ml: 0 }}>
+            {liked ? "40k" : "39k"} {/* Update count dynamically */}
+          </Typography>
+          <IconButton>
+            <ChatBubbleOutlineIcon />
+          </IconButton>
+          <Typography variant="body2" sx={{ ml: 0 }}>
+            827
+          </Typography>
+        </Box>
+        <Box>
+          <IconButton
+            onClick={toggleBookmark}
+            sx={{
+              transition: "transform 0.3s ease",
+              transform: bookmarked ? "scale(1.2)" : "scale(1)",
+            }}
+          >
+            {bookmarked ? (
+              <BookmarkIcon color="secondary" />
+            ) : (
+              <BookmarkBorderIcon />
+            )}
+          </IconButton>
+          <IconButton>
+            <ShareIcon />
+          </IconButton>
         </Box>
       </Box>
     </Card>

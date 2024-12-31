@@ -1,20 +1,13 @@
 import * as React from "react";
-import BlogMini from "./BlogMini";
-import RecipeMini from "./RecipeMini";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-
-function generate(element) {
-  return [0, 1, 2, 3, 4, 5, 6].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    })
-  );
-}
+import PopularRecipesTab from "./PopularRecipesTab";
+import PopularBlogsTab from "./PopularBlogsTab";
+import FollowingTab from "./FollowingTab";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -51,14 +44,22 @@ export default function ContentFeed() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+
   return (
-    <Box>
+    <Box
+      sx={{
+        width: { xs: "40%", sm: "60%", md: "75%", lg: "75%", xl: "85%" },
+        margin: "0 auto",
+      }}
+    >
       <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
         <Tabs
           centered
           value={value}
           onChange={handleChange}
           aria-label="Feed Tabs"
+          variant="fullWidth"
           sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
         >
           <Tab
@@ -80,28 +81,14 @@ export default function ContentFeed() {
       </Box>
 
       <CustomTabPanel value={value} index={0}>
-        {generate(<RecipeMini />).map((recipe, index) => (
-          <Box key={index} sx={{ width: 550, mb: 2 }}>
-            {recipe}
-          </Box>
-        ))}
+        <PopularRecipesTab />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        {generate(<BlogMini />).map((blog, index) => (
-          <Box key={index} sx={{ width: 550, mb: 2 }}>
-            {blog}
-          </Box>
-        ))}
+        <PopularBlogsTab />
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        <Box sx={{ width: 550, mb: 2 }}>
-          <BlogMini />
-        </Box>
-        <Box sx={{ width: 550, mb: 2 }}>
-          <RecipeMini />
-        </Box>
+       <CustomTabPanel value={value} index={2}>
+        <FollowingTab />
       </CustomTabPanel>
-
       <RecommendedUsers />
       <UpcomingEvents />
     </Box>
