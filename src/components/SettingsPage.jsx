@@ -110,7 +110,7 @@ const SettingsPage = () => {
             }
           }}
         />
-      </Paper>
+      </Box>
 
       <Paper elevation={3} sx={{ p: 3, mb: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
         <Box sx={{ mb: 3 }}>
