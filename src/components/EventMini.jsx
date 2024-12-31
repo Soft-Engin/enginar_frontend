@@ -237,24 +237,24 @@ export default function EventMini({ event }) {
           mb: 1,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", maxWidth: { sm: 250, md: 350, lg: 250, xl: 350 } }}>
           <Typography
             variant="h5"
             fontWeight="bold"
-            style={{ marginRight: "15px", maxWidth: "400px" }}
+            style={{ marginRight: "15px" }}
             noWrap
             onClick={() => navigate(`/event?id=${event.eventId}`)}
             sx={{ cursor: "pointer" }}
           >
             {event?.title || "Event Title"}
           </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <PlaceOutlinedIcon style={{ fontSize: "30px", marginRight: "2px" }} />
           <Typography variant="body2" component="div" noWrap>
             {event?.address?.district?.city?.name || "City"}
           </Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CalendarMonthIcon style={{ fontSize: "30px", marginRight: "2px" }} />
+          <CalendarMonthIcon style={{ fontSize: "30px", marginRight: "2px", marginLeft: "5px" }} />
           <Typography variant="body2" component="div" noWrap>
             {formattedDate}
           </Typography>
