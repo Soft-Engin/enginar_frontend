@@ -86,18 +86,21 @@ function PopularRecipesTab() {
   }, []);
 
   return (
-    <div>
+    <div data-testid="popular-recipes-tab">
       <LoadingErrorDisplay
+        data-testid="loading-error-display"
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      {recipes.map((recipe, index) => (
-        <Box key={index} sx={{ width: 600, mb: 2 }}>
-          <RecipeMini recipe={recipe} />
-        </Box>
-      ))}
+      <div data-testid="recipes-container">
+        {recipes.map((recipe, index) => (
+          <Box data-testid="recipe-box" key={index} sx={{ width: 600, mb: 2 }}>
+            <RecipeMini recipe={recipe} />
+          </Box>
+        ))}
+      </div>
     </div>
   );
 }
