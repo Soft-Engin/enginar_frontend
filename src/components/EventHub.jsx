@@ -274,8 +274,8 @@ export default function EventHub() {
       />
       <Grid
         item
-        xs={12}
-        sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", mb: 2 }}
+        size={12}
+        sx={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", mb: 2 }}
       >
         <FormControl sx={{ m: 1, minWidth: 180 }}>
           <InputLabel id="country-select-label">Country</InputLabel>
