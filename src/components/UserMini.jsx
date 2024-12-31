@@ -51,16 +51,18 @@ export default function UserMini() {
         <Avatar sx={{width: 130, height: 130, border: "4px solid white", position: "absolute", top: -65, left: 5 }} />
         <Box sx={{ ml: 18 }}>
           <Box sx={{ display: "flex", gap: 2, mt: 0.6, alignItems: "center" }}>
-            <Typography variant="h5" fontWeight="bold">
+            <Typography data-testid="user-name" variant="h5" fontWeight="bold">
               Hoshino Ichika
             </Typography>
-            <FollowButton variant="contained">Follow</FollowButton>
+            <FollowButton data-testid="follow-button" variant="contained">
+              Follow
+            </FollowButton>
           </Box>
           <Box sx={{ display: "flex", gap: 2, mt: 0.5 }}>
-            <Typography variant="body2">
+            <Typography data-testid="following-count" variant="body2">
               <strong>3</strong> Following
             </Typography>
-            <Typography variant="body2">
+            <Typography data-testid="followers-count" variant="body2">
               <strong>5</strong> Followers
             </Typography>
           </Box>
