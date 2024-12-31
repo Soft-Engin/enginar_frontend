@@ -33,16 +33,11 @@ describe("PopularBlogsTab component", () => {
     );
   };
 
-  it("shows loading spinner or 'loading' state initially", () => {
+it("shows loading spinner or 'loading' state initially", () => {
     renderPopularBlogsTab();
 
-    // We might rely on your LoadingErrorDisplay to show a spinner or "loading" text
-    // For example, if it displays "Loading..." or a spinner:
-    // expect(screen.getByTestId("loading-error-display")).toHaveTextContent(/loading/i);
-
-    // Or if you have a MUI CircularProgress, you can check by role:
-    // expect(screen.getByRole("progressbar")).toBeInTheDocument();
-  });
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+});
 
   it("shows error if fetching data fails", async () => {
     // 1) first call fails

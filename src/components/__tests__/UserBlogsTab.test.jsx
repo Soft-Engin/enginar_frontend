@@ -56,9 +56,7 @@ describe("UserBlogsTab component", () => {
 
     // We see the container
     expect(screen.getByTestId("user-blogs-tab-container")).toBeInTheDocument();
-    // The spinner or something from LoadingErrorDisplay => check if "loading" is visible
-    // Possibly check "loading" logic in <LoadingErrorDisplay>
-    // e.g. you might see a CircularProgress or text
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 
   it("shows error if fetching user blogs fails", async () => {

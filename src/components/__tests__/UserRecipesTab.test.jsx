@@ -37,12 +37,7 @@ describe("UserRecipesTab Component", () => {
     // Not resolving => the component remains in loading state
     renderRecipesTab("/profile?id=abc123");
 
-    // We can check that the loading spinner or some other loading state is present
-    // e.g. from your LoadingErrorDisplay or a MUI CircularProgress
-    // If you want to test a specific data-testid, adapt below:
-    // expect(screen.getByTestId("loading-error-display")).toBeInTheDocument();
-
-    // Or check for "loading" text if present in LoadingErrorDisplay
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 
   it("shows error if fetching user recipes fails", async () => {
