@@ -226,6 +226,7 @@ export default function RecipeMini({ recipe }) {
 
   return (
     <Box
+      data-testid={`recipe-mini-${recipe.id}`}
       sx={{
         maxWidth: 700,
         outline: "1.5px solid #C0C0C0",
@@ -285,6 +286,7 @@ export default function RecipeMini({ recipe }) {
         sx={{ cursor: "pointer" }}
       >
         <Typography
+          data-testid={`recipe-header-${recipe.id}`}
           variant="h5"
           fontWeight="bold"
           sx={{

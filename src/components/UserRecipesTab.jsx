@@ -90,16 +90,17 @@ function UserRecipesTab() {
   }, [userId]);
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
+    <Box data-testid="user-recipes-tab" sx={{ display: "flex", justifyContent: "center" }}>
       <LoadingErrorDisplay
+        data-testid="loading-error-display"
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      <Stack spacing={2} direction={"column"} alignItems={"center"}>
+      <Stack data-testid="recipes-stack" spacing={2} direction={"column"} alignItems={"center"}>
         {recipes.map((recipe) => (
-          <RecipeMini key={recipe.id} recipe={recipe} />
+          <RecipeMini data-testid={`recipe-${recipe.id}`} key={recipe.id} recipe={recipe} />
         ))}
       </Stack>
     </Box>
