@@ -7,7 +7,6 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Stack from "@mui/material/Stack";
 import {
   Box,
   Typography,
@@ -24,6 +23,8 @@ import UserEventsTab from "./UserEventsTab";
 import UserRecipesTab from "./UserRecipesTab";
 import FollowersListPopup from "./FollowersListPopup";
 import FollowingListPopup from "./FollowingListPopup";
+import RecommendedUsers from "./RecommendedUsers";
+import UpcomingEvents from "./UpcomingEvents";
 import { useSearchParams } from "react-router-dom";
 
 const SharedButton = styled(Button)(({ theme }) => ({
@@ -333,198 +334,202 @@ const UserProfile = () => {
   const bannerPlaceholder = "#ffffff";
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minWidth: "730px",
-        maxWidth: "730px",
-      }}
-    >
-      {/* Profile Edit Dialog */}
-      <ProfileEditDialog
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        profileData={profileData}
-        profilePic={profilePic}
-        bannerPic={bannerPic}
-        onProfileUpdate={handleUpdateProfile}
-      />
+    <Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          scale: { xs: "70%", sm: "80%", md: "95%", lg: "95%", xl: "100%" },
+          transformOrigin: "top",
+          width: { md: 650, lg: 620, xl: 730 }, 
+          margin: "0 auto",
+        }}
+      >
+        {/* Profile Edit Dialog */}
+        <ProfileEditDialog
+          open={editDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
+          profileData={profileData}
+          profilePic={profilePic}
+          bannerPic={bannerPic}
+          onProfileUpdate={handleUpdateProfile}
+        />
 
-      {/* Profile Column */}
-      <Box>
-        <Card
-          sx={{
-            position: "relative",
-            overflow: "visible",
-            backgroundColor: "#E9F6BC",
-            outline: "1px solid rgb(196, 196, 196)",
-          }}
-        >
-          {/* Cover Image */}
-          <Box
+        {/* Profile Column */}
+        <Box>
+          <Card
             sx={{
-              height: 225,
-              background: `url(${
-                bannerPic || bannerPlaceholder
-              }) no-repeat center`,
-              bgcolor: "#bbbbbb",
-              backgroundSize: "cover",
-              boxShadow: 2,
+              position: "relative",
+              overflow: "visible",
+              backgroundColor: "#E9F6BC",
+              outline: "1px solid rgb(196, 196, 196)",
             }}
-          />
-
-          {/* Profile Header */}
-          <CardContent>
+          >
+            {/* Cover Image */}
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "flex-start",
-                position: "relative",
+                height: 225,
+                background: `url(${
+                  bannerPic || bannerPlaceholder
+                }) no-repeat center`,
+                bgcolor: "#bbbbbb",
+                backgroundSize: "cover",
+                boxShadow: 2,
               }}
-            >
-              <Avatar
+            />
+
+            {/* Profile Header */}
+            <CardContent>
+              <Box
                 sx={{
-                  width: 150,
-                    height: 150,
-                    border: "4px solid white",
-                    position: "absolute",
-                    top: -90,
-                    left: 0,
-                  bgcolor: profilePic ? "transparent" : "#bdbdbd",
-                  boxShadow: 2,
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  position: "relative",
                 }}
               >
-                {!profilePic && profilePlaceholder}
-                {profilePic && (
-                  <Avatar
-                    src={profilePic}
-                    sx={{ width: "100%", height: "100%" }}
-                  />
-                )}
-              </Avatar>
-              <Box sx={{ mt: -2, ml: 20 }}>
-                <Box
-                  sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
+                <Avatar
+                  sx={{
+                    width: 150,
+                      height: 150,
+                      border: "4px solid white",
+                      position: "absolute",
+                      top: -90,
+                      left: 0,
+                    bgcolor: profilePic ? "transparent" : "#bdbdbd",
+                    boxShadow: 2,
+                  }}
                 >
-                  <Typography variant="h4" fontWeight="bold">
-                    {profileData.firstName} {profileData.lastName}
-                  </Typography>
-                  {!isOwnProfile &&
-                    (isFollowing ? (
-                      <FollowButton
-                        variant="contained"
-                        onClick={handleUnfollowUser}
-                      >
-                        Unfollow
-                      </FollowButton>
-                    ) : (
-                      <FollowButton
-                        variant="contained"
-                        onClick={handleFollowUser}
-                      >
-                        Follow
-                      </FollowButton>
-                    ))}
-                </Box>
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  sx={{ ml: 0.2 }}
-                >
-                  {profileData.userName}
-                </Typography>
-                <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+                  {!profilePic && profilePlaceholder}
+                  {profilePic && (
+                    <Avatar
+                      src={profilePic}
+                      sx={{ width: "100%", height: "100%" }}
+                    />
+                  )}
+                </Avatar>
+                <Box sx={{ mt: -2, ml: 20 }}>
+                  <Box
+                    sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
+                  >
+                    <Typography variant="h4" fontWeight="bold">
+                      {profileData.firstName} {profileData.lastName}
+                    </Typography>
+                    {!isOwnProfile &&
+                      (isFollowing ? (
+                        <FollowButton
+                          variant="contained"
+                          onClick={handleUnfollowUser}
+                        >
+                          Unfollow
+                        </FollowButton>
+                      ) : (
+                        <FollowButton
+                          variant="contained"
+                          onClick={handleFollowUser}
+                        >
+                          Follow
+                        </FollowButton>
+                      ))}
+                  </Box>
                   <Typography
                     variant="body2"
-                    onClick={handleFollowingPopupOpen}
-                    sx={{ cursor: "pointer" }}
+                    color="textSecondary"
+                    sx={{ ml: 0.2 }}
                   >
-                    <strong>{followingCount}</strong> Following
+                    {profileData.userName}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    onClick={handleFollowersPopupOpen}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <strong>{followersCount}</strong> Followers
-                  </Typography>
+                  <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+                    <Typography
+                      variant="body2"
+                      onClick={handleFollowingPopupOpen}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <strong>{followingCount}</strong> Following
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      onClick={handleFollowersPopupOpen}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <strong>{followersCount}</strong> Followers
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-              <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
-                <IconButton
-                  aria-label="more"
-                  id="menuButton"
-                  aria-controls={open ? "menu" : undefined}
-                  aria-expanded={open ? "true" : undefined}
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon sx={{ fontSize: "30px" }} />
-                </IconButton>
-                <Menu
-                  id="menu"
-                  MenuListProps={{
-                    "aria-labelledby": "menuButton",
-                  }}
-                  anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={open}
-                  onClose={handleClose}
-                >
-                  {isOwnProfile ? (
-                    <MenuItem key="Edit" onClick={handleEditProfile}>
-                      Edit Profile
+                <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
+                  <IconButton
+                    aria-label="more"
+                    id="menuButton"
+                    aria-controls={open ? "menu" : undefined}
+                    aria-expanded={open ? "true" : undefined}
+                    aria-haspopup="true"
+                    onClick={handleClick}
+                  >
+                    <MoreVertIcon sx={{ fontSize: "30px" }} />
+                  </IconButton>
+                  <Menu
+                    id="menu"
+                    MenuListProps={{
+                      "aria-labelledby": "menuButton",
+                    }}
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={open}
+                    onClose={handleClose}
+                  >
+                    {isOwnProfile ? (
+                      <MenuItem key="Edit" onClick={handleEditProfile}>
+                        Edit Profile
+                      </MenuItem>
+                    ) : null}
+                    <MenuItem key="Ban" onClick={handleClose}>
+                      Ban
                     </MenuItem>
-                  ) : null}
-                  <MenuItem key="Ban" onClick={handleClose}>
-                    Ban
-                  </MenuItem>
-                </Menu>
+                  </Menu>
+                </Box>
               </Box>
-            </Box>
 
-            {/* Profile Info */}
-            <Box>
-              <Typography sx={{ mt: 1, ml: 2 }}>{profileData.bio}</Typography>
+              {/* Profile Info */}
+              <Box>
+                <Typography sx={{ mt: 1, ml: 2 }}>{profileData.bio}</Typography>
+              </Box>
+            </CardContent>
+            {/* User Content */}
+            <Box sx={{ width: "100%", pb: 2 }}>
+              <Box sx={{ borderTop: 1, borderColor: "divider" }}>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  aria-label="basic tabs example"
+                  centered
+                  textColor="secondary"
+                  indicatorColor="secondary"
+                >
+                  <Tab label="Blogs" {...a11yProps(0)} />
+                  <Tab label="Events" {...a11yProps(1)} />
+                  <Tab label="Recipes" {...a11yProps(2)} />
+                </Tabs>
+              </Box>
+              <CustomTabPanel value={value} index={0}>
+                <UserBlogsTab />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={1}>
+                <UserEventsTab />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={2}>
+                <UserRecipesTab />
+              </CustomTabPanel>
             </Box>
-          </CardContent>
-          {/* User Content */}
-          <Box sx={{ width: "100%", pb: 2 }}>
-            <Box sx={{ borderTop: 1, borderColor: "divider" }}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label="basic tabs example"
-                centered
-                textColor="secondary"
-                indicatorColor="secondary"
-              >
-                <Tab label="Blogs" {...a11yProps(0)} />
-                <Tab label="Events" {...a11yProps(1)} />
-                <Tab label="Recipes" {...a11yProps(2)} />
-              </Tabs>
-            </Box>
-            <CustomTabPanel value={value} index={0}>
-              <UserBlogsTab />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-              <UserEventsTab />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={2}>
-              <UserRecipesTab />
-            </CustomTabPanel>
-          </Box>
-        </Card>
+          </Card>
+        </Box>
       </Box>
-      <FollowersListPopup
+    <FollowersListPopup
         open={followersPopupOpen}
         handleClose={handleFollowersPopupClose}
         userId={userId}
@@ -534,6 +539,8 @@ const UserProfile = () => {
         handleClose={handleFollowingPopupClose}
         userId={userId}
       />
+      <RecommendedUsers />
+      <UpcomingEvents />
     </Box>
   );
 };
