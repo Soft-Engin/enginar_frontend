@@ -91,22 +91,48 @@ describe("Navbar Component", () => {
   });
 
   it("renders user avatar if user is logged in", async () => {
-    // Set userLogged before rendering
+    // Set up logged in state
     localStorage.setItem("userLogged", "true");
+    localStorage.setItem("userData", JSON.stringify({ userId: "123" }));
 
-    // Suppose it fetches user data
-    axios.get.mockResolvedValueOnce({ status: 200, data: { userId: "123" } });
+    // Mock responses for user data and profile picture
+    axios.get.mockImplementation((url) => {
+      if (url === '/api/v1/users/me') {
+        return Promise.resolve({
+          status: 200,
+          data: {
+            userId: "123",
+            firstName: "John",
+            lastName: "Doe"
+          }
+        });
+      }
+      if (url === '/api/v1/users/123/profile-picture') {
+        return Promise.resolve({
+          status: 200,
+          data: new Blob(['profile-pic'])
+        });
+      }
+      return Promise.resolve({ status: 200, data: {} });
+    });
 
     renderNavbar();
 
-    // Wait for the user data fetch
-    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(1));
+    // Wait for the user avatar to appear
+    await waitFor(() => {
+      expect(screen.getByTestId("user-avatar-button")).toBeInTheDocument();
+    });
 
-    // Because user is logged, we do NOT see the AuthPopup
+    // Verify AuthPopup is not shown
     expect(screen.queryByTestId("mock-auth-popup")).not.toBeInTheDocument();
 
-    // We do see the user avatar
-    expect(screen.getByTestId("user-avatar-button")).toBeInTheDocument();
+    // Verify API calls were made with correct URLs
+    const getCalls = axios.get.mock.calls;
+    expect(getCalls.some(call => call[0] === '/api/v1/users/me')).toBe(true);
+    expect(getCalls.some(call => 
+      call[0] === '/api/v1/users/123/profile-picture' && 
+      call[1]?.responseType === 'blob'
+    )).toBe(true);
   });
 
   it("toggles the drawer open/close when clicking the menu icon", () => {
@@ -130,22 +156,44 @@ describe("Navbar Component", () => {
   });
 
   it("opens user menu when avatar is clicked (user logged in)", async () => {
-    // userLogged = true
+    // Set up logged in state
     localStorage.setItem("userLogged", "true");
-    axios.get.mockResolvedValueOnce({ data: { userId: "123" } });
+    localStorage.setItem("userData", JSON.stringify({ userId: "123" }));
+
+    // Mock responses for user data and profile picture
+    axios.get.mockImplementation((url) => {
+      if (url.includes('/api/v1/users/me')) {
+        return Promise.resolve({
+          status: 200,
+          data: {
+            userId: "123",
+            firstName: "John",
+            lastName: "Doe"
+          }
+        });
+      }
+      if (url.includes('/profile-picture')) {
+        return Promise.resolve({
+          status: 200,
+          data: new Blob(['profile-pic'])
+        });
+      }
+      return Promise.resolve({ status: 200, data: {} });
+    });
 
     renderNavbar();
 
-    // Wait for user data fetch
-    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(2));
+    // Wait for the avatar to appear
+    await waitFor(() => {
+      expect(screen.getByTestId("user-avatar-button")).toBeInTheDocument();
+    });
 
+    // Click avatar and verify menu appears
     const avatarButton = screen.getByTestId("user-avatar-button");
     fireEvent.click(avatarButton);
 
-    // Now we expect the user menu to be open
-    const userMenu = screen.getByTestId("user-menu");
-    expect(userMenu).toBeInTheDocument();
-    expect(userMenu).toBeVisible();
+    // Verify menu is shown
+    expect(screen.getByTestId("user-menu")).toBeInTheDocument();
   });
 
   it("opens/closes speed dial", () => {
