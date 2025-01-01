@@ -16,7 +16,6 @@ function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      style={{ display: "flex", justifyContent: "center" }}
       {...other}
     >
       {value === index && <Box>{children}</Box>}
