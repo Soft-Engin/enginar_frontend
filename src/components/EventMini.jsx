@@ -217,8 +217,8 @@ export default function EventMini({ event }) {
   return (
     <Box
       sx={{
-        width: 630,
         maxWidth: 630,
+        width: "100%",
         outline: "1.5px solid #C0C0C0",
         backgroundColor: "#FFFFFF",
         pl: 3,

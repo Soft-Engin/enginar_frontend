@@ -365,7 +365,7 @@ export default function Navbar(props) {
       action: () => {
         handleCloseUserMenu;
         navigate("/settings");
-      }
+      },
     },
     {
       text: "Logout",

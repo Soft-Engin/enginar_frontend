@@ -127,7 +127,7 @@ export default function RecommendedUsers() {
       sx={{
         position: "fixed",
         top: 115,
-        right: { lg: "1%", xl: "3%" },
+        right: { lg: "0.7%", xl: "2.5%" },
         width: 300,
         scale: { xs: "0%", sm: "0%", md: "0%", lg: "85%", xl: "95%" },
         borderRadius: 3,

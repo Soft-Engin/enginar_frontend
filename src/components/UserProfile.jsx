@@ -59,7 +59,17 @@ function CustomTabPanel(props) {
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       {...other}
     >
-      {value === index && <Box sx={{ pt: 0 }}>{children}</Box>}
+      {value === index && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {children}
+        </Box>
+      )}
     </div>
   );
 }
@@ -341,7 +351,7 @@ const UserProfile = () => {
           flexDirection: "column",
           scale: { xs: "70%", sm: "80%", md: "95%", lg: "95%", xl: "100%" },
           transformOrigin: "top",
-          width: { md: 650, lg: 620, xl: 730 }, 
+          width: { md: 650, lg: 620, xl: 730 },
           margin: "0 auto",
         }}
       >
@@ -390,11 +400,11 @@ const UserProfile = () => {
                 <Avatar
                   sx={{
                     width: 150,
-                      height: 150,
-                      border: "4px solid white",
-                      position: "absolute",
-                      top: -90,
-                      left: 0,
+                    height: 150,
+                    border: "4px solid white",
+                    position: "absolute",
+                    top: -90,
+                    left: 0,
                     bgcolor: profilePic ? "transparent" : "#bdbdbd",
                     boxShadow: 2,
                   }}
@@ -409,7 +419,12 @@ const UserProfile = () => {
                 </Avatar>
                 <Box sx={{ mt: -2, ml: 20 }}>
                   <Box
-                    sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      mt: 1,
+                      alignItems: "center",
+                    }}
                   >
                     <Typography variant="h4" fontWeight="bold">
                       {profileData.firstName} {profileData.lastName}
@@ -501,8 +516,8 @@ const UserProfile = () => {
               </Box>
             </CardContent>
             {/* User Content */}
-            <Box sx={{ width: "100%", pb: 2 }}>
-              <Box sx={{ borderTop: 1, borderColor: "divider" }}>
+            <Box sx={{ width: "100%", pb: 2, px: 2 }}>
+              <Box sx={{ borderTop: 1, borderColor: "divider", mb: 1 }}>
                 <Tabs
                   value={value}
                   onChange={handleChange}
@@ -529,7 +544,7 @@ const UserProfile = () => {
           </Card>
         </Box>
       </Box>
-    <FollowersListPopup
+      <FollowersListPopup
         open={followersPopupOpen}
         handleClose={handleFollowersPopupClose}
         userId={userId}

@@ -11,13 +11,14 @@ import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import axios from "axios";
 import dayjs from "dayjs";
-import { Link } from "react-router-dom"; // Import Link
+import { useNavigate } from "react-router-dom"; 
 
 export default function UpcomingEvents() {
   const [events, setEvents] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [eventParticipants, setEventParticipants] = React.useState({});
+  const navigate = useNavigate(); 
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -123,8 +124,12 @@ export default function UpcomingEvents() {
       loading: participantsLoading,
     } = participantsInfo;
 
+    const handleEventClick = () => {
+      navigate(`/event?id=${event.eventId}`);
+    };
+
     return (
-      <ListItem key={event.eventId}>
+      <ListItem key={event.eventId} onClick={handleEventClick} style={{ cursor: "pointer" }}>
         <Box
           sx={{
             outline: "1.5px solid #AAAAAA",
@@ -155,23 +160,16 @@ export default function UpcomingEvents() {
                   alignItems: "flex-start",
                 }}
               >
-                <Link
-                  to={`/event?id=${event.eventId}`}
-                  style={{ textDecoration: "none" }}
+                <Typography
+                  variant="subtitle1"
+                  component="div"
+                  fontWeight="bold"
+                  mt={0.5}
+                  sx={{ maxWidth: "210px", color: "black" }}
+                  noWrap
                 >
-                  {" "}
-                  {/* Add Link Here */}
-                  <Typography
-                    variant="subtitle1"
-                    component="div"
-                    fontWeight="bold"
-                    mt={0.5}
-                    sx={{ maxWidth: "210px", color: "black" }}
-                    noWrap
-                  >
-                    {event.title}
-                  </Typography>
-                </Link>
+                  {event.title}
+                </Typography>
                 <Box
                   sx={{
                     display: "flex",
