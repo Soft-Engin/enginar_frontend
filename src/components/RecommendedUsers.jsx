@@ -1,45 +1,129 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardHeader,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Avatar,
+  Typography,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemText from "@mui/material/ListItemText";
-import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
-import { Button } from "@mui/material";
+import axios from "axios";
 
-function generate(element) {
-  return [0, 1, 2, 3].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    })
-  );
-}
-
-const SharedButton = styled(Button)(({ theme }) => ({
-  border: "#888888",
-  borderStyle: "solid",
-  borderWidth: "2px",
+const SharedButton = styled("button")(({ following }) => ({
+  border: "2px solid #888888",
   height: "30px",
   minWidth: "90px",
   borderRadius: "20px",
-}));
-
-const FollowButton = styled(SharedButton)(({ theme }) => ({
-  color: "#453E3E",
-  backgroundColor: "#FFFFFF",
-  "&:hover": {
-    backgroundColor: "#FFFFFF",
-  },
-  textTransform: "none",
+  color: following ? "#FFFFFF" : "#453E3E",
+  backgroundColor: following ? "#888888" : "#FFFFFF",
   fontWeight: "bold",
-  variant: "subtitle1",
+  cursor: "pointer",
+  "&:hover": {
+    backgroundColor: following ? "#888888" : "#FFFFFF",
+  },
 }));
 
 export default function RecommendedUsers() {
+  const [recommendedUsers, setRecommendedUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isFollowing, setIsFollowing] = useState({});
+  const loggedInUserData = JSON.parse(localStorage.getItem("userData"));
+
+  const initializeData = async () => {
+    setLoading(true);
+    try {
+      let followingUsers = [];
+      if (loggedInUserData?.userId) {
+        const followingResponse = await axios.get(
+          `/api/v1/users/${loggedInUserData.userId}/following?pageSize=100`
+        );
+        followingUsers = followingResponse.data.items || [];
+        const followingMap = {};
+        followingUsers.forEach((user) => {
+          followingMap[user.userId] = true;
+        });
+        setIsFollowing(followingMap);
+      }
+
+      const response = await axios.get("/api/v1/feed/recipe", {
+        params: { pageSize: 20 },
+      });
+      if (response.data?.items) {
+        const uniqueUserIds = [];
+        const uniqueUsers = [];
+        response.data.items.forEach((item) => {
+          if (
+            !uniqueUserIds.includes(item.userId) &&
+            uniqueUserIds.length < 4 &&
+            !followingUsers.some(following => following.userId === item.userId)
+          ) {
+            uniqueUserIds.push(item.userId);
+            uniqueUsers.push(item);
+          }
+        });
+
+        const usersWithProfile = await Promise.all(
+          uniqueUsers.map(async (user) => {
+            const profilePicResponse = await axios
+              .get(`/api/v1/users/${user.userId}/profile-picture`, {
+                responseType: "blob",
+              })
+              .catch(() => null);
+
+            return {
+              ...user,
+              profilePictureUrl: profilePicResponse?.data
+                ? URL.createObjectURL(profilePicResponse.data)
+                : null,
+            };
+          })
+        );
+
+        setRecommendedUsers(usersWithProfile);
+      }
+    } catch (err) {
+      console.error("Error initializing data:", err);
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFollow = async (userId) => {
+    try {
+      await axios.post(`/api/v1/users/follow?targetUserId=${userId}`);
+      setIsFollowing((prev) => ({ ...prev, [userId]: true }));
+    } catch (err) {
+      console.error("Error following user:", err);
+    }
+  };
+
+  const handleUnfollow = async (userId) => {
+    try {
+      await axios.delete(`/api/v1/users/unfollow?targetUserId=${userId}`);
+      setIsFollowing((prev) => ({ ...prev, [userId]: false }));
+    } catch (err) {
+      console.error("Error unfollowing user:", err);
+    }
+  };
+
+  useEffect(() => {
+    initializeData();
+    return () => {
+      recommendedUsers.forEach((user) => {
+        if (user.profilePictureUrl) URL.revokeObjectURL(user.profilePictureUrl);
+      });
+    };
+  }, []);
+
   return (
-    <Box
+    <Card
       sx={{
         position: "fixed",
         top: 115,
@@ -52,30 +136,65 @@ export default function RecommendedUsers() {
         boxShadow: 5,
       }}
     >
-      <Typography
-        fontWeight="bold"
-        style={{ color: "#000000" }}
-        sx={{ pt: 2, pl: 2, fontSize: 24, opacity: 0.7 }}
-        variant="h5"
-        component="div"
-      >
-        Recommended Users
-      </Typography>
-      <List>
-        {generate(
-          <ListItem>
-            <ListItemAvatar>
-              <Avatar>{/* Buraya user profile picture gelecek*/}</Avatar>
-            </ListItemAvatar>
-            <ListItemText>
-              <Typography variant="h6" component="div" color="black">
-                Kendrick{/* Buraya username gelecek*/}
-              </Typography>
-            </ListItemText>
-            <FollowButton variant="contained">Follow</FollowButton>
-          </ListItem>
-        )}
-      </List>
-    </Box>
+      <CardHeader
+        title={
+          <Typography
+            fontWeight="bold"
+            sx={{ fontSize: 24, opacity: 0.7, color: "#000000" }}
+          >
+            Recommended Users
+          </Typography>
+        }
+      />
+      {loading && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100px"
+        >
+          <CircularProgress />
+        </Box>
+      )}
+      {error && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100px"
+        >
+          <Typography color="error">Error: {error}</Typography>
+        </Box>
+      )}
+      {!loading && !error && (
+        <List>
+          {recommendedUsers.map((user) => (
+            <ListItem key={user.userId}>
+              <ListItemAvatar>
+                <Avatar src={user.profilePictureUrl}>
+                  {!user.profilePictureUrl &&
+                    user.userName?.charAt(0).toUpperCase()}
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText>
+                <Typography variant="h6" color="black">
+                  {user.userName}
+                </Typography>
+              </ListItemText>
+              <SharedButton
+                following={isFollowing[user.userId]}
+                onClick={() =>
+                  isFollowing[user.userId]
+                    ? handleUnfollow(user.userId)
+                    : handleFollow(user.userId)
+                }
+              >
+                {isFollowing[user.userId] ? "Following" : "Follow"}
+              </SharedButton>
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </Card>
   );
 }
