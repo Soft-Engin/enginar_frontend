@@ -451,7 +451,7 @@ export default function EventDetailed({ eventId }) {
                   marginRight: 1,
                   cursor: "pointer",
                 }}
-                onClick={handleParticipantsPopupOpen}
+                // onClick={handleParticipantsPopupOpen}
               >
                 {participants &&
                   participants.map((participant) => (

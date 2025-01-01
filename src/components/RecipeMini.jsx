@@ -6,7 +6,6 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import ShareIcon from "@mui/icons-material/Share";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
@@ -424,7 +423,6 @@ export default function RecipeMini({ recipe }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ShareIcon style={{ fontSize: "28px", marginRight: 6 }} />
           <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
               <BookmarkIcon style={{ fontSize: "32px" }} />

@@ -12,7 +12,6 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import ShareIcon from "@mui/icons-material/Share";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
@@ -410,7 +409,6 @@ export default function BlogDetailed({ blogId }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ShareIcon style={{ fontSize: "42px", marginRight: 6 }} />
           <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
               <BookmarkIcon style={{ fontSize: "48px" }} />
