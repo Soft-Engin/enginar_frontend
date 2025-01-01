@@ -64,7 +64,7 @@ function CustomTabPanel(props) {
           sx={{
             display: "flex",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
           {children}
@@ -351,7 +351,7 @@ const UserProfile = () => {
           flexDirection: "column",
           scale: { xs: "70%", sm: "80%", md: "95%", lg: "95%", xl: "100%" },
           transformOrigin: "top",
-          width: { md: 650, lg: 620, xl: 730 }, 
+          width: { md: 650, lg: 620, xl: 730 },
           margin: "0 auto",
         }}
       >
@@ -400,11 +400,11 @@ const UserProfile = () => {
                 <Avatar
                   sx={{
                     width: 150,
-                      height: 150,
-                      border: "4px solid white",
-                      position: "absolute",
-                      top: -90,
-                      left: 0,
+                    height: 150,
+                    border: "4px solid white",
+                    position: "absolute",
+                    top: -90,
+                    left: 0,
                     bgcolor: profilePic ? "transparent" : "#bdbdbd",
                     boxShadow: 2,
                   }}
@@ -419,7 +419,12 @@ const UserProfile = () => {
                 </Avatar>
                 <Box sx={{ mt: -2, ml: 20 }}>
                   <Box
-                    sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      mt: 1,
+                      alignItems: "center",
+                    }}
                   >
                     <Typography variant="h4" fontWeight="bold">
                       {profileData.firstName} {profileData.lastName}
@@ -539,7 +544,7 @@ const UserProfile = () => {
           </Card>
         </Box>
       </Box>
-    <FollowersListPopup
+      <FollowersListPopup
         open={followersPopupOpen}
         handleClose={handleFollowersPopupClose}
         userId={userId}

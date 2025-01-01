@@ -218,6 +218,7 @@ export default function EventMini({ event }) {
     <Box
       sx={{
         maxWidth: 630,
+        width: "100%",
         outline: "1.5px solid #C0C0C0",
         backgroundColor: "#FFFFFF",
         pl: 3,
@@ -236,7 +237,13 @@ export default function EventMini({ event }) {
           mb: 1,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", maxWidth: { sm: 250, md: 350, lg: 250, xl: 350 } }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            maxWidth: { sm: 250, md: 350, lg: 250, xl: 350 },
+          }}
+        >
           <Typography
             variant="h5"
             fontWeight="bold"
@@ -253,7 +260,9 @@ export default function EventMini({ event }) {
           <Typography variant="body2" component="div" noWrap>
             {event?.address?.district?.city?.name || "City"}
           </Typography>
-          <CalendarMonthIcon style={{ fontSize: "30px", marginRight: "2px", marginLeft: "5px" }} />
+          <CalendarMonthIcon
+            style={{ fontSize: "30px", marginRight: "2px", marginLeft: "5px" }}
+          />
           <Typography variant="body2" component="div" noWrap>
             {formattedDate}
           </Typography>
@@ -389,11 +398,10 @@ export default function EventMini({ event }) {
               component="div"
               color="text.secondary"
             >
-              {participants.length + followedParticipants.length} people are going
+              {participants.length + followedParticipants.length} people are
+              going
               {followedParticipants && followedParticipants.length > 0 && (
-                <span>
-                  , and {followedParticipants.length} whom you follow
-                </span>
+                <span>, and {followedParticipants.length} whom you follow</span>
               )}
             </Typography>
           )}
