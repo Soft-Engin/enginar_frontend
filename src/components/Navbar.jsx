@@ -159,7 +159,7 @@ const navbarTitlesIconsBase = [
       </Typography>
     ),
     icon: <KitchenOutlinedIcon sx={drawerIconStyle} />,
-    link: "/profile",
+    link: "/fromMyKitchen",
   },
   {
     text: (
