@@ -482,7 +482,8 @@ export default function EventDetailed({ eventId }) {
                   component="div"
                   color="text.secondary"
                 >
-                  {participants.length + followedParticipants.length} people are going
+                  {participants.length + followedParticipants.length} people are
+                  going
                   {followedParticipants && followedParticipants.length > 0 && (
                     <span>
                       , and {followedParticipants.length} whom you follow
@@ -510,10 +511,14 @@ export default function EventDetailed({ eventId }) {
                 onClick={handleJoinLeaveToggle}
               >
                 <Typography variant="h5">
-                  {loadingIsParticipant ? (
-                    <CircularProgress size={15} color="inherit" />
-                  ) : isParticipant ? (
-                    "Leave"
+                  {userLogged ? (
+                    loadingIsParticipant ? (
+                      <CircularProgress size={15} color="inherit" />
+                    ) : isParticipant ? (
+                      "Leave"
+                    ) : (
+                      "Join"
+                    )
                   ) : (
                     "Join"
                   )}

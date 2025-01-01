@@ -9,6 +9,7 @@ import {
   Button,
   TextField,
   IconButton,
+  Divider,
 } from "@mui/material";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
@@ -49,9 +50,13 @@ export default function CommentSection({ type, contentId }) {
   const [commentImages, setCommentImages] = React.useState({});
   const [newComment, setNewComment] = React.useState("");
   const [newImages, setNewImages] = React.useState([]);
+  const [userAvatar, setUserAvatar] = React.useState(null);
+  const [userName, setUserName] = React.useState("");
+  const [userInitials, setUserInitials] = React.useState("");
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
   let userLogged = localStorage.getItem("userLogged") === "true";
-  let userId = localStorage.getItem("userId");
+  const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
+  const authButtonId = "loginButton";
 
   React.useEffect(() => {
     const fetchComments = async () => {
@@ -71,6 +76,46 @@ export default function CommentSection({ type, contentId }) {
     };
     fetchComments();
   }, [type, contentId]);
+  React.useEffect(() => {
+    if (userLogged && userId) {
+      const fetchUserData = async () => {
+        try {
+          const userDataResponse = await axios.get(`/api/v1/users/${userId}`);
+          if (userDataResponse.status === 200) {
+            setUserName(userDataResponse.data.userName);
+            //Generate user initials from username
+            const nameParts = userDataResponse.data.userName.split(" ");
+            const initials = nameParts
+              .map((part) => part.charAt(0).toUpperCase())
+              .join("");
+            setUserInitials(initials);
+          }
+          try {
+            const avatarResponse = await axios.get(
+              `/api/v1/users/${userId}/profile-picture`,
+              { responseType: "blob" }
+            );
+            if (avatarResponse.status === 200) {
+              const imageUrl = URL.createObjectURL(avatarResponse.data);
+              setUserAvatar(imageUrl);
+            }
+          } catch (error) {
+            if (error.response && error.response.status === 404) {
+              setUserAvatar(null);
+            } else {
+              console.error("Error fetching user profile picture", error);
+              setError("Error fetching user profile picture");
+            }
+          }
+        } catch (err) {
+          console.error("Error fetching user data:", err);
+          setError("Error fetching user data.");
+        }
+      };
+      fetchUserData();
+    }
+  }, [userLogged, userId]);
+
   React.useEffect(() => {
     if (comments && comments.length > 0) {
       const fetchCommentImages = async () => {
@@ -160,6 +205,13 @@ export default function CommentSection({ type, contentId }) {
     );
   }
   const handleAddComment = async () => {
+    if (!userLogged) {
+      const authButton = document.getElementById(authButtonId);
+      if (authButton) {
+        authButton.click();
+      }
+      return;
+    }
     setLoadingComment(true);
     setError(null);
     try {
@@ -239,11 +291,31 @@ export default function CommentSection({ type, contentId }) {
             flexDirection: "row",
           }}
         >
-          <Avatar
-            src={profilePictureUrl}
-            sx={{ width: 50, height: 50, marginRight: 0.5 }}
-            onError={() => setProfilePictureUrl(null)}
-          />
+          {userAvatar ? (
+            <Avatar
+              src={userAvatar}
+              sx={{ width: 50, height: 50, marginRight: 0.5, mt: 2 }}
+              onError={() => setUserAvatar(null)}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: 50,
+                height: 50,
+                borderRadius: "50%",
+                backgroundColor: "#ccc",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontSize: "1.2rem",
+                fontWeight: "bold",
+                marginRight: 0.5,
+              }}
+            >
+              {userInitials}
+            </Box>
+          )}
           <Box
             sx={{
               position: "relative",
@@ -253,6 +325,14 @@ export default function CommentSection({ type, contentId }) {
               width: "100%",
             }}
           >
+            <Typography
+              variant="body1"
+              fontWeight="bold"
+              noWrap
+              sx={{ mb: 0, ml: 2 }}
+            >
+              {userName || "User Name"}
+            </Typography>
             <TextField
               fullWidth
               multiline
@@ -344,16 +424,21 @@ export default function CommentSection({ type, contentId }) {
               textTransform: "none",
             }}
             onClick={handleAddComment}
-            disabled={loadingComment}
+            disabled={loadingComment || !newComment.trim()}
           >
-            {loadingComment ? (
-              <CircularProgress size={20} color="white" />
+            {userLogged ? (
+              loadingComment ? (
+                <CircularProgress size={20} color="white" />
+              ) : (
+                <Typography variant="h6">Post</Typography>
+              )
             ) : (
               <Typography variant="h6">Post</Typography>
             )}
           </Button>
         </Box>
       </Box>
+      <Divider></Divider>
       <List>
         {comments.map((comment, index) => (
           <StyledCommentItem key={index} disableGutters>
