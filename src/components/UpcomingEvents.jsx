@@ -9,19 +9,259 @@ import AvatarGroup from "@mui/material/AvatarGroup";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-
-function generate(element) {
-  return [0, 1].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    })
-  );
-}
-{
-  /* Bu komple kaldırılacak */
-}
+import axios from "axios";
+import dayjs from "dayjs";
+import { Link } from "react-router-dom"; // Import Link
 
 export default function UpcomingEvents() {
+  const [events, setEvents] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+  const [eventParticipants, setEventParticipants] = React.useState({});
+
+  const fetchEvents = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = {
+        pageNumber: 1,
+        pageSize: 2,
+        SortBy: "date",
+        FromDate: dayjs().format("YYYY-MM-DD"),
+      };
+
+      const eventsResponse = await axios.get(
+        `/api/v1/events/search?${new URLSearchParams(params).toString()}`
+      );
+
+      if (eventsResponse.data && eventsResponse.data.items) {
+        setEvents(eventsResponse.data.items);
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchParticipants = async (eventId) => {
+    try {
+      const participantsResponse = await axios.get(
+        `/api/v1/events/${eventId}/participants?pageNumber=1&pageSize=3`
+      );
+      return participantsResponse.data.participations.items || [];
+    } catch (err) {
+      console.error("Error fetching participants", err);
+      return [];
+    }
+  };
+
+  const fetchProfilePicture = async (userId) => {
+    try {
+      const profilePicResponse = await axios.get(
+        `/api/v1/users/${userId}/profile-picture`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      if (profilePicResponse && profilePicResponse.data) {
+        return URL.createObjectURL(profilePicResponse.data);
+      }
+    } catch (err) {
+      if (err.response && err.response.status === 404) {
+        return null;
+      }
+      console.error("Error fetching profile picture", err);
+      return null;
+    }
+  };
+
+  React.useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  React.useEffect(() => {
+    const loadAllParticipants = async () => {
+      if (!events || events.length === 0) return;
+      const allParticipants = {};
+
+      for (const event of events) {
+        const fetchedParticipants = await fetchParticipants(event.eventId);
+        const avatarPromises = fetchedParticipants.map(async (participant) => {
+          const profilePictureUrl = await fetchProfilePicture(
+            participant.userId
+          );
+          return {
+            userId: participant.userId,
+            profilePictureUrl,
+          };
+        });
+
+        const avatarResults = await Promise.all(avatarPromises);
+        allParticipants[event.eventId] = {
+          participants: fetchedParticipants,
+          avatars: avatarResults,
+          loading: false,
+        };
+      }
+      setEventParticipants(allParticipants);
+    };
+
+    loadAllParticipants();
+  }, [events]);
+
+  const renderEventItem = (event) => {
+    const participantsInfo = eventParticipants[event.eventId] || {
+      participants: [],
+      avatars: [],
+      loading: true,
+    };
+    const {
+      participants,
+      avatars,
+      loading: participantsLoading,
+    } = participantsInfo;
+
+    return (
+      <ListItem key={event.eventId}>
+        <Box
+          sx={{
+            outline: "1.5px solid #AAAAAA",
+            width: 270,
+            pl: 0.5,
+            pr: 1,
+            pb: 0.5,
+            backgroundColor: "#FFFFFF",
+            borderRadius: 3,
+          }}
+        >
+          <ListItemText>
+            <Box
+              sx={{
+                display: "grid",
+                gridAutoFlow: "row",
+                gridTemplateColumns: "0.7fr 1fr",
+                gridTemplateRows: "auto",
+              }}
+            >
+              <Box display="flex">
+                <LocalOfferOutlinedIcon style={{ fontSize: "50px" }} />
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Link
+                  to={`/event?id=${event.eventId}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  {" "}
+                  {/* Add Link Here */}
+                  <Typography
+                    variant="subtitle1"
+                    component="div"
+                    fontWeight="bold"
+                    mt={0.5}
+                    sx={{ maxWidth: "210px", color: "black" }}
+                    noWrap
+                  >
+                    {event.title}
+                  </Typography>
+                </Link>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginTop: "2px",
+                  }}
+                >
+                  <PlaceOutlinedIcon
+                    style={{ fontSize: "30px", marginRight: "2px" }}
+                  />
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{ marginRight: "15px", maxWidth: "75px" }}
+                    noWrap
+                  >
+                    {event.address?.district?.name}
+                  </Typography>
+                  <CalendarMonthIcon
+                    style={{ fontSize: "30px", marginRight: "2px" }}
+                  />
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{ maxWidth: "75px" }}
+                    noWrap
+                  >
+                    {dayjs(event.date).format("DD.MM.YYYY")}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginTop: "10px",
+                  }}
+                >
+                  {participantsLoading ? (
+                    <Typography variant="body2">
+                      Loading participants...
+                    </Typography>
+                  ) : (
+                    <AvatarGroup
+                      total={event.totalParticipantsCount}
+                      spacing={4}
+                      sx={{
+                        "& .MuiAvatar-root": {
+                          width: 36,
+                          height: 36,
+                          fontSize: 17,
+                        },
+                      }}
+                    >
+                      {avatars.map((avatar, index) => {
+                        return (
+                          <Avatar
+                            key={index}
+                            alt={participants[index]?.userName}
+                            src={avatar.profilePictureUrl || undefined}
+                          >
+                            {!avatar.profilePictureUrl &&
+                              participants[index]?.userName
+                                ?.charAt(0)
+                                .toUpperCase()}
+                          </Avatar>
+                        );
+                      })}
+                    </AvatarGroup>
+                  )}
+
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    color="text.secondary"
+                    sx={{ marginLeft: "2px" }}
+                    noWrap
+                  >
+                    are
+                    <br />
+                    going
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          </ListItemText>
+        </Box>
+      </ListItem>
+    );
+  };
+
   return (
     <Box
       sx={{
@@ -45,129 +285,10 @@ export default function UpcomingEvents() {
       >
         Upcoming Events
       </Typography>
-      <List>
-        {generate(
-          <ListItem>
-            <Box
-              sx={{
-                outline: "1.5px solid #AAAAAA",
-                width: 270,
-                pl: 0.5,
-                pr: 1,
-                pb: 0.5,
-                backgroundColor: "#FFFFFF",
-                borderRadius: 3,
-              }}
-            >
-              <ListItemText>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridAutoFlow: "row",
-                    gridTemplateColumns: "0.7fr 1fr",
-                    gridTemplateRows: "auto",
-                  }}
-                >
-                  <Box display="flex">
-                    <LocalOfferOutlinedIcon style={{ fontSize: "50px" }} />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <Typography
-                      variant="subtitle1"
-                      component="div"
-                      fontWeight="bold"
-                      mt={0.5}
-                      sx={{ maxWidth: "210px" }}
-                      noWrap
-                    >
-                      Enginar Festival @test wrapping
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginTop: "2px",
-                      }}
-                    >
-                      <PlaceOutlinedIcon
-                        style={{ fontSize: "30px", marginRight: "2px" }}
-                      />
-                      <Typography
-                        variant="body2"
-                        component="div"
-                        sx={{ marginRight: "15px", maxWidth: "75px" }}
-                        noWrap
-                      >
-                        Istanbul
-                      </Typography>
-                      <CalendarMonthIcon
-                        style={{ fontSize: "30px", marginRight: "2px" }}
-                      />
-                      <Typography
-                        variant="body2"
-                        component="div"
-                        sx={{ maxWidth: "75px" }}
-                        noWrap
-                      >
-                        24.12.2024
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginTop: "10px",
-                      }}
-                    >
-                      <AvatarGroup
-                        total={23}
-                        spacing={4}
-                        sx={{
-                          "& .MuiAvatar-root": {
-                            width: 36,
-                            height: 36,
-                            fontSize: 17,
-                          },
-                        }}
-                      >
-                        <Avatar
-                          alt="Remy Sharp"
-                          src="/static/images/avatar/1.jpg"
-                        />
-                        <Avatar
-                          alt="Travis Howard"
-                          src="/static/images/avatar/2.jpg"
-                        />
-                        <Avatar
-                          alt="Agnes Walker"
-                          src="/static/images/avatar/4.jpg"
-                        />
-                      </AvatarGroup>
-                      <Typography
-                        variant="body2"
-                        component="div"
-                        color="text.secondary"
-                        sx={{ marginLeft: "2px" }}
-                        noWrap
-                      >
-                        are
-                        <br />
-                        going
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-              </ListItemText>
-            </Box>
-          </ListItem>
-        )}
-      </List>
+
+      {loading && <Typography>Loading...</Typography>}
+      {error && <Typography>Error: {error.message}</Typography>}
+      <List>{events.map((event) => renderEventItem(event))}</List>
     </Box>
   );
 }

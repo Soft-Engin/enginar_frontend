@@ -18,6 +18,7 @@ function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      style={{display: "flex", justifyContent: "center"}}
       {...other}
     >
       {value === index && <Box>{children}</Box>}
@@ -49,7 +50,7 @@ export default function ContentFeed() {
   return (
     <Box
       sx={{
-        width: { xs: "40%", sm: "60%", md: "75%", lg: "75%", xl: "85%" },
+        width: "50vw",
         margin: "0 auto",
       }}
     >

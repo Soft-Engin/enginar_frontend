@@ -742,23 +742,25 @@ const CreateRecipe = () => {
                 </Box>
               ))}
             </Box>
-            <Button
-              variant="contained"
-              startIcon={<AddCircleIcon />}
-              sx={{ mt: 2 }}
-              onClick={addStep}
-            >
-              Add Step
-            </Button>
-            <Button
-              variant="contained"
-              sx={{ mt: 2 }}
-              color="success"
-              onClick={handleCreateRecipe}
-              disabled={creating}
-            >
-              {creating ? "Creating..." : "Create Recipe"}
-            </Button>
+            <Box sx={{display: "flex", justifyContent: "space-between"}}>
+              <Button
+                variant="contained"
+                startIcon={<AddCircleIcon />}
+                sx={{ mt: 2 }}
+                onClick={addStep}
+              >
+                Add Step
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ mt: 2 }}
+                color="success"
+                onClick={handleCreateRecipe}
+                disabled={creating}
+              >
+                {creating ? "Creating..." : "Create Recipe"}
+              </Button>
+            </Box>
           </Box>
         </Grid>
 
@@ -794,16 +796,18 @@ const CreateRecipe = () => {
                 border: "1px solid #ccc",
                 p: 1,
                 backgroundColor: "white",
-                display: "flex", // Added flex display
-                flexDirection: "column", // Added flex direction
+                display: "flex",
+                flexDirection: "column",
                 justifyContent:
                   filteredIngredients.length === 0 && searchTerm
                     ? "center"
-                    : "flex-start", // Changed condition for alignment
+                    : "flex-start",
                 alignItems:
                   filteredIngredients.length === 0 && searchTerm
                     ? "center"
-                    : "stretch", // Changed condition for alignment
+                    : "stretch",
+                maxWidth: "100%", // Ensure no X-overflow
+                overflowX: "hidden", // Prevent X-overflow
               }}
             >
               {filteredIngredients.length === 0 && searchTerm ? ( // Condition to render the message
@@ -818,10 +822,15 @@ const CreateRecipe = () => {
                         {letter}
                       </Typography>
                     </Divider>
-                    <div style={{ display: "flex" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap" }}>
                       {categorizedIngredients[letter].map((ingredient) => (
                         <div
-                          style={{ marginRight: 5, marginLeft: 5 }}
+                          style={{
+                            marginRight: 5,
+                            marginLeft: 5,
+                            marginTop: 5,
+                            marginBottom: 5,
+                          }}
                           key={ingredient.id}
                         >
                           <Card
