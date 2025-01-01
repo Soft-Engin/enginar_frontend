@@ -126,7 +126,7 @@ export default function SearchedBlogs({ query }) {
     window.addEventListener("scroll", handleScroll);
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [query]);
 
   return (
     <Box>

@@ -130,7 +130,7 @@ export default function SearchedRecipes({ query }) {
     window.addEventListener("scroll", handleScroll);
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [query]);
 
   return (
     <Box>
