@@ -220,7 +220,7 @@ export default function BlogMini({ blog }) {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -228,7 +228,7 @@ export default function BlogMini({ blog }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  
+
   return (
     <Box
       sx={{
@@ -335,6 +335,8 @@ export default function BlogMini({ blog }) {
             textOverflow: "ellipsis",
             lineHeight: "24px",
             mb: 2,
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
           }}
         >
           {blog.bodyText}

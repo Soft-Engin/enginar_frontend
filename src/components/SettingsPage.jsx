@@ -69,7 +69,9 @@ const SettingsPage = () => {
         <SettingsIcon sx={{ fontSize: 40, mr: 1 }} />
       </Box>
 
-      <Box sx={{ pt: 2, flexGrow: 1 }}> {/* Added flexGrow: 1 */}
+      <Box sx={{ pt: 2, flexGrow: 1 }}>
+        {" "}
+        {/* Added flexGrow: 1 */}
         <Typography variant="h6">Profile Settings</Typography>
         <Divider sx={{ marginBottom: 2 }} />
         <TextField
@@ -114,54 +116,52 @@ const SettingsPage = () => {
           }}
         />
       </Box>
-    
-       <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-          <Typography variant="h6">Allergen / Preferences Selection</Typography>
 
-          <Divider sx={{ my: 2 }} />
+      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <Typography variant="h6">Allergen / Preferences Selection</Typography>
 
-                <Box sx={{ mb: 2, pr: 2, pl: 2, flexGrow: 1}}>
-                  <Box
-                    sx={{
-                      mb: 2,
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 1,
-                      maxWidth: "100%",
-                      overflowX: "hidden",
-                    }}
-                  >
-            
-                      {selectedAllergens.length > 0 ? (
-                          selectedAllergens.map((allergen) => (
-                          <Chip
-                              key={allergen.id}
-                              label={allergen.name}
-                              onDelete={() => removeAllergen(allergen.id)}
-                              sx={{
-                                fontSize: "1rem",
-                                p: 0.5,
-                                backgroundColor: "#4CAF50",
-                                color: "white",
-                                "&:hover": {
-                                  backgroundColor: "#45a049",
-                                },
-                              }}
-                          />
-                          ))
-                      ) : (
-                          <Typography variant="body2" color="textSecondary">
-                          No allergens selected.
-                          </Typography>
-                      )}
-                    
-                  </Box>
-                </Box>
+        <Divider sx={{ my: 2 }} />
+
+        <Box sx={{ mb: 2, pr: 2, pl: 2, flexGrow: 1 }}>
+          <Box
+            sx={{
+              mb: 2,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              maxWidth: "100%",
+              overflowX: "hidden",
+            }}
+          >
+            {selectedAllergens.length > 0 ? (
+              selectedAllergens.map((allergen) => (
+                <Chip
+                  key={allergen.id}
+                  label={allergen.name}
+                  onDelete={() => removeAllergen(allergen.id)}
+                  sx={{
+                    fontSize: "1rem",
+                    p: 0.5,
+                    backgroundColor: "#4CAF50",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#45a049",
+                    },
+                  }}
+                />
+              ))
+            ) : (
+              <Typography variant="body2" color="textSecondary">
+                No allergens selected.
+              </Typography>
+            )}
+          </Box>
+        </Box>
 
         <Paper
-              elevation={3}
-              sx={{ p: 3, mb: 3, backgroundColor: "rgba(255, 255, 255, 0.9)" }}
-            >
+          elevation={3}
+          sx={{ p: 3, mb: 3, backgroundColor: "rgba(255, 255, 255, 0.9)" }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -184,7 +184,7 @@ const SettingsPage = () => {
               <ExpandMoreIcon />
             </IconButton>
           </Box>
-            
+
           <Collapse in={showAllergens}>
             <Box sx={{ maxHeight: "500px", overflowY: "auto" }}>
               <AllergenSelector

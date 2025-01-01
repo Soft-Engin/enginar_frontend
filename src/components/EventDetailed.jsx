@@ -289,11 +289,7 @@ export default function EventDetailed({ eventId }) {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                variant="h4"
-                fontWeight="bold"
-                noWrap
-              >
+              <Typography variant="h4" fontWeight="bold" noWrap>
                 {event?.title || "Event Title"}
               </Typography>
             </Box>
@@ -305,7 +301,7 @@ export default function EventDetailed({ eventId }) {
               component="div"
               fontWeight="bold"
               noWrap
-              sx= {{ mr: 1 }}
+              sx={{ mr: 1 }}
             >
               Date and Time:
             </Typography>
@@ -323,7 +319,13 @@ export default function EventDetailed({ eventId }) {
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-            <Typography variant="h6" component="div" fontWeight="bold" noWrap sx={{ mr: 1 }}>
+            <Typography
+              variant="h6"
+              component="div"
+              fontWeight="bold"
+              noWrap
+              sx={{ mr: 1 }}
+            >
               Location:
             </Typography>
             <PlaceOutlinedIcon
@@ -383,7 +385,13 @@ export default function EventDetailed({ eventId }) {
           <Typography
             variant="body1"
             component="div"
-            sx={{ lineHeight: "25px", mb: 3, pt: 0.5 }}
+            sx={{
+              lineHeight: "25px",
+              mb: 3,
+              pt: 0.5,
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
           >
             {event?.bodyText}
           </Typography>

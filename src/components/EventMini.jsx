@@ -323,6 +323,8 @@ export default function EventMini({ event }) {
           WebkitLineClamp: 5,
           textOverflow: "ellipsis",
           mb: 1,
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
         }}
       >
         {event?.bodyText || "Event Description"}

@@ -506,7 +506,6 @@ const RecipeSearch = () => {
                       handlePageChange(null, newPage);
                     }}
                     variant="outlined"
-
                   />
                 )}
               </Box>
