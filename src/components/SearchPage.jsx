@@ -15,7 +15,7 @@ export default function SearchPage() {
   return (
     <Box
       sx={{
-        width: { xs: 200, sm: 400, md: 520, lg: 520, xl: 600 },
+        width: 600,
         margin: "0 auto",
       }}
     >
