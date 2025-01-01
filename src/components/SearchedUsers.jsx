@@ -36,7 +36,7 @@ function a11yProps(index) {
   };
 }
 
-export default function SearchedUsers({query}) {
+export default function SearchedUsers({ query }) {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -63,14 +63,10 @@ export default function SearchedUsers({query}) {
           pageSize: pageSize,
           pageNumber: pageNumber,
           UserNameContains: query,
-          First_LastNameContains: query
         },
       });
       if (usersResponse.data && usersResponse.data.items) {
-        setUsers((prevUsers) => [
-          ...prevUsers,
-          ...usersResponse.data.items,
-        ]);
+        setUsers((prevUsers) => [...prevUsers, ...usersResponse.data.items]);
       }
       pageNumber += 1;
       console.log(pageNumber);
@@ -112,7 +108,7 @@ export default function SearchedUsers({query}) {
             pageSize: pageSize,
             pageNumber: 1,
             UserNameContains: query,
-            First_LastNameContains: query
+            First_LastNameContains: query,
           },
         });
         setUsers(response.data.items);
