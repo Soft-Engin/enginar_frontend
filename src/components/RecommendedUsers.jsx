@@ -61,7 +61,9 @@ export default function RecommendedUsers() {
           if (
             !uniqueUserIds.includes(item.userId) &&
             uniqueUserIds.length < 4 &&
-            !followingUsers.some(following => following.userId === item.userId)
+            !followingUsers.some(
+              (following) => following.userId === item.userId
+            )
           ) {
             uniqueUserIds.push(item.userId);
             uniqueUsers.push(item);
@@ -145,6 +147,7 @@ export default function RecommendedUsers() {
             Recommended Users
           </Typography>
         }
+        sx={{ pb: 0 }}
       />
       {loading && (
         <Box
@@ -177,7 +180,7 @@ export default function RecommendedUsers() {
                 </Avatar>
               </ListItemAvatar>
               <ListItemText>
-                <Typography variant="h6" color="black">
+                <Typography variant="h6" color="black" noWrap>
                   {user.userName}
                 </Typography>
               </ListItemText>
