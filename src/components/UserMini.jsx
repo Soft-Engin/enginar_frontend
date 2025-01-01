@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { Typography, Box, Avatar, Button } from "@mui/material";
+import { Typography, Box, Avatar, Button, CircularProgress } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import FollowersListPopup from "./FollowersListPopup";
+import FollowingListPopup from "./FollowingListPopup";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
@@ -38,10 +40,6 @@ export default function UserMini({ user }) {
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
   };
 
   const [loading, setLoading] = useState(true);
@@ -82,7 +80,7 @@ export default function UserMini({ user }) {
           setProfilePic(null);
         }
       } catch (error) {
-        console.error("Error fetching profile pic", error);
+        console.error("Error fetching profile pic: ", error);
         setProfilePic(null);
       }
       try {
@@ -99,10 +97,9 @@ export default function UserMini({ user }) {
           setBannerPic(null);
         }
       } catch (error) {
-        console.error("Error fetching profile pic", error);
+        console.error("Error fetching profile pic: ", error);
         setBannerPic(null);
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -174,10 +171,10 @@ export default function UserMini({ user }) {
       if (response.status === 200) {
         setIsFollowing(true);
         setFollowersCount((prev) => prev + 1);
-        setLoggedInUserFollowing((prev) => [...prev, user.userId]);
+        setLoggedInUserFollowing((prev) => [...prev, { userId: user.userId }]);
       }
     } catch (error) {
-      console.error("Error follow user:", error);
+      console.error("Error following user:", error);
       setError(
         error.response?.data?.message ||
           error.message ||
@@ -199,7 +196,7 @@ export default function UserMini({ user }) {
         );
       }
     } catch (error) {
-      console.error("Error unfollow user:", error);
+      console.error("Error unfollowing user:", error);
       setError(
         error.response?.data?.message ||
           error.message ||
@@ -207,6 +204,59 @@ export default function UserMini({ user }) {
       );
     }
   };
+
+  const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
+  const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
+
+  const handleFollowingPopupOpen = () => {
+    setFollowingPopupOpen(true);
+  };
+
+  const handleFollowingPopupClose = () => {
+    setFollowingPopupOpen(false);
+  };
+
+  const handleFollowersPopupOpen = () => {
+    setFollowersPopupOpen(true);
+  };
+
+  const handleFollowersPopupClose = () => {
+    setFollowersPopupOpen(false);
+  };
+
+  useEffect(() => {
+    // This runs when the component unmounts or userId changes
+    return () => {
+      setFollowersPopupOpen(false);
+      setFollowingPopupOpen(false);
+    };
+  }, [user.userId]);
+
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <Typography color="error">Error: {error}</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -254,17 +304,24 @@ export default function UserMini({ user }) {
         >
           {!profilePic && profilePlaceholder}
           {profilePic && (
-            <Avatar
-              src={profilePic}
-              sx={{ width: "100%", height: "100%" }}
-            />
+            <Avatar src={profilePic} sx={{ width: "100%", height: "100%" }} />
           )}
         </Avatar>
         <Box sx={{ ml: 18 }}>
           <Box sx={{ display: "flex", gap: 2, mt: 0.6, alignItems: "center" }}>
-            <Typography variant="h5" fontWeight="bold">
-              {user.firstName} {user.lastName}
-            </Typography>
+            <Link
+              to={`/profile?id=${user.userId}`}
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="h5" fontWeight="bold">
+                {user.firstName} {user.lastName}
+              </Typography>
+            </Link>
             {!isOwnProfile &&
               (isFollowing ? (
                 <FollowButton variant="contained" onClick={handleUnfollowUser}>
@@ -280,10 +337,18 @@ export default function UserMini({ user }) {
             {user.userName}
           </Typography>
           <Box sx={{ display: "flex", gap: 2, mt: 0.5 }}>
-            <Typography variant="body2">
+            <Typography
+              variant="body2"
+              onClick={handleFollowingPopupOpen}
+              sx={{ cursor: "pointer" }}
+            >
               <strong>{followingCount}</strong> Following
             </Typography>
-            <Typography variant="body2">
+            <Typography
+              variant="body2"
+              onClick={handleFollowersPopupOpen}
+              sx={{ cursor: "pointer" }}
+            >
               <strong>{followersCount}</strong> Followers
             </Typography>
           </Box>
@@ -322,6 +387,16 @@ export default function UserMini({ user }) {
           </Menu>
         </Box>
       </Box>
+      <FollowersListPopup
+        open={followersPopupOpen}
+        handleClose={handleFollowersPopupClose}
+        userId={user.userId}
+      />
+      <FollowingListPopup
+        open={followingPopupOpen}
+        handleClose={handleFollowingPopupClose}
+        userId={user.userId}
+      />
     </Box>
   );
 }
