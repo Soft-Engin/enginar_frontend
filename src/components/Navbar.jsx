@@ -189,7 +189,7 @@ const navbarTitlesIconsAuth = [
       </Typography>
     ),
     icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} />,
-    link: "/savedliked",
+    link: "/savedliked?mode=likes",
   },
   {
     text: (
@@ -198,7 +198,7 @@ const navbarTitlesIconsAuth = [
       </Typography>
     ),
     icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} />,
-    link: "/savedliked",
+    link: "/savedliked?mode=bookmarkes",
   },
 ];
 
