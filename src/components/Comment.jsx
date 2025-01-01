@@ -13,6 +13,7 @@ import { format, parseISO, formatDistanceToNow } from "date-fns";
 
 export default function Comment({ comment, commentImage }) {
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = React.useState("");
   const [loadingProfile, setLoadingProfile] = React.useState(true);
   const [errorProfile, setErrorProfile] = React.useState(null);
   const [commentImages, setCommentImages] = React.useState([]);
@@ -25,18 +26,37 @@ export default function Comment({ comment, commentImage }) {
         setLoadingProfile(true);
         setErrorProfile(null);
         try {
-          const response = await axios.get(
-            `/api/v1/users/${comment.userId}/profile-picture`,
-            { responseType: "blob" }
+          // Fetch User Name First
+          const userDataResponse = await axios.get(
+            `/api/v1/users/${comment.userId}`
           );
-          if (response.data) {
-            const profileUrl = URL.createObjectURL(response.data);
-            setProfilePictureUrl(profileUrl);
-          } else {
-            setProfilePictureUrl(null);
+          if (userDataResponse.status === 200) {
+            //Generate user initials from username
+            const nameParts = userDataResponse.data.userName.split(" ");
+            const initials = nameParts
+              .map((part) => part.charAt(0).toUpperCase())
+              .join("");
+            setUserInitials(initials);
+          }
+          try {
+            const response = await axios.get(
+              `/api/v1/users/${comment.userId}/profile-picture`,
+              { responseType: "blob" }
+            );
+            if (response.data) {
+              const profileUrl = URL.createObjectURL(response.data);
+              setProfilePictureUrl(profileUrl);
+            }
+          } catch (error) {
+            if (error.response && error.response.status === 404) {
+              setProfilePictureUrl(null);
+            } else {
+              console.error("Error fetching profile picture:", error);
+              setErrorProfile(error.message || "An unexpected error occurred.");
+            }
           }
         } catch (err) {
-          console.error("Error fetching profile picture:", err);
+          console.error("Error fetching user data:", err);
           setErrorProfile(err.message || "An unexpected error occurred.");
         } finally {
           setLoadingProfile(false);
@@ -67,10 +87,13 @@ export default function Comment({ comment, commentImage }) {
               images.push(imageUrl);
             }
           } catch (error) {
-            console.error(
-              `Error fetching image for comment ${comment.id} at index ${i}:`,
-              error
-            );
+            if (error.response && error.response.status !== 404) {
+              console.error(
+                `Error fetching image for comment ${comment.id} at index ${i}:`,
+                error
+              );
+              setErrorImages(error.message || "An unexpected error occurred.");
+            }
           }
         }
         setCommentImages(images);
@@ -88,14 +111,43 @@ export default function Comment({ comment, commentImage }) {
   }, [comment]);
 
   return (
-    <Box sx={{ maxWidth: 1500, width:1500, backgroundColor: "#EAEAEA", pb: 1.3, pt: 2.2 }}>
+    <Box
+      sx={{
+        maxWidth: 1500,
+        width: 1500,
+        backgroundColor: "#EAEAEA",
+        pb: 1.3,
+        pt: 2.2,
+      }}
+    >
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", pb: 1.2 }}>
-          <Avatar
-            src={profilePictureUrl}
-            sx={{ width: 50, height: 50, mr: 1.3 }}
-            onError={() => setProfilePictureUrl(null)}
-          />
+          {profilePictureUrl ? (
+            <Avatar
+              src={profilePictureUrl}
+              sx={{ width: 50, height: 50, mr: 1.3 }}
+              onError={() => setProfilePictureUrl(null)}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: 50,
+                height: 50,
+                borderRadius: "50%",
+                marginRight: 2,
+                backgroundColor: "#ccc",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontSize: "1.2rem",
+                fontWeight: "bold",
+              }}
+            >
+              {userInitials}
+            </Box>
+          )}
+
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <Typography variant="body1" fontWeight="bold" noWrap>
               {comment.userName}
@@ -136,11 +188,6 @@ export default function Comment({ comment, commentImage }) {
                 ))}
               </ImageList>
             ) : null}
-            {errorImages && (
-              <Box display="flex" justifyContent="center" my={2}>
-                <Typography color="error">Error: {errorImages}</Typography>
-              </Box>
-            )}
           </Box>
         </Box>
         <Box sx={{ display: "flex", ml: 4 }}>

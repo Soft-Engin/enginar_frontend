@@ -89,7 +89,7 @@ const ActionSpeedDial = styled(SpeedDial)(({ theme }) => ({
   right: 8,
   [theme.breakpoints.up("sm")]: {
     right: "auto",
-    left: 5,
+    left: 8,
   },
 }));
 
@@ -159,7 +159,7 @@ const navbarTitlesIconsBase = [
       </Typography>
     ),
     icon: <KitchenOutlinedIcon sx={drawerIconStyle} />,
-    link: "/profile",
+    link: "/fromMyKitchen",
   },
   {
     text: (

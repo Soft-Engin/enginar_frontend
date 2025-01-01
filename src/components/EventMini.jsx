@@ -419,10 +419,14 @@ export default function EventMini({ event }) {
             onClick={handleJoinLeaveToggle}
           >
             <Typography variant="h6">
-              {loadingIsParticipant ? (
-                <CircularProgress size={15} color="inherit" />
-              ) : isParticipant ? (
-                "Leave"
+              {userLogged ? (
+                loadingIsParticipant ? (
+                  <CircularProgress size={15} color="inherit" />
+                ) : isParticipant ? (
+                  "Leave"
+                ) : (
+                  "Join"
+                )
               ) : (
                 "Join"
               )}
