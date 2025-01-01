@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  TextField,
-  Box,
-  Typography,
-  Grid,
-  Card,
-  Button,
-} from "@mui/material";
+import { TextField, Box, Typography, Grid, Card, Button } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 const allergensList = [
@@ -88,15 +81,21 @@ const AllergenSelector = ({ onAllergenSelect, selectedAllergens = [] }) => {
                     alignItems: "center",
                     justifyContent: "space-between",
                     padding: "8px 16px",
-                    backgroundColor: isAllergenSelected(allergen.id) ? "#f5f5f5" : "#fff",
+                    backgroundColor: isAllergenSelected(allergen.id)
+                      ? "#f5f5f5"
+                      : "#fff",
                     opacity: isAllergenSelected(allergen.id) ? 0.6 : 1,
-                    borderColor: isAllergenSelected(allergen.id) ? "#555555" : "#000000",
+                    borderColor: isAllergenSelected(allergen.id)
+                      ? "#555555"
+                      : "#000000",
                   }}
                 >
                   <Typography
                     variant="body1"
                     sx={{
-                      textDecoration: isAllergenSelected(allergen.id) ? "line-through" : "none",
+                      textDecoration: isAllergenSelected(allergen.id)
+                        ? "line-through"
+                        : "none",
                     }}
                   >
                     {allergen.name}

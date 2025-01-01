@@ -742,7 +742,7 @@ const CreateRecipe = () => {
                 </Box>
               ))}
             </Box>
-            <Box sx={{display: "flex", justifyContent: "space-between"}}>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Button
                 variant="contained"
                 startIcon={<AddCircleIcon />}

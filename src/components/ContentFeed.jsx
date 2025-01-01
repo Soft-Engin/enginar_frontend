@@ -18,7 +18,7 @@ function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      style={{display: "flex", justifyContent: "center"}}
+      style={{ display: "flex", justifyContent: "center" }}
       {...other}
     >
       {value === index && (
@@ -26,7 +26,7 @@ function CustomTabPanel(props) {
           sx={{
             display: "flex",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
           {children}

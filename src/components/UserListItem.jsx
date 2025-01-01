@@ -15,11 +15,12 @@ const UserListItemContainer = styled(Box)(({ theme }) => ({
   boxShadow: 2,
   padding: theme.spacing(1), // Increased padding for better spacing
   outline: "1.5px solid #C0C0C0",
-    cursor: 'pointer', // Change cursor to pointer on hover
-    transition: 'background-color 0.1s ease', // Smooth transition for hover
-    "&:hover": { // Add hover effect
-        backgroundColor: '#f0f0f0', // Slight background color change on hover
-    },
+  cursor: "pointer", // Change cursor to pointer on hover
+  transition: "background-color 0.1s ease", // Smooth transition for hover
+  "&:hover": {
+    // Add hover effect
+    backgroundColor: "#f0f0f0", // Slight background color change on hover
+  },
 }));
 
 const UserListItem = ({ user }) => {

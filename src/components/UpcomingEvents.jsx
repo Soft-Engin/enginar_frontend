@@ -11,14 +11,14 @@ import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import axios from "axios";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 export default function UpcomingEvents() {
   const [events, setEvents] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [eventParticipants, setEventParticipants] = React.useState({});
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -129,7 +129,11 @@ export default function UpcomingEvents() {
     };
 
     return (
-      <ListItem key={event.eventId} onClick={handleEventClick} style={{ cursor: "pointer" }}>
+      <ListItem
+        key={event.eventId}
+        onClick={handleEventClick}
+        style={{ cursor: "pointer" }}
+      >
         <Box
           sx={{
             outline: "1.5px solid #AAAAAA",
@@ -265,7 +269,7 @@ export default function UpcomingEvents() {
       sx={{
         position: "fixed",
         top: 425,
-        right: { lg: "1%", xl: "3%" },
+        right: { lg: "0.7%", xl: "2.5%" },
         width: 300,
         scale: { xs: "0%", sm: "0%", md: "0%", lg: "85%", xl: "95%" },
         borderRadius: 3,
