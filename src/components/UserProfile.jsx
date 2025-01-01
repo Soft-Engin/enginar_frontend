@@ -59,7 +59,17 @@ function CustomTabPanel(props) {
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       {...other}
     >
-      {value === index && <Box sx={{ pt: 0 }}>{children}</Box>}
+      {value === index && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          {children}
+        </Box>
+      )}
     </div>
   );
 }
@@ -501,8 +511,8 @@ const UserProfile = () => {
               </Box>
             </CardContent>
             {/* User Content */}
-            <Box sx={{ width: "100%", pb: 2 }}>
-              <Box sx={{ borderTop: 1, borderColor: "divider" }}>
+            <Box sx={{ width: "100%", pb: 2, px: 2 }}>
+              <Box sx={{ borderTop: 1, borderColor: "divider", mb: 1 }}>
                 <Tabs
                   value={value}
                   onChange={handleChange}
