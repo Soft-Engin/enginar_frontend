@@ -90,19 +90,19 @@ function UserRecipesTab() {
   }, [userId]);
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
+    <div>
       <LoadingErrorDisplay
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      <Stack spacing={2} direction={"column"} alignItems={"center"}>
-        {recipes.map((recipe) => (
+      {recipes.map((recipe, index) => (
+        <Box key={index} sx={{ width: 600, mb: 2 }}>
           <RecipeMini key={recipe.id} recipe={recipe} />
-        ))}
-      </Stack>
-    </Box>
+        </Box>
+      ))}
+    </div>
   );
 }
 

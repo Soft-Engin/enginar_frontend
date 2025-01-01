@@ -295,8 +295,27 @@ export default function RecipeDetailed({ recipeId }) {
   }
 
   return (
-    <Box sx={{ width: "100%", outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", px: 4, pt: 2, pb: 1, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1.5, borderBottom: "1px solid #E0E0E0" }}>
+    <Box
+      sx={{
+        width: "100%",
+        outline: "1.5px solid #C0C0C0",
+        backgroundColor: "#FFFFFF",
+        px: 4,
+        pt: 2,
+        pb: 1,
+        borderRadius: "20px 20px 0 0",
+        boxShadow: 3,
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          pb: 1.5,
+          borderBottom: "1px solid #E0E0E0",
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Link
             to={`/profile?id=${recipe.userId}`}
@@ -418,7 +437,16 @@ export default function RecipeDetailed({ recipeId }) {
           )}
         </Box>
       )}
-      <Typography variant="body1" sx={{ lineHeight: "30px", mb: 2, px: 2 }}>
+      <Typography
+        variant="body1"
+        sx={{
+          lineHeight: "30px",
+          mb: 2,
+          px: 2,
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
+        }}
+      >
         {recipe.bodyText}
       </Typography>
       <Typography
@@ -476,7 +504,11 @@ export default function RecipeDetailed({ recipeId }) {
       >
         {recipe.steps.map((step, index) => (
           <ListItem key={index}>
-            {step}
+            <Typography
+              sx={{ wordWrap: "break-word", overflowWrap: "break-word" }}
+            >
+              {step}
+            </Typography>
             {stepImages[index] && (
               <Box
                 sx={{

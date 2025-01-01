@@ -88,19 +88,19 @@ function UserEventsTab() {
   }, [userId]);
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
+    <div>
       <LoadingErrorDisplay
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      <Stack spacing={2} direction={"column"} alignItems={"center"}>
-        {events.map((event) => (
+      {events.map((event, index) => (
+        <Box key={index} sx={{ mb: 2 }}>
           <EventMini key={event.id} event={event} />
-        ))}
-      </Stack>
-    </Box>
+        </Box>
+      ))}
+    </div>
   );
 }
 

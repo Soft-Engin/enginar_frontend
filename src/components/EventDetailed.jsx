@@ -289,45 +289,47 @@ export default function EventDetailed({ eventId }) {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                variant="h4"
-                fontWeight="bold"
-                style={{ marginRight: "15px", maxWidth: "400px" }}
-                noWrap
-              >
+              <Typography variant="h4" fontWeight="bold" noWrap>
                 {event?.title || "Event Title"}
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <CalendarMonthIcon
-                style={{ fontSize: "30px", marginRight: "3px" }}
-              />
-              <Typography
-                variant="body1"
-                component="div"
-                fontWeight="bold"
-                style={{ marginRight: "5px" }}
-                noWrap
-              >
-                Event Date and Time:
-              </Typography>
-              <Typography
-                variant="body1"
-                component="div"
-                color="text.secondary"
-                noWrap
-              >
-                {formattedDate}
               </Typography>
             </Box>
           </Box>
 
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography
+              variant="h6"
+              component="div"
+              fontWeight="bold"
+              noWrap
+              sx={{ mr: 1 }}
+            >
+              Date and Time:
+            </Typography>
+            <CalendarMonthIcon
+              style={{ fontSize: "28px", marginRight: "3px" }}
+            />
+            <Typography
+              variant="body1"
+              component="div"
+              color="text.secondary"
+              noWrap
+            >
+              {formattedDate}
+            </Typography>
+          </Box>
+
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-            <Typography variant="h6" component="div" fontWeight="bold" noWrap>
+            <Typography
+              variant="h6"
+              component="div"
+              fontWeight="bold"
+              noWrap
+              sx={{ mr: 1 }}
+            >
               Location:
             </Typography>
             <PlaceOutlinedIcon
-              style={{ fontSize: "30px", marginRight: "2px" }}
+              style={{ fontSize: "28px", marginRight: "2px" }}
             />
             <Typography
               variant="body1"
@@ -383,7 +385,13 @@ export default function EventDetailed({ eventId }) {
           <Typography
             variant="body1"
             component="div"
-            sx={{ lineHeight: "25px", mb: 3, pt: 0.5 }}
+            sx={{
+              lineHeight: "25px",
+              mb: 3,
+              pt: 0.5,
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
           >
             {event?.bodyText}
           </Typography>

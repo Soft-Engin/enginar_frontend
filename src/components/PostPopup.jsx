@@ -140,8 +140,7 @@ export default function PostPopup(props) {
           bodyText: bodyText,
           bannerImage: bannerImage,
         },
-        {
-        }
+        {}
       );
       if (response.status === 201) {
         setSuccess(true);

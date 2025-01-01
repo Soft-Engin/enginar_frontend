@@ -21,6 +21,7 @@ const StyledCardMedia = styled("img")({
   objectFit: "cover",
   height: "225px",
 });
+
 export default function RecipeMini({ recipe }) {
   const navigate = useNavigate();
   const [bannerUrl, setBannerUrl] = React.useState(null);
@@ -44,6 +45,8 @@ export default function RecipeMini({ recipe }) {
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
 
+  const recipeId = recipe?.id || recipe?.recipeId; // Extract recipeId
+
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
       setErrorState(null);
@@ -53,13 +56,13 @@ export default function RecipeMini({ recipe }) {
   };
 
   React.useEffect(() => {
-    if (recipe && recipe.id) {
+    if (recipeId) {
       const fetchBanner = async () => {
         setLoading(true);
         setError(null);
         try {
           const response = await axios.get(
-            `/api/v1/recipes/${recipe.id}/banner`,
+            `/api/v1/recipes/${recipeId}/banner`,
             { responseType: "blob" }
           );
           if (response.data) {
@@ -87,7 +90,8 @@ export default function RecipeMini({ recipe }) {
         URL.revokeObjectURL(bannerUrl);
       }
     };
-  }, [recipe]);
+  }, [recipeId]);
+
   React.useEffect(() => {
     if (recipe && recipe.userId) {
       const fetchProfilePicture = async () => {
@@ -119,15 +123,16 @@ export default function RecipeMini({ recipe }) {
       }
     };
   }, [recipe]);
+
   React.useEffect(() => {
-    if (recipe && recipe.id) {
+    if (recipeId) {
       const fetchLikesAndComments = async () => {
         setLoadingLikesComments(true);
         setErrorLikesComments(null);
         try {
           const [likeResponse, commentResponse] = await Promise.all([
-            axios.get(`/api/v1/recipes/${recipe.id}/like-count`),
-            axios.get(`/api/v1/recipes/${recipe.id}/comments`),
+            axios.get(`/api/v1/recipes/${recipeId}/like-count`),
+            axios.get(`/api/v1/recipes/${recipeId}/comments`),
           ]);
 
           setLikeCount(likeResponse.data.likeCount || 0);
@@ -141,15 +146,16 @@ export default function RecipeMini({ recipe }) {
       };
       fetchLikesAndComments();
     }
-  }, [recipe]);
+  }, [recipeId]);
+
   React.useEffect(() => {
-    if (recipe && recipe.id && userLogged) {
+    if (recipeId && userLogged) {
       const fetchIsLiked = async () => {
         setLoadingIsLiked(true);
         setErrorIsLiked(null);
         try {
           const response = await axios.get(
-            `/api/v1/recipes/${recipe.id}/is-liked`
+            `/api/v1/recipes/${recipeId}/is-liked`
           );
           setIsLiked(response.data.isLiked || false);
         } catch (err) {
@@ -161,15 +167,16 @@ export default function RecipeMini({ recipe }) {
       };
       fetchIsLiked();
     }
-  }, [recipe, userLogged]);
+  }, [recipeId, userLogged]);
+
   React.useEffect(() => {
-    if (recipe && recipe.id && userLogged) {
+    if (recipeId && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
         setErrorIsBookmarked(null);
         try {
           const response = await axios.get(
-            `/api/v1/recipes/${recipe.id}/is-bookmarked`
+            `/api/v1/recipes/${recipeId}/is-bookmarked`
           );
           setIsBookmarked(response.data.isBookmarked || false);
         } catch (err) {
@@ -181,7 +188,7 @@ export default function RecipeMini({ recipe }) {
       };
       fetchIsBookmarked();
     }
-  }, [recipe, userLogged]);
+  }, [recipeId, userLogged]);
 
   const handleLikeToggle = async () => {
     if (!userLogged) {
@@ -198,7 +205,7 @@ export default function RecipeMini({ recipe }) {
       setLikeCount((prevLikeCount) => prevLikeCount + 1);
     }
     try {
-      await axios.post(`/api/v1/recipes/${recipe.id}/toggle-like`);
+      await axios.post(`/api/v1/recipes/${recipeId}/toggle-like`);
     } catch (err) {
       console.error("Error toggling like", err);
       setIsLiked((prevIsLiked) => !prevIsLiked);
@@ -209,6 +216,7 @@ export default function RecipeMini({ recipe }) {
       }
     }
   };
+
   const handleBookmarkToggle = async () => {
     if (!userLogged) {
       const authButton = document.getElementById(authButtonId);
@@ -219,7 +227,7 @@ export default function RecipeMini({ recipe }) {
     }
     setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     try {
-      await axios.post(`/api/v1/recipes/${recipe.id}/bookmark`);
+      await axios.post(`/api/v1/recipes/${recipeId}/bookmark`);
     } catch (err) {
       console.error("Error toggling bookmark", err);
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
@@ -330,7 +338,7 @@ export default function RecipeMini({ recipe }) {
       </Box>
 
       <Box
-        onClick={() => navigate(`/recipe?id=${recipe.id}`)}
+        onClick={() => navigate(`/recipe?id=${recipeId}`)}
         sx={{ cursor: "pointer" }}
       >
         <Typography
@@ -356,6 +364,8 @@ export default function RecipeMini({ recipe }) {
             textOverflow: "ellipsis",
             lineHeight: "24px",
             mb: 2,
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
           }}
         >
           {recipe.bodyText}
@@ -405,6 +415,7 @@ export default function RecipeMini({ recipe }) {
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
               style={{ fontSize: "28px", marginRight: 4 }}
+              onClick={() => navigate(`/recipe?id=${recipeId}`)}
             />
             <Typography variant="body2" color="text.secondary">
               {commentCount}

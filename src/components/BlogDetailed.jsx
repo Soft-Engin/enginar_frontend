@@ -250,11 +250,10 @@ export default function BlogDetailed({ blogId }) {
   return (
     <Box
       sx={{
-        maxWidth: 1500,
+        width: "100%",
         outline: "1.5px solid #C0C0C0",
         backgroundColor: "#FFFFFF",
-        pl: 4,
-        pr: 4,
+        px: 4,
         pt: 2,
         pb: 1,
         borderRadius: "20px 20px 0 0",
@@ -310,7 +309,12 @@ export default function BlogDetailed({ blogId }) {
       <Typography
         variant="body1"
         component="div"
-        sx={{ lineHeight: "28px", mb: 2 }}
+        sx={{
+          lineHeight: "28px",
+          mb: 2,
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
+        }}
       >
         {blogData.bodyText}
       </Typography>

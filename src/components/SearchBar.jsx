@@ -18,6 +18,12 @@ const Search = styled("div")(({ theme }) => ({
   width: "100%",
   maxWidth: "600px",
   alignItems: "center",
+  [theme.breakpoints.down("xl")]: {
+    maxWidth: "500px",
+  },
+  [theme.breakpoints.down("lg")]: {
+    maxWidth: "450px",
+  },
 }));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
