@@ -265,7 +265,14 @@ export default function EventHub() {
   }, [handleScroll]); // Depend only on handleScroll
 
   return (
-    <Grid container rowSpacing={4} columnSpacing={2.5} sx={{ pt: 3, pb: 5, pl: 12, pr: 12 }} justifyContent="center" alignItems="center">
+    <Grid
+      container
+      rowSpacing={4}
+      columnSpacing={2.5}
+      sx={{ pt: 3, pb: 5, pl: 12, pr: 12 }}
+      justifyContent="center"
+      alignItems="center"
+    >
       <LoadingErrorDisplay
         loading={loading}
         error={error}
@@ -275,7 +282,13 @@ export default function EventHub() {
       <Grid
         item
         size={12}
-        sx={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", mb: 2 }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          mb: 2,
+        }}
       >
         <FormControl sx={{ m: 1, minWidth: 180 }}>
           <InputLabel id="country-select-label">Country</InputLabel>
@@ -367,8 +380,23 @@ export default function EventHub() {
       </Grid>
 
       {events.map((event, index) => (
-        <Grid item xs={12} sm={12} md={12} lg={6} xl={6} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: { xs: 500, sm: 500, md: 600, lg: 490, xl: 630 } }}>
-          <EventMini event={event} />
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={6}
+          lg={6}
+          xl={6}
+          key={index}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          sx={{
+            width: "100%",
+            maxWidth: { xs: 500, sm: 500, md: 600, lg: 490, xl: 630 },
+          }}
+        >
+          <EventMini event={event} sx={{ width: "100%" }} />
         </Grid>
       ))}
     </Grid>

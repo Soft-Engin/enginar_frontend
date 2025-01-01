@@ -21,7 +21,17 @@ function CustomTabPanel(props) {
       style={{display: "flex", justifyContent: "center"}}
       {...other}
     >
-      {value === index && <Box>{children}</Box>}
+      {value === index && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          {children}
+        </Box>
+      )}
     </div>
   );
 }
@@ -46,11 +56,9 @@ export default function ContentFeed() {
     setValue(newValue);
   };
 
-
   return (
     <Box
       sx={{
-        width: "50vw",
         margin: "0 auto",
       }}
     >
@@ -87,7 +95,7 @@ export default function ContentFeed() {
       <CustomTabPanel value={value} index={1}>
         <PopularBlogsTab />
       </CustomTabPanel>
-       <CustomTabPanel value={value} index={2}>
+      <CustomTabPanel value={value} index={2}>
         <FollowingTab />
       </CustomTabPanel>
       <RecommendedUsers />
