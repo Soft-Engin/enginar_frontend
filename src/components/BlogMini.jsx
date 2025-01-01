@@ -43,6 +43,8 @@ export default function BlogMini({ blog }) {
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
 
+  const blogId = blog?.id || blog?.blogId; // Extract blogId
+
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
       // Do nothing, don't set an error for 404. The image won't render, which is fine.
@@ -53,12 +55,12 @@ export default function BlogMini({ blog }) {
   };
 
   React.useEffect(() => {
-    if (blog && blog.id) {
+    if (blogId) {
       const fetchBanner = async () => {
         setLoading(true);
         setError(null);
         try {
-          const response = await axios.get(`/api/v1/blogs/${blog.id}/banner`, {
+          const response = await axios.get(`/api/v1/blogs/${blogId}/banner`, {
             responseType: "blob",
           });
           if (response.data) {
@@ -81,7 +83,7 @@ export default function BlogMini({ blog }) {
         URL.revokeObjectURL(bannerUrl);
       }
     };
-  }, [blog]);
+  }, [blogId]);
   React.useEffect(() => {
     if (blog && blog.userId) {
       const fetchProfilePicture = async () => {
@@ -114,14 +116,14 @@ export default function BlogMini({ blog }) {
     };
   }, [blog]);
   React.useEffect(() => {
-    if (blog && blog.id) {
+    if (blogId) {
       const fetchLikesAndComments = async () => {
         setLoadingLikesComments(true);
         setErrorLikesComments(null);
         try {
           const [likeResponse, commentResponse] = await Promise.all([
-            axios.get(`/api/v1/blogs/${blog.id}/like-count`),
-            axios.get(`/api/v1/blogs/${blog.id}/comments`),
+            axios.get(`/api/v1/blogs/${blogId}/like-count`),
+            axios.get(`/api/v1/blogs/${blogId}/comments`),
           ]);
 
           setLikeCount(likeResponse.data.likeCount || 0);
@@ -135,14 +137,14 @@ export default function BlogMini({ blog }) {
       };
       fetchLikesAndComments();
     }
-  }, [blog]);
+  }, [blogId]);
   React.useEffect(() => {
-    if (blog && blog.id && userLogged) {
+    if (blogId && userLogged) {
       const fetchIsLiked = async () => {
         setLoadingIsLiked(true);
         setErrorIsLiked(null);
         try {
-          const response = await axios.get(`/api/v1/blogs/${blog.id}/is-liked`);
+          const response = await axios.get(`/api/v1/blogs/${blogId}/is-liked`);
           setIsLiked(response.data.isLiked || false);
         } catch (err) {
           console.error("Error fetching isLiked:", err);
@@ -153,15 +155,15 @@ export default function BlogMini({ blog }) {
       };
       fetchIsLiked();
     }
-  }, [blog, userLogged]);
+  }, [blogId, userLogged]);
   React.useEffect(() => {
-    if (blog && blog.id && userLogged) {
+    if (blogId && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
         setErrorIsBookmarked(null);
         try {
           const response = await axios.get(
-            `/api/v1/blogs/${blog.id}/is-bookmarked`
+            `/api/v1/blogs/${blogId}/is-bookmarked`
           );
           setIsBookmarked(response.data.isBookmarked || false);
         } catch (err) {
@@ -173,7 +175,7 @@ export default function BlogMini({ blog }) {
       };
       fetchIsBookmarked();
     }
-  }, [blog, userLogged]);
+  }, [blogId, userLogged]);
 
   const handleLikeToggle = async () => {
     if (!userLogged) {
@@ -190,7 +192,7 @@ export default function BlogMini({ blog }) {
       setLikeCount((prevLikeCount) => prevLikeCount + 1);
     }
     try {
-      await axios.post(`/api/v1/blogs/${blog.id}/toggle-like`);
+      await axios.post(`/api/v1/blogs/${blogId}/toggle-like`);
     } catch (err) {
       console.error("Error toggling like", err);
       setIsLiked((prevIsLiked) => !prevIsLiked);
@@ -211,7 +213,7 @@ export default function BlogMini({ blog }) {
     }
     setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     try {
-      await axios.post(`/api/v1/blogs/${blog.id}/bookmark`);
+      await axios.post(`/api/v1/blogs/${blogId}/bookmark`);
     } catch (err) {
       console.error("Error toggling bookmark", err);
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
@@ -322,7 +324,7 @@ export default function BlogMini({ blog }) {
       </Box>
 
       <Box
-        onClick={() => navigate(`/blog?id=${blog.id}`)}
+        onClick={() => navigate(`/blog?id=${blogId}`)}
         sx={{ cursor: "pointer" }}
       >
         <Typography
@@ -388,7 +390,7 @@ export default function BlogMini({ blog }) {
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
               style={{ fontSize: "28px", marginRight: 4, cursor: "pointer" }}
-              onClick={() => navigate(`/blog?id=${blog.id}`)}
+              onClick={() => navigate(`/blog?id=${blogId}`)}
             />
             <Typography variant="body2" color="text.secondary">
               {commentCount}
