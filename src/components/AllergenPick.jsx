@@ -1,29 +1,39 @@
-import React, { useState } from "react";
-import { TextField, Box, Typography, Grid, Card, Button } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import React, { useState, useEffect } from "react";
+import {
+  TextField,
+  Box,
+  Typography,
+  Grid,
+  Card,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 
-const allergensList = [
-  { id: 1, name: "Dairy" },
-  { id: 2, name: "Eggs" },
-  { id: 3, name: "Fish" },
-  { id: 4, name: "Gluten" },
-  { id: 5, name: "Milk" },
-  { id: 6, name: "Peanuts" },
-  { id: 7, name: "Shellfish" },
-  { id: 8, name: "Soy" },
-  { id: 9, name: "Tree Nuts" },
-  { id: 10, name: "Wheat" },
-  { id: 11, name: "Mustard" },
-  { id: 12, name: "Sesame" },
-  { id: 13, name: "Lupin" },
-  { id: 14, name: "Celery" },
-  { id: 15, name: "Salam" },
-];
+import SearchIcon from "@mui/icons-material/Search";
+import axios from "axios";
 
 const AllergenSelector = ({ onAllergenSelect, selectedAllergens = [] }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [allergens, setAllergens] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredAllergens = allergensList
+  useEffect(() => {
+    const fetchAllergens = async () => {
+      try {
+        const response = await axios.get(
+          "/api/v6/allergens?pageNumber=1&pageSize=999"
+        );
+        setAllergens(response.data.items);
+      } catch (error) {
+        console.error("Error fetching allergens:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllergens();
+  }, []);
+
+  const filteredAllergens = allergens
     .filter((allergen) =>
       allergen.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -34,12 +44,17 @@ const AllergenSelector = ({ onAllergenSelect, selectedAllergens = [] }) => {
 
   const toggleAllergen = (allergen) => {
     if (!isAllergenSelected(allergen.id)) {
-      onAllergenSelect([...selectedAllergens, allergen]);
+      const newAllergen = { id: allergen.id, name: allergen.name };
+      onAllergenSelect([...selectedAllergens, newAllergen]);
+    } else {
+      onAllergenSelect(
+        selectedAllergens.filter((selected) => selected.id !== allergen.id)
+      );
     }
   };
 
   return (
-    <Box sx={{ width: "100%", maxWidth: "600px", margin: "0 auto" }}>
+    <Box sx={{ width: "100%", margin: "0 auto" }}>
       <TextField
         variant="outlined"
         placeholder="Search Allergens"
@@ -66,7 +81,11 @@ const AllergenSelector = ({ onAllergenSelect, selectedAllergens = [] }) => {
           backgroundColor: "white",
         }}
       >
-        {filteredAllergens.length === 0 && searchTerm ? (
+        {loading ? (
+          <Box display="flex" justifyContent="center" p={2}>
+            <CircularProgress />
+          </Box>
+        ) : filteredAllergens.length === 0 ? (
           <Typography variant="body1" color="textSecondary" textAlign="center">
             No allergens found.
           </Typography>

@@ -52,7 +52,7 @@ export default function RecommendedUsers() {
       }
 
       const response = await axios.get("/api/v1/feed/recipe", {
-        params: { pageSize: 20 },
+        params: { pageSize: 150 },
       });
       if (response.data?.items) {
         const uniqueUserIds = [];
@@ -61,6 +61,7 @@ export default function RecommendedUsers() {
           if (
             !uniqueUserIds.includes(item.userId) &&
             uniqueUserIds.length < 4 &&
+            item.userId !== loggedInUserData?.userId && // Check if the user is not the logged in user
             !followingUsers.some(
               (following) => following.userId === item.userId
             )

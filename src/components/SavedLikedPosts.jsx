@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import RecipeMini from "./RecipeMini";
 import BlogMini from "./BlogMini";
 import PropTypes from "prop-types";
@@ -7,6 +7,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -38,15 +39,18 @@ function a11yProps(index) {
 }
 
 export default function SavedLikedPosts() {
-  const [value, setValue] = React.useState(0);
-  const [recipes, setRecipes] = React.useState([]);
-  const [blogs, setBlogs] = React.useState([]);
-  const [loadingRecipes, setLoadingRecipes] = React.useState(true);
-  const [loadingBlogs, setLoadingBlogs] = React.useState(true);
-  const [loadingMoreRecipes, setLoadingMoreRecipes] = React.useState(false);
-  const [loadingMoreBlogs, setLoadingMoreBlogs] = React.useState(false);
-  const [errorRecipes, setErrorRecipes] = React.useState(null);
-  const [errorBlogs, setErrorBlogs] = React.useState(null);
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode") || "likes"; // Default to 'likes' if no mode is specified
+
+  const [value, setValue] = useState(0); // 0 for Recipes, 1 for Blogs
+  const [recipes, setRecipes] = useState([]);
+  const [blogs, setBlogs] = useState([]);
+  const [loadingRecipes, setLoadingRecipes] = useState(true);
+  const [loadingBlogs, setLoadingBlogs] = useState(true);
+  const [loadingMoreRecipes, setLoadingMoreRecipes] = useState(false);
+  const [loadingMoreBlogs, setLoadingMoreBlogs] = useState(false);
+  const [errorRecipes, setErrorRecipes] = useState(null);
+  const [errorBlogs, setErrorBlogs] = useState(null);
   const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
 
   let recipesPageNumber = 1;
@@ -66,18 +70,26 @@ export default function SavedLikedPosts() {
     setErrorRecipes(null);
     try {
       const params = { page: recipesPageNumber, pageSize: pageSize };
-      const response = await axios.get(
-        `/api/v1/users/${userId}/likes/recipes`,
-        { params }
-      );
+      const endpoint =
+        mode === "likes"
+          ? `/api/v1/users/${userId}/likes/recipes`
+          : `/api/v1/users/${userId}/bookmarks/recipes`;
+      const response = await axios.get(endpoint, { params });
+
       if (response.data && response.data.items) {
         setRecipes((prevRecipes) => [...prevRecipes, ...response.data.items]);
       }
       recipesTotalPages = Math.ceil(response.data.totalCount / pageSize);
       recipesPageNumber += 1;
     } catch (error) {
-      console.error("Error fetching recipes:", error);
-      setErrorRecipes(error.message || "An unexpected error occurred.");
+      if (error.response && error.response.status === 404) {
+        setRecipes([]);
+        recipesTotalPages = 0;
+        recipesPageNumber = 2;
+      } else {
+        console.error("Error fetching recipes:", error);
+        setErrorRecipes(error.message || "An unexpected error occurred.");
+      }
     } finally {
       setLoadingMoreRecipes(false);
     }
@@ -89,17 +101,26 @@ export default function SavedLikedPosts() {
     setErrorBlogs(null);
     try {
       const params = { page: blogsPageNumber, pageSize: pageSize };
-      const response = await axios.get(`/api/v1/users/${userId}/likes/blogs`, {
-        params,
-      });
+      const endpoint =
+        mode === "likes"
+          ? `/api/v1/users/${userId}/likes/blogs`
+          : `/api/v1/users/${userId}/bookmarks/blogs`;
+      const response = await axios.get(endpoint, { params });
+
       if (response.data && response.data.items) {
         setBlogs((prevBlogs) => [...prevBlogs, ...response.data.items]);
       }
       blogsTotalPages = Math.ceil(response.data.totalCount / pageSize);
       blogsPageNumber += 1;
     } catch (error) {
-      console.error("Error fetching blogs:", error);
-      setErrorBlogs(error.message || "An unexpected error occurred.");
+      if (error.response && error.response.status === 404) {
+        setBlogs([]);
+        blogsTotalPages = 0;
+        blogsPageNumber = 2;
+      } else {
+        console.error("Error fetching blogs:", error);
+        setErrorBlogs(error.message || "An unexpected error occurred.");
+      }
     } finally {
       setLoadingMoreBlogs(false);
     }
@@ -124,37 +145,70 @@ export default function SavedLikedPosts() {
     }, 100);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchInitialData = async () => {
       setLoadingRecipes(true);
       setLoadingBlogs(true);
+
       try {
-        const recipesResponse = await axios.get(
-          `/api/v1/users/${userId}/likes/recipes`,
-          { params: { page: 1, pageSize: pageSize } }
-        );
+        const recipesEndpoint =
+          mode === "likes"
+            ? `/api/v1/users/${userId}/likes/recipes`
+            : `/api/v1/users/${userId}/bookmarks/recipes`;
+        const recipesResponse = await axios.get(recipesEndpoint, {
+          params: { page: 1, pageSize: pageSize },
+        });
+
         if (recipesResponse.data && recipesResponse.data.items) {
           setRecipes(recipesResponse.data.items);
           recipesTotalPages = Math.ceil(
             recipesResponse.data.totalCount / pageSize
           );
           recipesPageNumber = 2;
+        } else {
+          setRecipes([]);
+          recipesTotalPages = 0;
+          recipesPageNumber = 2;
         }
-        const blogsResponse = await axios.get(
-          `/api/v1/users/${userId}/likes/blogs`,
-          { params: { page: 1, pageSize: pageSize } }
-        );
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          setRecipes([]);
+          recipesTotalPages = 0;
+          recipesPageNumber = 2;
+        } else {
+          console.error("Error fetching initial recipes data:", error);
+          setErrorRecipes(error.message || "An unexpected error occurred.");
+        }
+      } finally {
+        setLoadingRecipes(false);
+      }
+      try {
+        const blogsEndpoint =
+          mode === "likes"
+            ? `/api/v1/users/${userId}/likes/blogs`
+            : `/api/v1/users/${userId}/bookmarks/blogs`;
+        const blogsResponse = await axios.get(blogsEndpoint, {
+          params: { page: 1, pageSize: pageSize },
+        });
         if (blogsResponse.data && blogsResponse.data.items) {
           setBlogs(blogsResponse.data.items);
           blogsTotalPages = Math.ceil(blogsResponse.data.totalCount / pageSize);
           blogsPageNumber = 2;
+        } else {
+          setBlogs([]);
+          blogsTotalPages = 0;
+          blogsPageNumber = 2;
         }
       } catch (error) {
-        console.error("Error fetching initial data:", error);
-        setErrorRecipes(error.message || "An unexpected error occurred.");
-        setErrorBlogs(error.message || "An unexpected error occurred.");
+        if (error.response && error.response.status === 404) {
+          setBlogs([]);
+          blogsTotalPages = 0;
+          blogsPageNumber = 2;
+        } else {
+          console.error("Error fetching initial blogs data:", error);
+          setErrorBlogs(error.message || "An unexpected error occurred.");
+        }
       } finally {
-        setLoadingRecipes(false);
         setLoadingBlogs(false);
       }
     };
@@ -162,7 +216,12 @@ export default function SavedLikedPosts() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, userId]);
+
+  const getNoContentMessage = () => {
+    return `No ${mode === "likes" ? "liked" : "saved"} `;
+  };
 
   return (
     <Box sx={{ px: 10 }}>
@@ -195,6 +254,9 @@ export default function SavedLikedPosts() {
         >
           {loadingRecipes && <div>Loading recipes...</div>}
           {errorRecipes && <div>Error loading recipes: {errorRecipes}</div>}
+          {recipes.length === 0 && !loadingRecipes && !errorRecipes && (
+            <div>{getNoContentMessage()} recipes found.</div>
+          )}
           {recipes.map((recipe, index) => (
             <Grid
               item
@@ -223,6 +285,9 @@ export default function SavedLikedPosts() {
         >
           {loadingBlogs && <div>Loading blogs...</div>}
           {errorBlogs && <div>Error loading blogs: {errorBlogs}</div>}
+          {blogs.length === 0 && !loadingBlogs && !errorBlogs && (
+            <div>{getNoContentMessage()} blogs found.</div>
+          )}
           {blogs.map((blog, index) => (
             <Grid
               item

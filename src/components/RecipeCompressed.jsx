@@ -13,7 +13,6 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import ShareIcon from "@mui/icons-material/Share";
 
 const RecipeCompressed = () => {
   const [liked, setLiked] = useState(false);
@@ -94,9 +93,6 @@ const RecipeCompressed = () => {
             ) : (
               <BookmarkBorderIcon />
             )}
-          </IconButton>
-          <IconButton>
-            <ShareIcon />
           </IconButton>
         </Box>
       </Box>
