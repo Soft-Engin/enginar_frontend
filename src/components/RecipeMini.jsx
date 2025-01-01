@@ -356,6 +356,8 @@ export default function RecipeMini({ recipe }) {
             textOverflow: "ellipsis",
             lineHeight: "24px",
             mb: 2,
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
           }}
         >
           {recipe.bodyText}

@@ -335,6 +335,8 @@ export default function BlogMini({ blog }) {
             textOverflow: "ellipsis",
             lineHeight: "24px",
             mb: 2,
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
           }}
         >
           {blog.bodyText}

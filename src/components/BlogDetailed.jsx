@@ -309,7 +309,12 @@ export default function BlogDetailed({ blogId }) {
       <Typography
         variant="body1"
         component="div"
-        sx={{ lineHeight: "28px", mb: 2 }}
+        sx={{
+          lineHeight: "28px",
+          mb: 2,
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
+        }}
       >
         {blogData.bodyText}
       </Typography>
