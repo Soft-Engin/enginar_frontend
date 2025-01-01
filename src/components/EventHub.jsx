@@ -63,7 +63,7 @@ export default function EventHub() {
 
       if (isNewSearch) {
         setEvents([]);
-        setPageNumber(1);
+        setPageNumber(2);
       }
 
       setLoadingMore(!isNewSearch);
