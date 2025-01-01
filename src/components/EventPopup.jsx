@@ -109,6 +109,16 @@ export default function EventPopup(props) {
   }, []);
 
   const handleClose = () => {
+    setEventName("");
+    setEventDescription("");
+    setEventDate("");
+    setSelectedCountry("");
+    setSelectedCity("");
+    setSelectedDistrict("");
+    setAddress("");
+    setSelectedRequirements([]);
+    setError(null);
+    
     props.handleClose();
   };
 
