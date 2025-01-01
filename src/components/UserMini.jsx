@@ -5,6 +5,8 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
@@ -26,7 +28,7 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
   variant: "subtitle1",
 }));
 
-export default function UserMini() {
+export default function UserMini({user}) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
