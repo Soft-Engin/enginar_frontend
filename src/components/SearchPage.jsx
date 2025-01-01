@@ -10,7 +10,7 @@ import SearchedRecipes from "./SearchedRecipes";
 export default function SearchPage() {
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
-  const query = searchParams.get("query"); // Not used for fetching yet
+  const query = searchParams.get("query");
 
   return (
     <Box
@@ -19,10 +19,10 @@ export default function SearchPage() {
         margin: "0 auto",
       }}
     >
-      {type == "user" && <SearchedUsers />}
-      {type == "blog" && <SearchedBlogs />}
-      {type == "recipe" && <SearchedRecipes />}
-      {!type && <SearchedUsers />}
+      {type == "user" && <SearchedUsers query={query} />}
+      {type == "blog" && <SearchedBlogs query={query} />}
+      {type == "recipe" && <SearchedRecipes query={query} />}
+      {!type && <SearchedUsers query={query} />}
 
       <RecommendedUsers />
       <UpcomingEvents />
