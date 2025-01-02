@@ -346,7 +346,7 @@ export default function BlogDetailed({ blogId }) {
           }}
         >
           <Typography variant="body1" fontWeight={"bold"}>
-            Click here to see related recipe
+            Click here to see the related recipe!
           </Typography>
         </Link>
       )}
@@ -390,7 +390,7 @@ export default function BlogDetailed({ blogId }) {
                 />
               ) : (
                 <FavoriteBorderIcon
-                  style={{ fontSize: "45px", marginRight: 4 }}
+                  style={{ fontSize: "45px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
@@ -400,7 +400,7 @@ export default function BlogDetailed({ blogId }) {
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
-              style={{ fontSize: "42px", marginRight: 4 }}
+              style={{ fontSize: "42px", marginRight: 4, color: "#757575" }}
             />
             <Typography variant="body1" color="text.secondary">
               {commentCount}
@@ -413,7 +413,9 @@ export default function BlogDetailed({ blogId }) {
             {isBookmarked ? (
               <BookmarkIcon style={{ fontSize: "48px" }} />
             ) : (
-              <BookmarkBorderOutlinedIcon style={{ fontSize: "48px" }} />
+              <BookmarkBorderOutlinedIcon
+                style={{ fontSize: "48px", color: "#757575" }}
+              />
             )}
           </IconButton>
         </Box>

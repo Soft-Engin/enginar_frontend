@@ -149,21 +149,23 @@ export default function Comment({ comment, commentImage }) {
           )}
 
           <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Typography variant="body1" fontWeight="bold" noWrap>
-              {comment.userName}
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Typography variant="body1" fontWeight="bold" noWrap>
+                {comment.userName}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {comment.timestamp &&
+                  formatDistanceToNow(parseISO(comment.timestamp), {
+                    addSuffix: true,
+                  })}
+              </Typography>
+            </Box>
             <Typography variant="body2">{comment.text}</Typography>
             {errorProfile && (
               <Box display="flex" justifyContent="center" my={2}>
                 <Typography color="error">Error: {errorProfile}</Typography>
               </Box>
             )}
-            <Typography variant="body2" color="text.secondary">
-              {comment.timestamp &&
-                formatDistanceToNow(parseISO(comment.timestamp), {
-                  addSuffix: true,
-                })}
-            </Typography>
             {loadingImages ? (
               <Box display="flex" justifyContent="center" my={2}>
                 <CircularProgress size={20} />

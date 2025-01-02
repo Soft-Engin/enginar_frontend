@@ -231,7 +231,23 @@ export default function SavedLikedPosts() {
           value={value}
           onChange={handleChange}
           aria-label="basic tabs example"
-          sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
+          sx={{
+            "& .MuiTabs-indicator": {
+              backgroundColor: "#4B9023",
+            },
+            "& .MuiTab-root": {
+              fontSize: "1.1rem",
+              fontWeight: "bold",
+              textTransform: "none",
+              padding: "12px 20px",
+            },
+            "& .MuiTab-root.Mui-selected": {
+              color: "#4B9023",
+            },
+            "& .MuiTab-root:hover": {
+              color: "#66c72e",
+            },
+          }}
         >
           <Tab
             label="Recipes"

@@ -14,7 +14,7 @@ import {
 import axios from "axios";
 import { styled } from "@mui/material/styles";
 import Comment from "./Comment";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 
 const StyledCommentItem = styled(ListItem)(({ theme }) => ({
@@ -303,7 +303,7 @@ export default function CommentSection({ type, contentId }) {
                 width: 50,
                 height: 50,
                 borderRadius: "50%",
-                backgroundColor: "#ccc",
+                backgroundColor: "#A5E072",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -329,7 +329,7 @@ export default function CommentSection({ type, contentId }) {
               variant="body1"
               fontWeight="bold"
               noWrap
-              sx={{ mb: 0, ml: 2 }}
+              sx={{ mb: 0, ml: 1.6, position: "relative", top: 10 }}
             >
               {userName || "User Name"}
             </Typography>
@@ -378,14 +378,15 @@ export default function CommentSection({ type, contentId }) {
                   variant="outlined"
                   component="span"
                   style={{
-                    backgroundColor: "white",
                     borderRadius: 30,
                     textTransform: "none",
-                    marginLeft: 1,
+                    marginLeft: 11,
                     padding: 0,
                   }}
                 >
-                  <AddPhotoAlternateIcon />
+                  <AddPhotoAlternateOutlinedIcon
+                    sx={{ fontSize: "25px", color: "#417D1E", position: "relative", top: -5 }}
+                  />
                 </IconButton>
               </label>
               {newImages &&

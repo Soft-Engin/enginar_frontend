@@ -12,7 +12,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { Typography, CircularProgress } from "@mui/material";
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 
 import { useNavigate } from "react-router-dom";
 

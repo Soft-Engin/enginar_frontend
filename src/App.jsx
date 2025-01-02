@@ -71,12 +71,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/createRecipe",
-        element: <CreateRecipe />
+        element: <CreateRecipe />,
       },
       {
         path: "/fromMyKitchen",
-        element: <IngredientRecipeSearch />
-      }
+        element: <IngredientRecipeSearch />,
+      },
     ],
   },
 ]);

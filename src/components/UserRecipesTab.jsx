@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Stack, Box, CircularProgress, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import RecipeMini from "./RecipeMini";
 import { LoadingErrorDisplay } from "./LoadingErrorDisplay";
 import { useSearchParams } from "react-router-dom";
@@ -38,7 +38,7 @@ function UserRecipesTab() {
       }
       pageNumber += 1;
     } catch (err) {
-      console.error("Error fetching more data:", err);
+      console.error("Error fetching more data: ", err);
       setErrorMore(err.message || "An unexpected error occurred.");
     } finally {
       setLoadingMore(false);
@@ -77,7 +77,7 @@ function UserRecipesTab() {
         pageNumber = 2;
         totalPages = Math.ceil(response.data.totalCount / pageSize);
       } catch (err) {
-        console.error("Error fetching user recipes:", err);
+        console.error("Error fetching user recipes: ", err);
         setError(err.message || "An unexpected error occurred.");
       } finally {
         setLoading(false);
