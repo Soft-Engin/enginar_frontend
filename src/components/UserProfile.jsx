@@ -112,6 +112,7 @@ const UserProfile = () => {
   const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
   const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
   const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
+  const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -430,22 +431,26 @@ const UserProfile = () => {
                     <Typography variant="h4" fontWeight="bold">
                       {profileData.firstName} {profileData.lastName}
                     </Typography>
-                    {!isOwnProfile &&
-                      (isFollowing ? (
-                        <FollowButton
-                          variant="contained"
-                          onClick={handleUnfollowUser}
-                        >
-                          Unfollow
-                        </FollowButton>
-                      ) : (
-                        <FollowButton
-                          variant="contained"
-                          onClick={handleFollowUser}
-                        >
-                          Follow
-                        </FollowButton>
-                      ))}
+                    {
+                      !isOwnProfile &&
+                        (userLogged ? (
+                          isFollowing ? (
+                            <FollowButton
+                              variant="contained"
+                              onClick={handleUnfollowUser}
+                            >
+                              Unfollow
+                            </FollowButton>
+                          ) : (
+                            <FollowButton
+                              variant="contained"
+                              onClick={handleFollowUser}
+                            >
+                              Follow
+                            </FollowButton>
+                          )
+                        ) : null)
+                    }
                   </Box>
                   <Typography
                     variant="body2"

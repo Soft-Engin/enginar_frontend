@@ -63,6 +63,7 @@ export default function UserMini({ user }) {
   const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
   const isOwnProfile =
     JSON.parse(localStorage.getItem("userData"))?.userId === user.userId;
+  const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
 
   const profilePlaceholder = user?.firstName
     ? user.firstName.charAt(0).toUpperCase()
@@ -329,15 +330,20 @@ export default function UserMini({ user }) {
               </Typography>
             </Link>
             {!isOwnProfile &&
-              (isFollowing ? (
-                <FollowButton variant="contained" onClick={handleUnfollowUser}>
-                  Unfollow
-                </FollowButton>
-              ) : (
-                <FollowButton variant="contained" onClick={handleFollowUser}>
-                  Follow
-                </FollowButton>
-              ))}
+              (userLogged ? (
+                isFollowing ? (
+                  <FollowButton
+                    variant="contained"
+                    onClick={handleUnfollowUser}
+                  >
+                    Unfollow
+                  </FollowButton>
+                ) : (
+                  <FollowButton variant="contained" onClick={handleFollowUser}>
+                    Follow
+                  </FollowButton>
+                )
+              ) : null)}
           </Box>
           <Typography variant="body2" color="textSecondary" sx={{ ml: 0.2 }}>
             {user.userName}
