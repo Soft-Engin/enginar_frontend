@@ -9,6 +9,10 @@ import {
   ListItem,
   CircularProgress,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
 } from "@mui/material";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
@@ -19,6 +23,7 @@ import { Link } from "react-router-dom";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import EventPopup from "./EventPopup";
 
 export default function EventDetailed({ eventId }) {
   const [participantsPopupOpen, setParticipantsPopupOpen] =
@@ -48,6 +53,12 @@ export default function EventDetailed({ eventId }) {
       : null
   );
   const isOwnEvent = eventData?.creatorId === loggedInUserData?.userId;
+
+  //EDIT POPUP STATE
+  const [editPopupOpen, setEditPopupOpen] = useState(false);
+
+  // DELETE DIALOG STATE
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleParticipantsPopupOpen = () => {
     setParticipantsPopupOpen(true);
@@ -344,6 +355,58 @@ export default function EventDetailed({ eventId }) {
     ? format(parseISO(eventData.date), "dd.MM.yyyy, HH:mm")
     : "N/A";
 
+  //EDIT FUNCTIONALITY
+  const handleEditEvent = () => {
+    setEditPopupOpen(true);
+  };
+
+  const handleCloseEditPopup = () => {
+    setEditPopupOpen(false);
+  };
+
+  //DELETE FUNCTIONALITY
+  const handleOpenDeleteDialog = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+  };
+
+  const handleDeleteEvent = () => {
+    handleOpenDeleteDialog();
+  };
+
+  // Delete confirmation dialog component
+  const DeleteConfirmationDialog = () => {
+    const confirmDelete = async () => {
+      try {
+        await axios.delete(`/api/v1/events/${eventData.eventId}`);
+        // Handle successful deletion - redirect, refresh list or notify user
+        window.location.href = "/"; // Redirect to home after delete
+      } catch (error) {
+        console.error("Error deleting event:", error);
+      }
+      handleCloseDeleteDialog();
+    };
+    return (
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this event?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  };
+
   return (
     <Box
       sx={{
@@ -450,10 +513,22 @@ export default function EventDetailed({ eventId }) {
                     </>
                   ) : (
                     <>
-                      <MenuItem key="Edit" onClick={handleClose}>
+                      <MenuItem
+                        key="Edit"
+                        onClick={() => {
+                          handleClose();
+                          handleEditEvent();
+                        }}
+                      >
                         Edit Event
                       </MenuItem>
-                      <MenuItem key="Delete" onClick={handleClose}>
+                      <MenuItem
+                        key="Delete"
+                        onClick={() => {
+                          handleClose();
+                          handleDeleteEvent();
+                        }}
+                      >
                         Delete Event
                       </MenuItem>
                     </>
@@ -619,7 +694,6 @@ export default function EventDetailed({ eventId }) {
                   marginRight: 1,
                   cursor: "pointer",
                 }}
-                // onClick={handleParticipantsPopupOpen}
               >
                 {participants &&
                   participants.map((participant) => (
@@ -706,6 +780,13 @@ export default function EventDetailed({ eventId }) {
             open={participantsPopupOpen}
             handleClose={handleParticipantsPopupClose}
           />
+          <EventPopup
+            open={editPopupOpen}
+            handleClose={handleCloseEditPopup}
+            editMode={true}
+            eventData={eventData}
+          />
+          <DeleteConfirmationDialog />
         </>
       )}
     </Box>

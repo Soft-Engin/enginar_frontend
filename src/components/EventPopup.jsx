@@ -20,6 +20,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 
 export default function EventPopup(props) {
+  const { editMode, eventData } = props;
+
   const [selectedRequirements, setSelectedRequirements] = useState([]);
   const [requirementOptions, setRequirementOptions] = useState([]);
   const [locationData, setLocationData] = useState({
@@ -40,6 +42,31 @@ export default function EventPopup(props) {
   const [requirementPage, setRequirementPage] = useState(1);
   const [totalRequirements, setTotalRequirements] = useState(0);
   const [loadingRequirements, setLoadingRequirements] = useState(false);
+
+  useEffect(() => {
+    //set initial values when editing
+    if (editMode && eventData) {
+      setEventName(eventData.title);
+      setEventDescription(eventData.bodyText);
+      setEventDate(eventData.date ? dayjs(eventData.date) : null);
+      setAddress(eventData?.address?.street || "");
+      setSelectedDistrict(eventData?.address?.district?.id || "");
+      setSelectedCity(eventData?.address?.district?.city?.id || "");
+      setSelectedCountry(eventData?.address?.district?.city?.country?.id || "");
+      setSelectedRequirements(
+        eventData.requirements?.map((req) => req.id) || []
+      );
+    } else {
+      setEventName("");
+      setEventDescription("");
+      setEventDate(null);
+      setSelectedCountry("");
+      setSelectedCity("");
+      setSelectedDistrict("");
+      setAddress("");
+      setSelectedRequirements([]);
+    }
+  }, [editMode, eventData, props.open]);
 
   useEffect(() => {
     const fetchRequirements = async () => {
@@ -137,29 +164,38 @@ export default function EventPopup(props) {
 
     const formattedDate = eventDate ? dayjs(eventDate).toISOString() : null;
 
-    const eventData = {
+    const eventDataToSubmit = {
       title: eventName,
       bodyText: eventDescription,
       date: formattedDate,
       districtId: selectedDistrict || 0,
       addressName: "TODO address name for now",
       street: address,
-      requirementIds: selectedRequirements,
+      requirementIds: selectedRequirements.map(Number), // <-- Corrected line
     };
 
-    console.log(eventData);
     try {
-      const response = await axios.post(`/api/v1/events`, eventData);
+      let response;
+      if (editMode && props.eventData.eventId) {
+        response = await axios.put(
+          `/api/v1/events/${props.eventData.eventId}`,
+          eventDataToSubmit
+        );
+      } else {
+        response = await axios.post(`/api/v1/events`, eventDataToSubmit);
+      }
       if (response.data && response.data.eventId) {
         navigate(`/event/?id=${response.data.eventId}`);
         handleClose();
       } else {
-        setError("Event created successfully, but could not get the event id");
+        setError(
+          "Event created/updated successfully, but could not get the event id"
+        );
         console.error("Error, event id not in the response");
       }
     } catch (err) {
-      setError("Error creating the event");
-      console.error("Error creating event:", err);
+      setError(`Error ${editMode ? "updating" : "creating"} the event`);
+      console.error(`Error ${editMode ? "updating" : "creating"} event:`, err);
     }
   };
 
@@ -233,7 +269,7 @@ export default function EventPopup(props) {
               fontSize: "1.5rem",
             }}
           >
-            Create New Event
+            {editMode ? "Edit Event" : "Create New Event"}
             <IconButton
               onClick={handleClose}
               sx={{
@@ -448,7 +484,7 @@ export default function EventPopup(props) {
                 marginLeft: "auto",
               }}
             >
-              Create Event
+              {editMode ? "Update Event" : "Create Event"}
             </Button>
             {error && <p style={{ color: "red" }}>{error}</p>}
           </DialogContent>
