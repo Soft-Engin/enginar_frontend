@@ -403,7 +403,7 @@ export default function RecipeMini({ recipe }) {
                 />
               ) : (
                 <FavoriteBorderIcon
-                  style={{ fontSize: "30px", marginRight: 4 }}
+                  style={{ fontSize: "30px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
@@ -413,7 +413,7 @@ export default function RecipeMini({ recipe }) {
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
-              style={{ fontSize: "28px", marginRight: 4 }}
+              style={{ fontSize: "28px", marginRight: 4, color: "#757575" }}
               onClick={() => navigate(`/recipe?id=${recipeId}`)}
             />
             <Typography variant="body2" color="text.secondary">
@@ -427,7 +427,9 @@ export default function RecipeMini({ recipe }) {
             {isBookmarked ? (
               <BookmarkIcon style={{ fontSize: "32px" }} />
             ) : (
-              <BookmarkBorderOutlinedIcon style={{ fontSize: "32px" }} />
+              <BookmarkBorderOutlinedIcon
+                style={{ fontSize: "32px", color: "#757575" }}
+              />
             )}
           </IconButton>
         </Box>

@@ -573,7 +573,7 @@ export default function RecipeDetailed({ recipeId }) {
                 />
               ) : (
                 <FavoriteBorderIcon
-                  style={{ fontSize: "45px", marginRight: 4 }}
+                  style={{ fontSize: "45px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
@@ -583,7 +583,7 @@ export default function RecipeDetailed({ recipeId }) {
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
-              style={{ fontSize: "42px", marginRight: 4 }}
+              style={{ fontSize: "42px", marginRight: 4, color: "#757575" }}
             />
             <Typography variant="body1" color="text.secondary">
               {commentCount}
@@ -596,7 +596,9 @@ export default function RecipeDetailed({ recipeId }) {
             {isBookmarked ? (
               <BookmarkIcon style={{ fontSize: "48px" }} />
             ) : (
-              <BookmarkBorderOutlinedIcon style={{ fontSize: "48px" }} />
+              <BookmarkBorderOutlinedIcon
+                style={{ fontSize: "48px", color: "#757575" }}
+              />
             )}
           </IconButton>
         </Box>
