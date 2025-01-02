@@ -284,12 +284,28 @@ export default function EventDetailed({ eventId }) {
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center",
+              alignItems: "flex-start", 
               mb: 1,
+              width: "100%",
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography variant="h4" fontWeight="bold" noWrap>
+            <Box sx={{ 
+              display: "flex", 
+              alignItems: "flex-start",
+              maxWidth: "100%" 
+            }}>
+              <Typography 
+                variant="h4" 
+                fontWeight="bold"
+                sx={{
+                  overflowWrap: "break-word",
+                  wordWrap: "break-word",
+                  hyphens: "auto",
+                  maxWidth: "100%", 
+                  whiteSpace: "normal", 
+                  lineHeight: 1.2,
+                }}
+              >
                 {event?.title || "Event Title"}
               </Typography>
             </Box>
