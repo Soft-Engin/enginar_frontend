@@ -391,7 +391,12 @@ export default function CommentSection({ type, contentId }) {
                   }}
                 >
                   <AddPhotoAlternateOutlinedIcon
-                    sx={{ fontSize: "25px", color: "#417D1E", position: "relative", top: -5 }}
+                    sx={{
+                      fontSize: "25px",
+                      color: "#417D1E",
+                      position: "relative",
+                      top: -5,
+                    }}
                   />
                 </IconButton>
               </label>
@@ -423,12 +428,17 @@ export default function CommentSection({ type, contentId }) {
         <Box sx={{ display: "flex", alignItems: "center", ml: 5 }}>
           <Button
             variant="contained"
-            style={{
+            sx={{
               backgroundColor: "#4B9023",
-              borderRadius: 30,
-              width: "90px",
-              height: "40px",
+              color: "#fff",
+              ":hover": {
+                backgroundColor: "#4B9023",
+              },
+              borderRadius: 20,
+              marginLeft: "auto",
               textTransform: "none",
+              height: "36px",
+              width: "80px"
             }}
             onClick={handleAddComment}
             disabled={loadingComment || !newComment.trim()}
@@ -449,10 +459,7 @@ export default function CommentSection({ type, contentId }) {
       <List>
         {comments.map((comment, index) => (
           <StyledCommentItem key={index} disableGutters>
-            <Comment
-              comment={comment}
-              type={type}
-            />
+            <Comment comment={comment} type={type} />
           </StyledCommentItem>
         ))}
       </List>
