@@ -61,7 +61,7 @@ const SubmitButton = styled(Button)(({ theme }) => ({
 
 export default function AuthPopup(props) {
   const navigate = useNavigate();
-  
+
   const [open, setOpen] = React.useState(false);
   const [isSignup, setIsSignup] = React.useState(true);
   const [formError, setFormError] = React.useState(null);
@@ -116,6 +116,7 @@ export default function AuthPopup(props) {
           props.setAnchorElUser(null);
           handleClose();
           navigate("/");
+          window.location.reload();
         }
       } else if (response.status === 400) {
         if (isSignup) {

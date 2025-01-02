@@ -272,8 +272,9 @@ export default function Navbar(props) {
     setUserLogged(false);
     localStorage.removeItem("userData");
     setUser(null);
-    navigate("/");
     setProfilePic(null);
+    navigate("/");
+    window.location.reload();
   };
   useEffect(() => {
     setNavbarTitlesIcons(
