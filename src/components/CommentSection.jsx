@@ -303,7 +303,7 @@ export default function CommentSection({ type, contentId }) {
                 width: 50,
                 height: 50,
                 borderRadius: "50%",
-                backgroundColor: "#ccc",
+                backgroundColor: "#A5E072",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -329,7 +329,7 @@ export default function CommentSection({ type, contentId }) {
               variant="body1"
               fontWeight="bold"
               noWrap
-              sx={{ mb: 0, ml: 2 }}
+              sx={{ mb: 0, ml: 1.6, position: "relative", top: 10 }}
             >
               {userName || "User Name"}
             </Typography>
