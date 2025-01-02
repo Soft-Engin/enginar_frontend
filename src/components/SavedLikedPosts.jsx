@@ -264,9 +264,10 @@ export default function SavedLikedPosts() {
       <CustomTabPanel value={value} index={0}>
         <Grid
           container
-          spacing={6}
+          rowSpacing={4}
+          columnSpacing={4}
           justifyContent="center"
-          sx={{ pt: 2, pb: 5 }}
+          sx={{ pt: 2, pb: 5, scale: { md: "85%", lg: "85%", xl: "95%" }, transformOrigin: "top" }}
         >
           {loadingRecipes && <div>Loading recipes...</div>}
           {errorRecipes && <div>Error loading recipes: {errorRecipes}</div>}
@@ -284,10 +285,13 @@ export default function SavedLikedPosts() {
               key={index}
               display="flex"
               justifyContent="center"
-              alignItems="center"
-              sx={{ maxWidth: 450 }}
+              alignItems="stretch"
+              sx={{
+                width: "100%",
+                maxWidth: { sm: 300, md: 410, lg: 410, xl: 425 },
+              }}
             >
-              <RecipeMini recipe={recipe} />
+              <RecipeMini recipe={recipe} sx={{ width: "100%" }} />
             </Grid>
           ))}
         </Grid>
@@ -295,7 +299,8 @@ export default function SavedLikedPosts() {
       <CustomTabPanel value={value} index={1}>
         <Grid
           container
-          spacing={6}
+          rowSpacing={4}
+          columnSpacing={4}
           justifyContent="center"
           sx={{ pt: 2, pb: 5 }}
         >
@@ -315,10 +320,13 @@ export default function SavedLikedPosts() {
               key={index}
               display="flex"
               justifyContent="center"
-              alignItems="center"
-              sx={{ maxWidth: 450 }}
+              alignItems="stretch"
+              sx={{
+                width: "100%",
+                maxWidth: { sm: 300, md: 410, lg: 410, xl: 425 },
+              }}
             >
-              <BlogMini blog={blog} />
+              <BlogMini blog={blog} sx={{ width: "100%" }} />
             </Grid>
           ))}
         </Grid>

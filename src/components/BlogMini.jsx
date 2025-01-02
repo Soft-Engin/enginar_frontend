@@ -321,6 +321,7 @@ export default function BlogMini({ blog }) {
     <Box
       sx={{
         maxWidth: 700,
+        width: "100%",
         outline: "1.5px solid #C0C0C0",
         backgroundColor: "#FFFFFF",
         pl: 3,
@@ -329,6 +330,9 @@ export default function BlogMini({ blog }) {
         pb: 1.5,
         borderRadius: 5,
         boxShadow: 5,
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
       }}
     >
       <Box
@@ -465,6 +469,7 @@ export default function BlogMini({ blog }) {
             mb: 2,
             wordWrap: "break-word",
             overflowWrap: "break-word",
+            flexGrow: 1,
           }}
         >
           {blog.bodyText}
@@ -493,6 +498,7 @@ export default function BlogMini({ blog }) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          marginTop: "auto",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
