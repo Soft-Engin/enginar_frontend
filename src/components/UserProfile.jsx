@@ -15,6 +15,10 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import axios from "axios";
 import ProfileEditDialog from "./ProfileEditDialog";
@@ -98,6 +102,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [banDialogOpen, setBanDialogOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   const [loggedInUserData, setLoggedInUserData] = useState(
@@ -273,6 +278,40 @@ const UserProfile = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+  const handleBanOpen = () => {
+    setBanDialogOpen(true);
+  };
+
+  const handleBanClose = () => {
+    setBanDialogOpen(false);
+    handleClose();
+  };
+
+  const handleBanConfirm = async () => {
+    try {
+      const response = await axios.delete(`/api/v1/users/${userId}`);
+
+      if (response.status === 200) {
+        console.log(`User ${userId} banned successfully.`);
+        // Remove user from UI or provide user feedback on successful ban
+      } else {
+        console.error(
+          `Failed to ban user ${userId}. Status: ${response.status}`
+        );
+        setError(`Failed to ban user. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error banning user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to ban the user."
+      );
+    } finally {
+      setBanDialogOpen(false); // Close the dialog after either success or error.
+      handleClose();
+    }
   };
 
   const handleEditProfile = () => {
@@ -510,11 +549,70 @@ const UserProfile = () => {
                         </MenuItem>
                       ) : null}
                       {isAdmin ? (
-                        <MenuItem key="Ban" onClick={handleClose}>
+                        <MenuItem key="Ban" onClick={handleBanOpen}>
                           Ban
                         </MenuItem>
                       ) : null}
                     </Menu>
+                    <Dialog
+                      open={banDialogOpen}
+                      onClose={handleBanClose}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                      PaperProps={{
+                        sx: {
+                          width: { xs: 250, sm: 400 },
+                          borderRadius: 4,
+                          backgroundColor: "#C8EFA5",
+                          padding: 0.5,
+                        },
+                      }}
+                    >
+                      <DialogTitle sx={{ fontWeight: "bold" }}>
+                        Confirm Ban
+                      </DialogTitle>
+                      <DialogContent>
+                        <Typography>
+                          Are you sure you want to ban this user?
+                        </Typography>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button
+                          onClick={handleBanClose}
+                          sx={{
+                            backgroundColor: "#C8EFA5",
+                            color: "black",
+                            ":hover": {
+                              backgroundColor: "#C8EFA5",
+                            },
+                            borderRadius: 20,
+                            marginTop: 2,
+                            display: "block",
+                            marginLeft: "auto",
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleBanConfirm}
+                          variant="contained"
+                          sx={{
+                            backgroundColor: "#cc0000",
+                            color: "error",
+                            ":hover": {
+                              backgroundColor: "#cc0000",
+                            },
+                            borderRadius: 20,
+                            marginTop: 2,
+                            display: "block",
+                            marginLeft: "auto",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Confirm Ban
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
                   </Box>
                 )}
               </Box>
