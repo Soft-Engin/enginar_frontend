@@ -225,6 +225,9 @@ export default function EventMini({ event }) {
         pb: 1.5,
         borderRadius: 5,
         boxShadow: 5,
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
       }}
     >
       <Box
@@ -322,6 +325,7 @@ export default function EventMini({ event }) {
           mb: 1,
           wordWrap: "break-word",
           overflowWrap: "break-word",
+          flexGrow: 1,
         }}
       >
         {event?.bodyText || "Event Description"}
@@ -333,6 +337,7 @@ export default function EventMini({ event }) {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          marginTop: "auto",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -341,6 +346,7 @@ export default function EventMini({ event }) {
             component="div"
             fontWeight="bold"
             style={{ marginRight: "6px" }}
+            noWrap
           >
             Participants:
           </Typography>
@@ -400,7 +406,7 @@ export default function EventMini({ event }) {
               {participants.length + followedParticipants.length} people are
               going
               {followedParticipants && followedParticipants.length > 0 && (
-                <span>, and {followedParticipants.length} whom you follow</span>
+                <span> ({followedParticipants.length} whom you follow)</span>
               )}
             </Typography>
           )}

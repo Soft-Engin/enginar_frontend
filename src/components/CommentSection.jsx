@@ -299,14 +299,14 @@ export default function CommentSection({ type, contentId }) {
           {userAvatar ? (
             <Avatar
               src={userAvatar}
-              sx={{ width: 50, height: 50, marginRight: 0.5, mt: 2 }}
+              sx={{ width: 50, height: 50, marginRight: 0.5, mt: 1 }}
               onError={() => setUserAvatar(null)}
             />
           ) : (
             <Box
               sx={{
-                width: 60,
-                height: 60,
+                width: 50,
+                height: 50,
                 borderRadius: "50%",
                 marginRight: 0.5,
                 backgroundColor: "#A5E072",
@@ -317,6 +317,7 @@ export default function CommentSection({ type, contentId }) {
                 fontSize: "1.2rem",
                 fontWeight: "bold",
                 flexShrink: 0,
+                mt: 1
               }}
             >
               {userInitials}

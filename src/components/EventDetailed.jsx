@@ -661,9 +661,7 @@ export default function EventDetailed({ eventId }) {
                   {participants.length + followedParticipants.length} people are
                   going
                   {followedParticipants && followedParticipants.length > 0 && (
-                    <span>
-                      , and {followedParticipants.length} whom you follow
-                    </span>
+                    <span> ({followedParticipants.length} whom you follow)</span>
                   )}
                 </Typography>
               )}
