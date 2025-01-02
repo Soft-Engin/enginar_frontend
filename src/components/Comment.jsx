@@ -235,16 +235,6 @@ export default function Comment({ comment, type, onDelete }) {
                 ))}
               </ImageList>
             ) : null}
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ marginTop: 1 }}
-            >
-              {comment.timestamp &&
-                formatDistanceToNow(parseISO(comment.timestamp), {
-                  addSuffix: true,
-                })}
-            </Typography>
           </Box>
         </Box>
         {isCommentOwner && (
