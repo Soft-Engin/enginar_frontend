@@ -45,6 +45,8 @@ export default function RecipeMini({ recipe }) {
   let userLogged = localStorage.getItem("userLogged") === "true";
 
   const recipeId = recipe?.id || recipe?.recipeId; // Extract recipeId
+  const isOwnRecipe =
+    JSON.parse(localStorage.getItem("userData"))?.userId === recipe.userId;
 
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
@@ -326,15 +328,20 @@ export default function RecipeMini({ recipe }) {
               open={open}
               onClose={handleClose}
             >
-              <MenuItem key="Follow" onClick={handleClose}>
-                Follow User
-              </MenuItem>
-              <MenuItem key="Edit" onClick={handleClose}>
-                Edit Recipe
-              </MenuItem>
-              <MenuItem key="Delete" onClick={handleClose}>
-                Delete Recipe
-              </MenuItem>
+              {!isOwnRecipe ? (
+                <MenuItem key="Follow" onClick={handleClose}>
+                  Follow User
+                </MenuItem>
+              ) : (
+                <>
+                  <MenuItem key="Edit" onClick={handleClose}>
+                    Edit Recipe
+                  </MenuItem>
+                  <MenuItem key="Delete" onClick={handleClose}>
+                    Delete Recipe
+                  </MenuItem>
+                </>
+              )}
             </Menu>
           </Box>
         )}

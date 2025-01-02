@@ -43,6 +43,8 @@ export default function BlogMini({ blog }) {
   let userLogged = localStorage.getItem("userLogged") === "true";
 
   const blogId = blog?.id || blog?.blogId; // Extract blogId
+  const isOwnBlog =
+    JSON.parse(localStorage.getItem("userData"))?.userId === blog.userId;
 
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
@@ -312,15 +314,20 @@ export default function BlogMini({ blog }) {
               open={open}
               onClose={handleClose}
             >
-              <MenuItem key="Follow" onClick={handleClose}>
-                Follow User
-              </MenuItem>
-              <MenuItem key="Edit" onClick={handleClose}>
-                Edit Blog
-              </MenuItem>
-              <MenuItem key="Delete" onClick={handleClose}>
-                Delete Blog
-              </MenuItem>
+              {!isOwnBlog ? (
+                <MenuItem key="Follow" onClick={handleClose}>
+                  Follow User
+                </MenuItem>
+              ) : (
+                <>
+                  <MenuItem key="Edit" onClick={handleClose}>
+                    Edit Blog
+                  </MenuItem>
+                  <MenuItem key="Delete" onClick={handleClose}>
+                    Delete Blog
+                  </MenuItem>
+                </>
+              )}
             </Menu>
           </Box>
         )}
