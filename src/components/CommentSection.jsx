@@ -117,33 +117,38 @@ export default function CommentSection({ type, contentId }) {
   }, [userLogged, userId]);
 
   React.useEffect(() => {
-    if (comments && comments.length > 0) {
-      const fetchCommentImages = async () => {
-        const images = {};
-        for (let i = 0; i < comments.length; i++) {
-          try {
-            const response = await axios.get(
-              `/api/v1/comments/${comments[i].id}/images/0`,
-              { responseType: "blob" }
-            );
-            if (response.data) {
-              const imageUrl = URL.createObjectURL(response.data);
-              images[comments[i].id] = imageUrl;
-            } else {
-              images[comments[i].id] = null;
-            }
-          } catch (error) {
-            console.error(
-              `Error fetching image for comment ${comments[i].id}:`,
-              error
-            );
-            images[comments[i].id] = null;
+    // this handles images for each comment
+    const fetchCommentImages = async () => {
+      if (!comments || comments.length === 0) {
+        setCommentImages({});
+        return;
+      }
+
+      const images = {};
+      for (const comment of comments) {
+        try {
+          const response = await axios.get(
+            `/api/v1/${type}s/comments/${comment.id}/images/0`,
+            { responseType: "blob" }
+          );
+          if (response.data) {
+            const imageUrl = URL.createObjectURL(response.data);
+            images[comment.id] = imageUrl;
+          } else {
+            images[comment.id] = null;
           }
+        } catch (error) {
+          console.error(
+            `Error fetching image for comment ${comment.id}:`,
+            error
+          );
+          images[comment.id] = null;
         }
-        setCommentImages(images);
-      };
-      fetchCommentImages();
-    }
+      }
+      setCommentImages(images);
+    };
+
+    fetchCommentImages();
     return () => {
       for (const commentId in commentImages) {
         if (commentImages[commentId]) {
@@ -151,7 +156,8 @@ export default function CommentSection({ type, contentId }) {
         }
       }
     };
-  }, [comments]);
+  }, [comments, type]);
+
   React.useEffect(() => {
     if (userLogged && userId) {
       const fetchProfilePicture = async () => {
@@ -445,7 +451,7 @@ export default function CommentSection({ type, contentId }) {
           <StyledCommentItem key={index} disableGutters>
             <Comment
               comment={comment}
-              commentImage={commentImages[comment.id]}
+              type={type}
             />
           </StyledCommentItem>
         ))}
