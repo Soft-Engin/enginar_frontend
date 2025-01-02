@@ -1,11 +1,24 @@
 html {
   height: 100%;
 }
-#body {
+
+body {
   display: flex;
   place-items: center;
-  background-color: #FFFCE5;
+  background-color: #FFFCE5 !important;
   height: 100%;
+}
+
+body.invert-mode {
+
+  display: flex;
+  place-items: center;
+  background-color: black;
+  height: 100%;
+}
+
+.invert-mode {
+  filter: invert(100%);
 }
 
 .jersey-25-regular {
@@ -13,4 +26,3 @@ html {
   font-weight: 400;
   font-style: normal;
 }
-

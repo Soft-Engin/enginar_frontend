@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const SharedButton = styled("button")(({ following }) => ({
   border: "2px solid #888888",
@@ -52,7 +53,7 @@ export default function RecommendedUsers() {
       }
 
       const response = await axios.get("/api/v1/feed/recipe", {
-        params: { pageSize: 20 },
+        params: { pageSize: 150 },
       });
       if (response.data?.items) {
         const uniqueUserIds = [];
@@ -61,6 +62,7 @@ export default function RecommendedUsers() {
           if (
             !uniqueUserIds.includes(item.userId) &&
             uniqueUserIds.length < 4 &&
+            item.userId !== loggedInUserData?.userId && // Check if the user is not the logged in user
             !followingUsers.some(
               (following) => following.userId === item.userId
             )
@@ -172,18 +174,36 @@ export default function RecommendedUsers() {
       {!loading && !error && (
         <List>
           {recommendedUsers.map((user) => (
-            <ListItem key={user.userId}>
-              <ListItemAvatar>
-                <Avatar src={user.profilePictureUrl}>
-                  {!user.profilePictureUrl &&
-                    user.userName?.charAt(0).toUpperCase()}
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText>
-                <Typography variant="h6" color="black" noWrap>
-                  {user.userName}
-                </Typography>
-              </ListItemText>
+            <ListItem
+              key={user.userId}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                pr: 1,
+              }}
+            >
+              <Link
+                to={`/profile?id=${user.userId}`}
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <ListItemAvatar>
+                  <Avatar src={user.profilePictureUrl}>
+                    {!user.profilePictureUrl &&
+                      user.userName?.charAt(0).toUpperCase()}
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText>
+                  <Typography variant="h6" color="black" noWrap>
+                    {user.userName}
+                  </Typography>
+                </ListItemText>
+              </Link>
               <SharedButton
                 following={isFollowing[user.userId]}
                 onClick={() =>
@@ -192,7 +212,7 @@ export default function RecommendedUsers() {
                     : handleFollow(user.userId)
                 }
               >
-                {isFollowing[user.userId] ? "Following" : "Follow"}
+                {isFollowing[user.userId] ? "Unfollow" : "Follow"}
               </SharedButton>
             </ListItem>
           ))}

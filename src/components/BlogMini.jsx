@@ -6,11 +6,10 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import ShareIcon from "@mui/icons-material/Share";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
-import { format, parseISO, formatDistanceToNow } from "date-fns";
+import { parseISO, formatDistanceToNow } from "date-fns";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
@@ -378,7 +377,7 @@ export default function BlogMini({ blog }) {
                 />
               ) : (
                 <FavoriteBorderIcon
-                  style={{ fontSize: "30px", marginRight: 4 }}
+                  style={{ fontSize: "30px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
@@ -389,7 +388,12 @@ export default function BlogMini({ blog }) {
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
-              style={{ fontSize: "28px", marginRight: 4, cursor: "pointer" }}
+              style={{
+                fontSize: "28px",
+                marginRight: 4,
+                cursor: "pointer",
+                color: "#757575",
+              }}
               onClick={() => navigate(`/blog?id=${blogId}`)}
             />
             <Typography variant="body2" color="text.secondary">
@@ -399,12 +403,13 @@ export default function BlogMini({ blog }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ShareIcon style={{ fontSize: "28px", marginRight: 6 }} />
           <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
               <BookmarkIcon style={{ fontSize: "32px" }} />
             ) : (
-              <BookmarkBorderOutlinedIcon style={{ fontSize: "32px" }} />
+              <BookmarkBorderOutlinedIcon
+                style={{ fontSize: "32px", color: "#757575" }}
+              />
             )}
           </IconButton>
         </Box>

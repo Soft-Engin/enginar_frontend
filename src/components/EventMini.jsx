@@ -6,13 +6,11 @@ import {
   AvatarGroup,
   Button,
   CircularProgress,
-  IconButton,
 } from "@mui/material";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import axios from "axios";
 import { format, parseISO } from "date-fns";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function EventMini({ event }) {
@@ -310,7 +308,6 @@ export default function EventMini({ event }) {
             </Typography>
           </Link>
         </Box>
-        <MoreHorizIcon style={{ fontSize: "30px" }} />
       </Box>
 
       <Typography

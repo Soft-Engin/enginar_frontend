@@ -21,7 +21,6 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/Bookmark";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import ShareIcon from "@mui/icons-material/Share";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import LocalDiningIcon from "@mui/icons-material/LocalDining";
@@ -726,7 +725,7 @@ export default function RecipeDetailed({ recipeId }) {
                 />
               ) : (
                 <FavoriteBorderIcon
-                  style={{ fontSize: "45px", marginRight: 4 }}
+                  style={{ fontSize: "45px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
@@ -736,7 +735,7 @@ export default function RecipeDetailed({ recipeId }) {
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
-              style={{ fontSize: "42px", marginRight: 4 }}
+              style={{ fontSize: "42px", marginRight: 4, color: "#757575" }}
             />
             <Typography variant="body1" color="text.secondary">
               {commentCount}
@@ -745,12 +744,13 @@ export default function RecipeDetailed({ recipeId }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ShareIcon style={{ fontSize: "42px", marginRight: 6 }} />
           <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
               <BookmarkIcon style={{ fontSize: "48px" }} />
             ) : (
-              <BookmarkBorderOutlinedIcon style={{ fontSize: "48px" }} />
+              <BookmarkBorderOutlinedIcon
+                style={{ fontSize: "48px", color: "#757575" }}
+              />
             )}
           </IconButton>
         </Box>
