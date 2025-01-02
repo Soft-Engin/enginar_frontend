@@ -1,20 +1,13 @@
-import * as React from "react";
-import BlogMini from "./BlogMini";
-import RecipeMini from "./RecipeMini";
+import React, { useState } from "react";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-
-function generate(element) {
-  return [0, 1, 2, 3, 4, 5, 6].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    })
-  );
-}
+import PopularRecipesTab from "./PopularRecipesTab";
+import PopularBlogsTab from "./PopularBlogsTab";
+import FollowingTab from "./FollowingTab";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -25,6 +18,7 @@ function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      style={{ display: "flex", justifyContent: "center" }}
       {...other}
     >
       {value === index && <Box>{children}</Box>}
@@ -51,15 +45,39 @@ export default function ContentFeed() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
+
   return (
-    <Box>
+    <Box
+      sx={{
+        margin: "0 auto",
+      }}
+    >
       <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
         <Tabs
           centered
           value={value}
           onChange={handleChange}
           aria-label="Feed Tabs"
-          sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
+          variant="fullWidth"
+          sx={{
+            "& .MuiTabs-indicator": {
+              backgroundColor: "#4B9023",
+            },
+            "& .MuiTab-root": {
+              fontSize: "1.1rem",
+              fontWeight: "bold",
+              textTransform: "none",
+              padding: "12px 20px",
+            },
+            "& .MuiTab-root.Mui-selected": {
+              color: "#4B9023",
+            },
+            "& .MuiTab-root:hover": {
+              color: "#66c72e",
+            },
+          }}
         >
           <Tab
             label="Popular Recipes"
@@ -71,37 +89,25 @@ export default function ContentFeed() {
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
             {...a11yProps(1)}
           />
-          <Tab
-            label="Following"
-            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
-            {...a11yProps(1)}
-          />
+          {userLogged && (
+            <Tab
+              label="Following"
+              sx={{ "&.Mui-selected": { color: "#4B9023" } }}
+              {...a11yProps(2)}
+            />
+          )}
         </Tabs>
       </Box>
 
       <CustomTabPanel value={value} index={0}>
-        {generate(<RecipeMini />).map((recipe, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
-            {recipe}
-          </Box>
-        ))}
+        <PopularRecipesTab />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        {generate(<BlogMini />).map((blog, index) => (
-          <Box key={index} sx={{ width: 600, mb: 2 }}>
-            {blog}
-          </Box>
-        ))}
+        <PopularBlogsTab />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        <Box sx={{ width: 600, mb: 2 }}>
-          <BlogMini />
-        </Box>
-        <Box sx={{ width: 600, mb: 2 }}>
-          <RecipeMini />
-        </Box>
+        <FollowingTab />
       </CustomTabPanel>
-
       <RecommendedUsers />
       <UpcomingEvents />
     </Box>

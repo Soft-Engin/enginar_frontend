@@ -1,89 +1,155 @@
-import React from 'react';
-import { styled, alpha } from '@mui/material/styles';
-import InputBase from '@mui/material/InputBase';
-import SearchIcon from '@mui/icons-material/Search';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import Box from '@mui/material/Box';
+import React from "react";
+import { styled, alpha } from "@mui/material/styles";
+import InputBase from "@mui/material/InputBase";
+import SearchIcon from "@mui/icons-material/Search";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { useNavigate } from "react-router-dom";
 
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  display: 'flex',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  display: "flex",
+  borderRadius: 15,
+  backgroundColor: theme.palette.common.white,
   marginRight: theme.spacing(1),
   marginLeft: theme.spacing(1),
-  width: '100%',
-  maxWidth: '600px',
+  width: "100%",
+  maxWidth: "600px",
+  alignItems: "center",
+  [theme.breakpoints.down("xl")]: {
+    maxWidth: "500px",
+  },
+  [theme.breakpoints.down("lg")]: {
+    maxWidth: "450px",
+  },
 }));
 
-const SearchIconWrapper = styled('div')(({ theme }) => ({
+const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: alpha(theme.palette.common.white, 0.7),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "black",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  width: '100%',
-  '& .MuiInputBase-input': {
+  color: "black",
+  width: "100%",
+  "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
+    transition: theme.transitions.create("width"),
+    width: "100%",
   },
 }));
 
 const StyledSelect = styled(Select)(({ theme }) => ({
-  color: 'inherit',
-  backgroundColor: 'transparent',
-  '&:before': {
+  color: "black",
+  backgroundColor: "#A5E072",
+  "&:before": {
     borderColor: alpha(theme.palette.common.white, 0.7),
   },
-  '&:after': {
+  "&:after": {
     borderColor: theme.palette.common.white,
   },
-  '& .MuiSelect-icon': {
-    color: alpha(theme.palette.common.white, 0.7),
+  "& .MuiSelect-icon": {
+    color: "black",
   },
-  '& .MuiSelect-select': {
+  "& .MuiSelect-select": {
     padding: theme.spacing(1),
     paddingRight: `calc(1em + ${theme.spacing(4)})`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
+  borderRadius: "8px",
+  height: "30px",
+  minWidth: "95px",
+  marginRight: 10,
+  fontSize: "0.95rem",
+}));
+
+const MenuProps = {
+  PaperProps: {
+    style: {
+      backgroundColor: "#A5E072",
+      color: "black",
+      borderRadius: "0 0 8px 8px",
+      marginTop: -6,
+      minWidth: "95px",
+      boxShadow: "none",
+    },
+  },
+  anchorOrigin: {
+    vertical: "bottom",
+    horizontal: "left",
+  },
+  transformOrigin: {
+    vertical: "top",
+    horizontal: "left",
+  },
+};
+
+const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
+  padding: theme.spacing(0.4, 2),
+  fontSize: "0.95rem",
 }));
 
 export default function SearchBar() {
-  const [searchType, setSearchType] = React.useState('user');
+  const [searchType, setSearchType] = React.useState("user");
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const navigate = useNavigate();
+
+  const selectOptions = [
+    { value: "user", label: "Users" },
+    { value: "blog", label: "Blogs" },
+    { value: "recipe", label: "Recipes" },
+  ];
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      navigate(`/search?type=${searchType}&query=${searchQuery}`);
+    }
+  };
 
   return (
-    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
       <Search>
         <SearchIconWrapper>
           <SearchIcon />
         </SearchIconWrapper>
         <StyledInputBase
           placeholder="Search…"
-          inputProps={{ 'aria-label': 'search' }}
+          inputProps={{ "aria-label": "search" }}
+          onKeyDown={handleKeyDown}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <StyledSelect
           value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
           variant="standard"
-          sx={{ minWidth: 100 }}
+          disableUnderline
+          MenuProps={MenuProps}
         >
-          <MenuItem value="user">Users</MenuItem>
-          <MenuItem value="post">Posts</MenuItem>
-          <MenuItem value="recipe">Recipes</MenuItem>
+          {selectOptions.map((option) => {
+            const isSelected = option.value == searchType;
+            return (
+              <StyledMenuItem
+                key={option.value}
+                value={option.value}
+                sx={{ display: isSelected ? "none" : "block" }}
+              >
+                <Typography sx={{ ml: 0.5 }}>{option.label}</Typography>
+              </StyledMenuItem>
+            );
+          })}
         </StyledSelect>
       </Search>
     </Box>
   );
-};
+}
