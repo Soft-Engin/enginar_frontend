@@ -112,7 +112,7 @@ export default function SearchedRecipes({ query }) {
             pageSize: pageSize,
             pageNumber: 1,
             HeaderContains: query,
-            SortBy: "date",
+            SortBy: "createdAt",
           },
         });
         setRecipes(response.data.items);

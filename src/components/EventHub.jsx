@@ -269,7 +269,7 @@ export default function EventHub() {
       columnSpacing={2.5}
       sx={{ pt: 3, pb: 5, pl: 12, pr: 12 }}
       justifyContent="center"
-      alignItems="center"
+      alignItems="stretch"
     >
       <LoadingErrorDisplay
         loading={loading}
@@ -388,7 +388,7 @@ export default function EventHub() {
           key={index}
           display="flex"
           justifyContent="center"
-          alignItems="center"
+          alignItems="stretch"
           sx={{
             width: "100%",
             maxWidth: { xs: 500, sm: 500, md: 600, lg: 490, xl: 630 },

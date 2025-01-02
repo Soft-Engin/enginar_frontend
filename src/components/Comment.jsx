@@ -17,6 +17,7 @@ import {
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import axios from "axios";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
+import { Link } from "react-router-dom";
 
 export default function Comment({ comment, type, onDelete }) {
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
@@ -141,7 +142,9 @@ export default function Comment({ comment, type, onDelete }) {
   const handleConfirmDelete = async () => {
     setOpenDialog(false);
     try {
-      await axios.delete(`/api/v1/${type}${type !== "event" ? "s" : ""}/comments/${comment.id}`);
+      await axios.delete(
+        `/api/v1/${type}${type !== "event" ? "s" : ""}/comments/${comment.id}`
+      );
       // Refresh the page
       window.location.reload();
     } catch (error) {
@@ -193,9 +196,19 @@ export default function Comment({ comment, type, onDelete }) {
 
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography variant="body1" fontWeight="bold" noWrap>
-                {comment.userName}
-              </Typography>
+              <Link
+                to={`/profile?id=${comment.userId}`}
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="body1" fontWeight="bold" noWrap>
+                  {comment.userName}
+                </Typography>
+              </Link>
               <Typography variant="body2" color="text.secondary">
                 {comment.timestamp &&
                   formatDistanceToNow(parseISO(comment.timestamp), {

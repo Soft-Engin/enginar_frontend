@@ -53,6 +53,7 @@ export default function EventDetailed({ eventId }) {
       : null
   );
   const isOwnEvent = eventData?.creatorId === loggedInUserData?.userId;
+  let isAdmin = loggedInUserData?.roleName === "Admin";
 
   //EDIT POPUP STATE
   const [editPopupOpen, setEditPopupOpen] = useState(false);
@@ -499,16 +500,47 @@ export default function EventDetailed({ eventId }) {
                   open={open}
                   onClose={handleClose}
                 >
-                  {!isOwnEvent ? (
+                  {isAdmin || !isOwnEvent ? (
                     <>
-                      {isFollowing ? (
-                        <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
-                          Unfollow Host
-                        </MenuItem>
-                      ) : (
-                        <MenuItem key="Follow" onClick={handleFollowUser}>
-                          Follow Host
-                        </MenuItem>
+                      {isAdmin && (
+                        <>
+                          <MenuItem
+                            key="Edit"
+                            onClick={() => {
+                              handleClose();
+                              handleEditEvent();
+                            }}
+                          >
+                            Edit Event
+                          </MenuItem>
+                          <MenuItem
+                            key="Delete"
+                            onClick={() => {
+                              handleClose();
+                              handleDeleteEvent();
+                            }}
+                            sx={{ color: "red" }}
+                          >
+                            Delete Event
+                          </MenuItem>
+                        </>
+                      )}
+
+                      {!isOwnEvent && (
+                        <>
+                          {isFollowing ? (
+                            <MenuItem
+                              key="Unfollow"
+                              onClick={handleUnfollowUser}
+                            >
+                              Unfollow Host
+                            </MenuItem>
+                          ) : (
+                            <MenuItem key="Follow" onClick={handleFollowUser}>
+                              Follow Host
+                            </MenuItem>
+                          )}
+                        </>
                       )}
                     </>
                   ) : (
@@ -528,6 +560,7 @@ export default function EventDetailed({ eventId }) {
                           handleClose();
                           handleDeleteEvent();
                         }}
+                        sx={{ color: "red" }}
                       >
                         Delete Event
                       </MenuItem>
@@ -736,7 +769,8 @@ export default function EventDetailed({ eventId }) {
                   going
                   {followedParticipants && followedParticipants.length > 0 && (
                     <span>
-                      , and {followedParticipants.length} whom you follow
+                      {" "}
+                      ({followedParticipants.length} whom you follow)
                     </span>
                   )}
                 </Typography>

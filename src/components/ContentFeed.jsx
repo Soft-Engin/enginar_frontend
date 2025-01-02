@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 import PropTypes from "prop-types";
@@ -46,6 +46,8 @@ export default function ContentFeed() {
     setValue(newValue);
   };
 
+  const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
+
   return (
     <Box
       sx={{
@@ -87,11 +89,13 @@ export default function ContentFeed() {
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
             {...a11yProps(1)}
           />
-          <Tab
-            label="Following"
-            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
-            {...a11yProps(2)}
-          />
+          {userLogged && (
+            <Tab
+              label="Following"
+              sx={{ "&.Mui-selected": { color: "#4B9023" } }}
+              {...a11yProps(2)}
+            />
+          )}
         </Tabs>
       </Box>
 

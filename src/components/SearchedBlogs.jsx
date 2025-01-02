@@ -108,7 +108,7 @@ export default function SearchedBlogs({ query }) {
             pageSize: pageSize,
             pageNumber: 1,
             BodyContains: query,
-            SortBy: "date",
+            SortBy: "createdAt",
           },
         });
         setBlogs(response.data.items);

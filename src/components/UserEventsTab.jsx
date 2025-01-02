@@ -96,7 +96,7 @@ function UserEventsTab() {
         errorMore={errorMore}
       />
       {events.map((event, index) => (
-        <Box key={index} sx={{ mb: 2 }}>
+        <Box key={index} sx={{ width: 600, mb: 2 }}>
           <EventMini key={event.id} event={event} />
         </Box>
       ))}
