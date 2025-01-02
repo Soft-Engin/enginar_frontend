@@ -222,7 +222,7 @@ const SettingsPage = () => {
 
       <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
         <Typography variant="h6">Allergen / Preferences Selection</Typography>
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ mb: 2 }} />
         <Box sx={{ mb: 2, pr: 2, pl: 2, flexGrow: 1 }}>
           <Box
             sx={{

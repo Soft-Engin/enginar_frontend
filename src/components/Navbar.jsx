@@ -165,7 +165,7 @@ const navbarTitlesIconsBase = [
       </Typography>
     ),
     icon: <CasinoOutlinedIcon sx={drawerIconStyle} />,
-    action: () => { },
+    action: () => {},
   },
   {
     text: (
@@ -227,10 +227,10 @@ export default function Navbar(props) {
   );
   const getStoredInvertMode = () => {
     return localStorage.getItem("isInverted") === "true";
-  }
+  };
   const setStoredInvertMode = (value) => {
     localStorage.setItem("isInverted", value.toString());
-  }
+  };
 
   useEffect(() => {
     const storedMode = getStoredInvertMode();
@@ -243,7 +243,6 @@ export default function Navbar(props) {
     return () => {
       document.body.classList.remove("invert-mode");
     };
-
   }, []);
 
   const toggleInvertMode = () => {
@@ -251,8 +250,7 @@ export default function Navbar(props) {
     setIsInverted(newInverted);
     if (newInverted) {
       document.body.classList.add("invert-mode");
-    }
-    else {
+    } else {
       document.body.classList.remove("invert-mode");
     }
     setStoredInvertMode(newInverted);
@@ -417,9 +415,11 @@ export default function Navbar(props) {
           <SearchBar />
 
           <RightSection>
-            <IconButton onClick={toggleInvertMode} sx={{
-              opacity: 0
-            }}
+            <IconButton
+              onClick={toggleInvertMode}
+              sx={{
+                opacity: 0,
+              }}
             >
               {isInverted ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
@@ -512,11 +512,11 @@ export default function Navbar(props) {
                   },
                   drawerOpen
                     ? {
-                      justifyContent: "initial",
-                    }
+                        justifyContent: "initial",
+                      }
                     : {
-                      justifyContent: "center",
-                    },
+                        justifyContent: "center",
+                      },
                 ]}
               >
                 <ListItemIcon
@@ -529,11 +529,11 @@ export default function Navbar(props) {
                     },
                     drawerOpen
                       ? {
-                        mr: 3,
-                      }
+                          mr: 3,
+                        }
                       : {
-                        mr: "auto",
-                      },
+                          mr: "auto",
+                        },
                   ]}
                 >
                   {item.icon}
@@ -543,11 +543,11 @@ export default function Navbar(props) {
                   sx={[
                     drawerOpen
                       ? {
-                        opacity: 1,
-                      }
+                          opacity: 1,
+                        }
                       : {
-                        opacity: 0,
-                      },
+                          opacity: 0,
+                        },
                   ]}
                 />
               </ListItemButton>
