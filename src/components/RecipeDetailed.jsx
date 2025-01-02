@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogActions,
   Button,
+  DialogContent,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -465,29 +466,51 @@ export default function RecipeDetailed({ recipeId }) {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-      <Dialog
-        open={openDialog}
-        onClose={handleDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Are you sure you want to delete this recipe?"}
-        </DialogTitle>
+      <Dialog open={openDialog} onClose={handleDialogClose} 
+      PaperProps={{
+        sx: {
+          width: { xs: 250, sm: 400 },
+          borderRadius: 4,
+          backgroundColor: "#C8EFA5",
+          padding: 0.5,
+        },
+      }}>
+        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this recipe?</Typography>
+        </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
+          <Button onClick={handleDialogClose}
+          sx={{
+            backgroundColor: "#C8EFA5",
+            color: "black",
+            ":hover": {
+              backgroundColor: "#C8EFA5",
+            },
+            borderRadius: 20,
+            marginTop: 2,
+            display: "block",
+            marginLeft: "auto",
+          }}>
             Cancel
           </Button>
-          <Button
-            onClick={() => {
-              handleDelete();
-              handleDialogClose();
-            }}
-            color="error"
-            autoFocus
-          >
-            Delete
-          </Button>
+          <Button onClick={() => {handleDelete(); handleDialogClose();} }
+              variant="contained"
+              sx={{
+                backgroundColor: "#cc0000",
+                color: "error",
+                ":hover": {
+                  backgroundColor: "#cc0000",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+                fontWeight: "bold",
+              }}
+            >
+              Delete
+            </Button>
         </DialogActions>
       </Dialog>
       <Box
