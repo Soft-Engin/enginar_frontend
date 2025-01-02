@@ -275,7 +275,7 @@ export default function CommentSection({ type, contentId }) {
         backgroundColor: "#EAEAEA",
         px: 3,
         py: 2,
-        borderRadius: "0 0 15px 15px",
+        borderRadius: "0 0 20px 20px",
         boxShadow: 3,
       }}
     >

@@ -151,8 +151,7 @@ export default function Comment({ comment, type, onDelete }) {
   return (
     <Box
       sx={{
-        maxWidth: 1500,
-        width: 1500,
+        width: "100%",
         backgroundColor: "#EAEAEA",
         pb: 1.3,
         pt: 2.2,
