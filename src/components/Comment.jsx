@@ -178,7 +178,7 @@ export default function Comment({ comment, type, onDelete }) {
                 height: 50,
                 borderRadius: "50%",
                 marginRight: 2,
-                backgroundColor: "#ccc",
+                backgroundColor: "#A5E072",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
