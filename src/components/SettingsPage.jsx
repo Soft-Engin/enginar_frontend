@@ -24,6 +24,8 @@ const SettingsPage = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [selectedAllergens, setSelectedAllergens] = useState([]);
   const [showAllergens, setShowAllergens] = useState(false);
   const [notification, setNotification] = useState({
@@ -32,6 +34,7 @@ const SettingsPage = () => {
     severity: "success",
   });
   const [isInverted, setIsInverted] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   const getStoredInvertMode = () => {
     return localStorage.getItem("isInverted") === "true";
@@ -65,6 +68,10 @@ const SettingsPage = () => {
     setStoredInvertMode(newInverted);
   };
 
+  const handleToggleChangePassword = () => {
+    setShowChangePassword(!showChangePassword);
+  };
+
   const auth = localStorage.getItem("accessToken");
   const apiVersion = "v1";
   const createAuthHeader = () => {
@@ -93,18 +100,61 @@ const SettingsPage = () => {
     fetchSelectedAllergens();
   }, []);
 
-  const handleForgotPassword = async () => {
+  const fetchUserEmail = async () => {
     try {
-      const response = await axios.post("/api/v1/auth/forgot-password", {
-        email: email,
+      const response = await axios.get(`/api/${apiVersion}/users/me`, {
+        headers: createAuthHeader(),
       });
-
+      if (response.data && response.data.email) {
+        setEmail(response.data.email);
+        return response.data.email;
+      } else {
+        setNotification({
+          open: true,
+          message: "Error fetching user email.",
+          severity: "error",
+        });
+        return null;
+      }
+    } catch (error) {
       setNotification({
         open: true,
-        message: response.data.message,
-        severity: "success",
+        message: "Error fetching user email.",
+        severity: "error",
       });
-      setEmail("");
+      console.error("Error fetching user email:", error);
+      return null;
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      const userEmail = await fetchUserEmail();
+      if (userEmail) {
+        const response = await axios.post(
+          `/api/${apiVersion}/auth/forgot-password`,
+          {
+            email: userEmail,
+          }
+        );
+
+        if (response.data && response.data.token) {
+          setNotification({
+            open: true,
+            message: response.data.message,
+            severity: "success",
+          });
+          return response.data.token;
+        } else {
+          setNotification({
+            open: true,
+            message: "Error getting password reset token.",
+            severity: "error",
+          });
+          return null;
+        }
+      }
+      return null;
     } catch (error) {
       setNotification({
         open: true,
@@ -112,6 +162,80 @@ const SettingsPage = () => {
         severity: "error",
       });
       console.error("Forgot password error:", error);
+      return null;
+    }
+  };
+
+  const handleChangePassword = async () => {
+    try {
+      const userEmail = await fetchUserEmail();
+      if (userEmail) {
+        if (newPassword !== confirmPassword) {
+          setNotification({
+            open: true,
+            message: "New password and confirm password do not match.",
+            severity: "error",
+          });
+          return;
+        }
+        const token = await handleForgotPassword();
+        if (!token) {
+          setNotification({
+            open: true,
+            message: "Please request a password reset token first.",
+            severity: "error",
+          });
+          return;
+        }
+
+        const response = await axios.post(
+          `/api/${apiVersion}/auth/reset-password`,
+          {
+            email: userEmail,
+            token: token,
+            newPassword: newPassword,
+            confirmPassword: confirmPassword,
+          }
+        );
+        setNotification({
+          open: true,
+          message: "Password changed successfully!",
+          severity: "success",
+        });
+        setNewPassword("");
+        setConfirmPassword("");
+        setShowChangePassword(false);
+      }
+    } catch (error) {
+      if (error.response && error.response.data) {
+        const errorData = error.response.data;
+        let errorMessages = [];
+        if (errorData.errors) {
+          if (Array.isArray(errorData.errors)) {
+            errorMessages = errorData.errors.map(
+              (err) => err.description || err
+            );
+          } else if (typeof errorData.errors === "object") {
+            errorMessages = Object.values(errorData.errors).flat();
+          }
+        } else if (errorData.message) {
+          errorMessages.push(errorData.message);
+        }
+
+        setNotification({
+          open: true,
+          message: errorMessages.join("\n"),
+          severity: "error",
+        });
+      } else {
+        setNotification({
+          open: true,
+          message: "Error changing password. Please try again.",
+          severity: "error",
+        });
+      }
+
+      console.error("Change password error:", error);
     }
   };
 
@@ -144,6 +268,8 @@ const SettingsPage = () => {
     setUsername("");
     setPassword("");
     setSelectedAllergens([]);
+    setNewPassword("");
+    setConfirmPassword("");
   };
 
   const toggleAllergenSection = () => {
@@ -190,34 +316,78 @@ const SettingsPage = () => {
       <Box sx={{ pt: 2, flexGrow: 1 }}>
         <Typography variant="h6">Profile Settings</Typography>
         <Divider sx={{ marginBottom: 2 }} />
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            alignItems: "center",
-            marginBottom: 3,
-          }}
+        <Paper
+          elevation={3}
+          sx={{ p: 3, mb: 3, backgroundColor: "rgba(255, 255, 255, 0.9)" }}
         >
-          <TextField
-            label="Email for Password Reset"
-            variant="outlined"
-            fullWidth
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+          <Box
             sx={{
-              "& .MuiOutlinedInput-root": {
-                backgroundColor: "white",
-              },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 2,
+              pr: 2,
+              pl: 2,
             }}
-          />
-          <Button
-            variant="contained"
-            onClick={handleForgotPassword}
-            sx={{ backgroundColor: "#4B9023", height: 56 }}
           >
-            Reset Password
-          </Button>
-        </Box>
+            <Typography>Change Password</Typography>
+            <IconButton
+              onClick={handleToggleChangePassword}
+              sx={{
+                transition: "transform 0.3s",
+                transform: showChangePassword ? "rotate(180deg)" : "none",
+              }}
+            >
+              <ExpandMoreIcon />
+            </IconButton>
+          </Box>
+          <Collapse in={showChangePassword}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <TextField
+                label="New Password"
+                variant="outlined"
+                fullWidth
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                  },
+                }}
+              />
+              <TextField
+                label="Confirm New Password"
+                variant="outlined"
+                fullWidth
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "white",
+                  },
+                }}
+              />
+              <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+                <Button
+                  variant="outlined"
+                  sx={{ color: "black" }}
+                  onClick={handleToggleChangePassword}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleChangePassword}
+                  sx={{ backgroundColor: "#4B9023" }}
+                >
+                  Change Password
+                </Button>
+              </Box>
+            </Box>
+          </Collapse>
+        </Paper>
       </Box>
 
       <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
@@ -340,7 +510,9 @@ const SettingsPage = () => {
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert severity={notification.severity} sx={{ width: "100%" }}>
-          {notification.message}
+          <Typography variant="body1" style={{ whiteSpace: "pre-line" }}>
+            {notification.message}
+          </Typography>
         </Alert>
       </Snackbar>
     </Box>

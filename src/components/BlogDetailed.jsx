@@ -675,18 +675,51 @@ export default function BlogDetailed({ blogId }) {
           bannerImage={bannerImage} // Pass bannerImage as a prop
         />
       )}
-      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete} 
+      PaperProps={{
+        sx: {
+          width: { xs: 250, sm: 400 },
+          borderRadius: 4,
+          backgroundColor: "#C8EFA5",
+          padding: 0.5,
+        },
+      }}>
+        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
         <DialogContent>
-          <Typography>
-            Are you sure you want to delete this blog post?
-          </Typography>
+          <Typography>Are you sure you want to delete this blog post?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelDelete}>Cancel</Button>
-          <Button onClick={handleDeleteBlog} color="error">
-            Delete
+          <Button onClick={handleCancelDelete}
+          sx={{
+            backgroundColor: "#C8EFA5",
+            color: "black",
+            ":hover": {
+              backgroundColor: "#C8EFA5",
+            },
+            borderRadius: 20,
+            marginTop: 2,
+            display: "block",
+            marginLeft: "auto",
+          }}>
+            Cancel
           </Button>
+          <Button onClick={handleDeleteBlog} 
+              variant="contained"
+              sx={{
+                backgroundColor: "#cc0000",
+                color: "error",
+                ":hover": {
+                  backgroundColor: "#cc0000",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+                fontWeight: "bold",
+              }}
+            >
+              Delete
+            </Button>
         </DialogActions>
       </Dialog>
     </Box>
