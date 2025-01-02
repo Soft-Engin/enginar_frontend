@@ -112,6 +112,8 @@ const UserProfile = () => {
   const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
   const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
   const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
+  const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
+  let isAdmin = localStorage.getItem("roleName") === "Admin";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -431,21 +433,23 @@ const UserProfile = () => {
                       {profileData.firstName} {profileData.lastName}
                     </Typography>
                     {!isOwnProfile &&
-                      (isFollowing ? (
-                        <FollowButton
-                          variant="contained"
-                          onClick={handleUnfollowUser}
-                        >
-                          Unfollow
-                        </FollowButton>
-                      ) : (
-                        <FollowButton
-                          variant="contained"
-                          onClick={handleFollowUser}
-                        >
-                          Follow
-                        </FollowButton>
-                      ))}
+                      (userLogged ? (
+                        isFollowing ? (
+                          <FollowButton
+                            variant="contained"
+                            onClick={handleUnfollowUser}
+                          >
+                            Unfollow
+                          </FollowButton>
+                        ) : (
+                          <FollowButton
+                            variant="contained"
+                            onClick={handleFollowUser}
+                          >
+                            Follow
+                          </FollowButton>
+                        )
+                      ) : null)}
                   </Box>
                   <Typography
                     variant="body2"
@@ -471,44 +475,48 @@ const UserProfile = () => {
                     </Typography>
                   </Box>
                 </Box>
-                <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
-                  <IconButton
-                    aria-label="more"
-                    id="menuButton"
-                    aria-controls={open ? "menu" : undefined}
-                    aria-expanded={open ? "true" : undefined}
-                    aria-haspopup="true"
-                    onClick={handleClick}
-                  >
-                    <MoreVertIcon sx={{ fontSize: "30px" }} />
-                  </IconButton>
-                  <Menu
-                    id="menu"
-                    MenuListProps={{
-                      "aria-labelledby": "menuButton",
-                    }}
-                    anchorEl={anchorEl}
-                    anchorOrigin={{
-                      vertical: "top",
-                      horizontal: "left",
-                    }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
-                    }}
-                    open={open}
-                    onClose={handleClose}
-                  >
-                    {isOwnProfile ? (
-                      <MenuItem key="Edit" onClick={handleEditProfile}>
-                        Edit Profile
-                      </MenuItem>
-                    ) : null}
-                    <MenuItem key="Ban" onClick={handleClose}>
-                      Ban
-                    </MenuItem>
-                  </Menu>
-                </Box>
+                {(isOwnProfile || isAdmin) && (
+                  <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
+                    <IconButton
+                      aria-label="more"
+                      id="menuButton"
+                      aria-controls={open ? "menu" : undefined}
+                      aria-expanded={open ? "true" : undefined}
+                      aria-haspopup="true"
+                      onClick={handleClick}
+                    >
+                      <MoreVertIcon sx={{ fontSize: "30px" }} />
+                    </IconButton>
+                    <Menu
+                      id="menu"
+                      MenuListProps={{
+                        "aria-labelledby": "menuButton",
+                      }}
+                      anchorEl={anchorEl}
+                      anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "left",
+                      }}
+                      transformOrigin={{
+                        vertical: "top",
+                        horizontal: "right",
+                      }}
+                      open={open}
+                      onClose={handleClose}
+                    >
+                      {isOwnProfile ? (
+                        <MenuItem key="Edit" onClick={handleEditProfile}>
+                          Edit Profile
+                        </MenuItem>
+                      ) : null}
+                      {isAdmin ? (
+                        <MenuItem key="Ban" onClick={handleClose}>
+                          Ban
+                        </MenuItem>
+                      ) : null}
+                    </Menu>
+                  </Box>
+                )}
               </Box>
 
               {/* Profile Info */}

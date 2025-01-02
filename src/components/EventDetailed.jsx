@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -8,18 +8,22 @@ import {
   List,
   ListItem,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ParticipantsListPopup from "./ParticipantsListPopup";
 import axios from "axios";
 import { format, parseISO } from "date-fns";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 export default function EventDetailed({ eventId }) {
   const [participantsPopupOpen, setParticipantsPopupOpen] =
     React.useState(false);
-  const [event, setEvent] = React.useState(null);
+  const [eventData, setEventData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
@@ -36,8 +40,14 @@ export default function EventDetailed({ eventId }) {
 
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
-
-  const navigate = useNavigate();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
+  const [loggedInUserData, setLoggedInUserData] = useState(
+    localStorage.getItem("userData")
+      ? JSON.parse(localStorage.getItem("userData"))
+      : null
+  );
+  const isOwnEvent = eventData?.creatorId === loggedInUserData?.userId;
 
   const handleParticipantsPopupOpen = () => {
     setParticipantsPopupOpen(true);
@@ -47,6 +57,92 @@ export default function EventDetailed({ eventId }) {
     setParticipantsPopupOpen(false);
   };
 
+  useEffect(() => {
+    const fetchLoggedInUserFollowing = async () => {
+      if (loggedInUserData?.userId) {
+        try {
+          const response = await axios.get(
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+          );
+          if (response.status === 200) {
+            setLoggedInUserFollowing(response.data.items);
+          }
+        } catch (error) {
+          console.error(
+            "Error fetching logged in user's following list: ",
+            error
+          );
+        }
+      }
+    };
+    fetchLoggedInUserFollowing();
+  }, [loggedInUserData?.userId]);
+
+  useEffect(() => {
+    if (eventData && loggedInUserFollowing) {
+      const isFollowing = loggedInUserFollowing.some(
+        (following) => following.userId === eventData.creatorId
+      );
+      setIsFollowing(isFollowing);
+    } else {
+      setIsFollowing(false);
+    }
+  }, [loggedInUserFollowing, eventData?.creatorId]);
+
+  const handleFollowUser = async () => {
+    try {
+      const response = await axios.post(
+        `/api/v1/users/follow?targetUserId=${eventData.creatorId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(true);
+        setLoggedInUserFollowing((prev) => [
+          ...prev,
+          { userId: eventData.creatorId },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to follow the user."
+      );
+    }
+  };
+
+  const handleUnfollowUser = async () => {
+    try {
+      const response = await axios.delete(
+        `/api/v1/users/unfollow?targetUserId=${eventData.creatorId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(false);
+        setLoggedInUserFollowing((prev) =>
+          prev.filter((following) => following.userId !== eventData.creatorId)
+        );
+      }
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to unfollow the user."
+      );
+    }
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   React.useEffect(() => {
     const fetchEventData = async () => {
       setLoading(true);
@@ -54,7 +150,7 @@ export default function EventDetailed({ eventId }) {
       try {
         const response = await axios.get(`/api/v1/events/${eventId}`);
         if (response.data) {
-          setEvent(response.data);
+          setEventData(response.data);
         }
       } catch (err) {
         console.error("Error fetching event data:", err);
@@ -71,10 +167,10 @@ export default function EventDetailed({ eventId }) {
 
   React.useEffect(() => {
     const fetchProfilePicture = async () => {
-      if (event && event.creatorId) {
+      if (eventData && eventData.creatorId) {
         try {
           const response = await axios.get(
-            `/api/v1/users/${event.creatorId}/profile-picture`,
+            `/api/v1/users/${eventData.creatorId}/profile-picture`,
             { responseType: "blob" }
           );
           if (response.data) {
@@ -96,16 +192,16 @@ export default function EventDetailed({ eventId }) {
         URL.revokeObjectURL(profilePictureUrl);
       }
     };
-  }, [event]);
+  }, [eventData]);
 
   React.useEffect(() => {
     const fetchParticipants = async () => {
-      if (event && event.eventId) {
+      if (eventData && eventData.eventId) {
         setLoadingParticipants(true);
         setErrorParticipants(null);
         try {
           const response = await axios.get(
-            `/api/v1/events/${event.eventId}/participants`
+            `/api/v1/events/${eventData.eventId}/participants`
           );
           if (response.data && response.data.participations) {
             setParticipants(response.data.participations.items || []);
@@ -126,7 +222,7 @@ export default function EventDetailed({ eventId }) {
       }
     };
     fetchParticipants();
-  }, [event]);
+  }, [eventData]);
 
   React.useEffect(() => {
     const fetchProfilePictures = async () => {
@@ -203,13 +299,13 @@ export default function EventDetailed({ eventId }) {
   }, [followedParticipants]);
 
   React.useEffect(() => {
-    if (event && event.eventId && userLogged) {
+    if (eventData && eventData.eventId && userLogged) {
       const fetchIsParticipant = async () => {
         setLoadingIsParticipant(true);
         setErrorIsParticipant(null);
         try {
           const response = await axios.get(
-            `/api/v1/events/${event.eventId}/is-participant`
+            `/api/v1/events/${eventData.eventId}/is-participant`
           );
           setIsParticipant(response.data.isParticipant || false);
         } catch (err) {
@@ -223,7 +319,7 @@ export default function EventDetailed({ eventId }) {
       };
       fetchIsParticipant();
     }
-  }, [event, userLogged]);
+  }, [eventData, userLogged]);
 
   const handleJoinLeaveToggle = async () => {
     if (!userLogged) {
@@ -236,7 +332,7 @@ export default function EventDetailed({ eventId }) {
     setIsParticipant((prevIsParticipant) => !prevIsParticipant);
     try {
       await axios.post(
-        `/api/v1/events/${event.eventId}/toggle-event-attendance`
+        `/api/v1/events/${eventData.eventId}/toggle-event-attendance`
       );
     } catch (err) {
       console.error("Error toggling event attendance", err);
@@ -244,8 +340,8 @@ export default function EventDetailed({ eventId }) {
     }
   };
 
-  const formattedDate = event?.date
-    ? format(parseISO(event.date), "dd.MM.yyyy, HH:mm")
+  const formattedDate = eventData?.date
+    ? format(parseISO(eventData.date), "dd.MM.yyyy, HH:mm")
     : "N/A";
 
   return (
@@ -284,31 +380,87 @@ export default function EventDetailed({ eventId }) {
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "flex-start", 
+              alignItems: "flex-start",
               mb: 1,
               width: "100%",
             }}
           >
-            <Box sx={{ 
-              display: "flex", 
-              alignItems: "flex-start",
-              maxWidth: "100%" 
-            }}>
-              <Typography 
-                variant="h4" 
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "flex-start",
+                maxWidth: "100%",
+              }}
+            >
+              <Typography
+                variant="h4"
                 fontWeight="bold"
                 sx={{
                   overflowWrap: "break-word",
                   wordWrap: "break-word",
                   hyphens: "auto",
-                  maxWidth: "100%", 
-                  whiteSpace: "normal", 
+                  maxWidth: "100%",
+                  whiteSpace: "normal",
                   lineHeight: 1.2,
                 }}
               >
-                {event?.title || "Event Title"}
+                {eventData?.title || "Event Title"}
               </Typography>
             </Box>
+            {userLogged && (
+              <Box>
+                <IconButton
+                  aria-label="more"
+                  id="menuButton"
+                  aria-controls={open ? "menu" : undefined}
+                  aria-expanded={open ? "true" : undefined}
+                  aria-haspopup="true"
+                  onClick={handleClick}
+                >
+                  <MoreHorizIcon sx={{ fontSize: "30px" }} />
+                </IconButton>
+                <Menu
+                  id="menu"
+                  MenuListProps={{
+                    "aria-labelledby": "menuButton",
+                  }}
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "left",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={open}
+                  onClose={handleClose}
+                >
+                  {!isOwnEvent ? (
+                    <>
+                      {isFollowing ? (
+                        <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                          Unfollow Host
+                        </MenuItem>
+                      ) : (
+                        <MenuItem key="Follow" onClick={handleFollowUser}>
+                          Follow Host
+                        </MenuItem>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <MenuItem key="Edit" onClick={handleClose}>
+                        Edit Event
+                      </MenuItem>
+                      <MenuItem key="Delete" onClick={handleClose}>
+                        Delete Event
+                      </MenuItem>
+                    </>
+                  )}
+                </Menu>
+              </Box>
+            )}
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -353,10 +505,10 @@ export default function EventDetailed({ eventId }) {
               color="text.secondary"
               noWrap
             >
-              {event?.address?.street || ""},{" "}
-              {event?.address?.district?.name || ""},{" "}
-              {event?.address?.district?.city?.name || ""},{" "}
-              {event?.address?.district?.city?.country?.name || ""}
+              {eventData?.address?.street || ""},{" "}
+              {eventData?.address?.district?.name || ""},{" "}
+              {eventData?.address?.district?.city?.name || ""},{" "}
+              {eventData?.address?.district?.city?.country?.name || ""}
             </Typography>
           </Box>
 
@@ -371,7 +523,7 @@ export default function EventDetailed({ eventId }) {
               Host:
             </Typography>
             <Link
-              to={`/profile?id=${event?.creatorId}`}
+              to={`/profile?id=${eventData?.creatorId}`}
               style={{
                 textDecoration: "none",
                 color: "inherit",
@@ -385,7 +537,7 @@ export default function EventDetailed({ eventId }) {
                 onError={() => setProfilePictureUrl(null)}
               />
               <Typography variant="body1" component="div" noWrap>
-                <b>{event?.creatorUserName}</b>
+                <b>{eventData?.creatorUserName}</b>
               </Typography>
             </Link>
           </Box>
@@ -409,10 +561,10 @@ export default function EventDetailed({ eventId }) {
               overflowWrap: "break-word",
             }}
           >
-            {event?.bodyText}
+            {eventData?.bodyText}
           </Typography>
 
-          {event?.requirements && event.requirements.length > 0 && (
+          {eventData?.requirements && eventData.requirements.length > 0 && (
             <Box
               sx={{
                 mb: 2,
@@ -434,7 +586,7 @@ export default function EventDetailed({ eventId }) {
                   "& .MuiListItem-root": { display: "list-item", pl: 0, mb: 0 },
                 }}
               >
-                {event.requirements.map((req) => (
+                {eventData.requirements.map((req) => (
                   <ListItem key={req.id}>
                     <b>{req.name}:</b> {req.description}
                   </ListItem>

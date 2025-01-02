@@ -275,7 +275,7 @@ export default function CommentSection({ type, contentId }) {
         backgroundColor: "#EAEAEA",
         px: 3,
         py: 2,
-        borderRadius: "0 0 15px 15px",
+        borderRadius: "0 0 20px 20px",
         boxShadow: 3,
       }}
     >
@@ -286,7 +286,6 @@ export default function CommentSection({ type, contentId }) {
           alignItems: "center",
           mb: 0.5,
           mr: 2.5,
-          pb: 1.6,
         }}
       >
         <Box
@@ -306,9 +305,10 @@ export default function CommentSection({ type, contentId }) {
           ) : (
             <Box
               sx={{
-                width: 50,
-                height: 50,
+                width: 60,
+                height: 60,
                 borderRadius: "50%",
+                marginRight: 0.5,
                 backgroundColor: "#A5E072",
                 display: "flex",
                 alignItems: "center",
@@ -316,7 +316,7 @@ export default function CommentSection({ type, contentId }) {
                 color: "#fff",
                 fontSize: "1.2rem",
                 fontWeight: "bold",
-                marginRight: 0.5,
+                flexShrink: 0,
               }}
             >
               {userInitials}
@@ -324,9 +324,7 @@ export default function CommentSection({ type, contentId }) {
           )}
           <Box
             sx={{
-              position: "relative",
               display: "flex",
-              alignItems: "flex-start",
               flexDirection: "column",
               width: "100%",
             }}
@@ -335,7 +333,7 @@ export default function CommentSection({ type, contentId }) {
               variant="body1"
               fontWeight="bold"
               noWrap
-              sx={{ mb: 0, ml: 1.6, position: "relative", top: 10 }}
+              sx={{ mb: 0, ml: 1.8 }}
             >
               {userName || "User Name"}
             </Typography>
@@ -361,6 +359,8 @@ export default function CommentSection({ type, contentId }) {
                     fontSize: "18px",
                   },
                 },
+                position: "relative",
+                top: -12
               }}
             />
             <Box
@@ -386,12 +386,17 @@ export default function CommentSection({ type, contentId }) {
                   style={{
                     borderRadius: 30,
                     textTransform: "none",
-                    marginLeft: 11,
+                    marginLeft: 15,
                     padding: 0,
+                    top: -20
                   }}
                 >
                   <AddPhotoAlternateOutlinedIcon
-                    sx={{ fontSize: "25px", color: "#417D1E", position: "relative", top: -5 }}
+                    sx={{
+                      fontSize: "25px",
+                      color: "#417D1E",
+                      position: "relative",
+                    }}
                   />
                 </IconButton>
               </label>
@@ -420,15 +425,20 @@ export default function CommentSection({ type, contentId }) {
             </Box>
           </Box>
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center", ml: 5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", ml: 5, mb: 5 }}>
           <Button
             variant="contained"
-            style={{
+            sx={{
               backgroundColor: "#4B9023",
-              borderRadius: 30,
-              width: "90px",
-              height: "40px",
+              color: "#fff",
+              ":hover": {
+                backgroundColor: "#4B9023",
+              },
+              borderRadius: 20,
+              marginLeft: "auto",
               textTransform: "none",
+              height: "36px",
+              width: "80px",
             }}
             onClick={handleAddComment}
             disabled={loadingComment || !newComment.trim()}
@@ -449,10 +459,7 @@ export default function CommentSection({ type, contentId }) {
       <List>
         {comments.map((comment, index) => (
           <StyledCommentItem key={index} disableGutters>
-            <Comment
-              comment={comment}
-              type={type}
-            />
+            <Comment comment={comment} type={type} />
           </StyledCommentItem>
         ))}
       </List>

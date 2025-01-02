@@ -34,6 +34,7 @@ export default function RecommendedUsers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState({});
+  const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
   const loggedInUserData = JSON.parse(localStorage.getItem("userData"));
 
   const initializeData = async () => {
@@ -62,7 +63,7 @@ export default function RecommendedUsers() {
           if (
             !uniqueUserIds.includes(item.userId) &&
             uniqueUserIds.length < 4 &&
-            item.userId !== loggedInUserData?.userId && // Check if the user is not the logged in user
+            item.userId !== loggedInUserData?.userId &&
             !followingUsers.some(
               (following) => following.userId === item.userId
             )
@@ -204,16 +205,18 @@ export default function RecommendedUsers() {
                   </Typography>
                 </ListItemText>
               </Link>
-              <SharedButton
-                following={isFollowing[user.userId]}
-                onClick={() =>
-                  isFollowing[user.userId]
-                    ? handleUnfollow(user.userId)
-                    : handleFollow(user.userId)
-                }
-              >
-                {isFollowing[user.userId] ? "Unfollow" : "Follow"}
-              </SharedButton>
+              {userLogged && (
+                <SharedButton
+                  following={isFollowing[user.userId]}
+                  onClick={() =>
+                    isFollowing[user.userId]
+                      ? handleUnfollow(user.userId)
+                      : handleFollow(user.userId)
+                  }
+                >
+                  {isFollowing[user.userId] ? "Unfollow" : "Follow"}
+                </SharedButton>
+              )}
             </ListItem>
           ))}
         </List>

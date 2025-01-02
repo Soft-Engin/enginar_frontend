@@ -63,6 +63,8 @@ export default function UserMini({ user }) {
   const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
   const isOwnProfile =
     JSON.parse(localStorage.getItem("userData"))?.userId === user.userId;
+  const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
+  let isAdmin = localStorage.getItem("roleName") === "Admin";
 
   const profilePlaceholder = user?.firstName
     ? user.firstName.charAt(0).toUpperCase()
@@ -329,15 +331,20 @@ export default function UserMini({ user }) {
               </Typography>
             </Link>
             {!isOwnProfile &&
-              (isFollowing ? (
-                <FollowButton variant="contained" onClick={handleUnfollowUser}>
-                  Unfollow
-                </FollowButton>
-              ) : (
-                <FollowButton variant="contained" onClick={handleFollowUser}>
-                  Follow
-                </FollowButton>
-              ))}
+              (userLogged ? (
+                isFollowing ? (
+                  <FollowButton
+                    variant="contained"
+                    onClick={handleUnfollowUser}
+                  >
+                    Unfollow
+                  </FollowButton>
+                ) : (
+                  <FollowButton variant="contained" onClick={handleFollowUser}>
+                    Follow
+                  </FollowButton>
+                )
+              ) : null)}
           </Box>
           <Typography variant="body2" color="textSecondary" sx={{ ml: 0.2 }}>
             {user.userName}
@@ -359,39 +366,41 @@ export default function UserMini({ user }) {
             </Typography>
           </Box>
         </Box>
-        <Box sx={{ position: "absolute", right: -10 }}>
-          <IconButton
-            aria-label="more"
-            id="menuButton"
-            aria-controls={open ? "menu" : undefined}
-            aria-expanded={open ? "true" : undefined}
-            aria-haspopup="true"
-            onClick={handleClick}
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            id="menu"
-            MenuListProps={{
-              "aria-labelledby": "menuButton",
-            }}
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            open={open}
-            onClose={handleClose}
-          >
-            <MenuItem key="Ban" onClick={handleClose}>
-              Ban
-            </MenuItem>
-          </Menu>
-        </Box>
+        {userLogged && isAdmin && (
+          <Box sx={{ position: "absolute", right: -10 }}>
+            <IconButton
+              aria-label="more"
+              id="menuButton"
+              aria-controls={open ? "menu" : undefined}
+              aria-expanded={open ? "true" : undefined}
+              aria-haspopup="true"
+              onClick={handleClick}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="menu"
+              MenuListProps={{
+                "aria-labelledby": "menuButton",
+              }}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={open}
+              onClose={handleClose}
+            >
+              <MenuItem key="Ban" onClick={handleClose}>
+                Ban
+              </MenuItem>
+            </Menu>
+          </Box>
+        )}
       </Box>
       <FollowersListPopup
         open={followersPopupOpen}

@@ -63,7 +63,7 @@ export default function SearchedRecipes({ query }) {
           pageSize: pageSize,
           pageNumber: pageNumber,
           HeaderContains: query,
-          SortBy: "date",
+          SortBy: "createdAt",
         },
       });
       if (recipesResponse.data && recipesResponse.data.items) {

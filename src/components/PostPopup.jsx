@@ -31,6 +31,7 @@ export default function PostPopup(props) {
   // State for banner image URL
   const [bannerImage, setBannerImage] = useState("");
   const bannerImageInputRef = useRef(null);
+  const [newPost, setNewPost] = React.useState("");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -279,6 +280,8 @@ export default function PostPopup(props) {
                 autoFocus
                 fullWidth
                 multiline
+                value={newPost}
+                onChange={(e) => setNewPost(e.target.value)}
                 rows={4}
                 placeholder="Write something..."
                 variant="outlined"
@@ -371,6 +374,7 @@ export default function PostPopup(props) {
                     borderRadius: 20,
                     marginLeft: "auto",
                   }}
+                  disabled={!newPost.trim()}
                 >
                   Post
                 </Button>

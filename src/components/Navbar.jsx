@@ -225,6 +225,7 @@ export default function Navbar(props) {
   const [navbarTitlesIcons, setNavbarTitlesIcons] = useState(
     navbarTitlesIconsBase
   );
+  const [showSpeedDial, setShowSpeedDial] = useState(false);
   const getStoredInvertMode = () => {
     return localStorage.getItem("isInverted") === "true";
   };
@@ -261,6 +262,15 @@ export default function Navbar(props) {
   };
   const handleSpeedDialOpen = () => setSpeedDialOpen(true);
   const handleSpeedDialClose = () => setSpeedDialOpen(false);
+
+  useEffect(() => {
+    if (userLogged) {
+      setShowSpeedDial(true);
+    } else {
+      setShowSpeedDial(false);
+    }
+  }, [userLogged]);
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -272,8 +282,9 @@ export default function Navbar(props) {
     setUserLogged(false);
     localStorage.removeItem("userData");
     setUser(null);
-    navigate("/");
     setProfilePic(null);
+    navigate("/");
+    window.location.reload();
   };
   useEffect(() => {
     setNavbarTitlesIcons(
@@ -567,48 +578,50 @@ export default function Navbar(props) {
         <DrawerHeader />
         {props.body}
       </Box>
-      <ActionSpeedDial
-        ariaLabel="SpeedDial tooltip example"
-        icon={<SpeedDialIcon />}
-        onClose={handleSpeedDialClose}
-        onOpen={handleSpeedDialOpen}
-        open={speedDialOpen}
-        FabProps={{
-          sx: {
-            bgcolor: "#4B9023",
-            "&:hover": {
+      {showSpeedDial && (
+        <ActionSpeedDial
+          ariaLabel="SpeedDial tooltip example"
+          icon={<SpeedDialIcon />}
+          onClose={handleSpeedDialClose}
+          onOpen={handleSpeedDialOpen}
+          open={speedDialOpen}
+          FabProps={{
+            sx: {
               bgcolor: "#4B9023",
+              "&:hover": {
+                bgcolor: "#4B9023",
+              },
+              width: "50px",
+              height: "50px",
             },
-            width: "50px",
-            height: "50px",
-          },
-        }}
-      >
-        <SpeedDialAction
-          key={"Blog"}
-          icon={<PostAddIcon />}
-          tooltipTitle={"Blog"}
-          tooltipOpen
-          onClick={handlePostPopupOpen}
-          tooltipPlacement={isSmUp ? "right" : "left"}
-        />
-        <SpeedDialAction
-          key={"Event"}
-          icon={<GroupAddIcon />}
-          tooltipTitle={"Event"}
-          tooltipOpen
-          onClick={handleEventPopupOpen}
-          tooltipPlacement={isSmUp ? "right" : "left"}
-        />
-        <SpeedDialAction
-          key={"Recipe"}
-          icon={<RestaurantMenuIcon />}
-          tooltipTitle={"Recipe"}
-          tooltipOpen
-          onClick={() => navigate("/createRecipe")}
-          tooltipPlacement={isSmUp ? "right" : "left"}
-        />
-      </ActionSpeedDial>
+          }}
+        >
+          <SpeedDialAction
+            key={"Blog"}
+            icon={<PostAddIcon />}
+            tooltipTitle={"Blog"}
+            tooltipOpen
+            onClick={handlePostPopupOpen}
+            tooltipPlacement={isSmUp ? "right" : "left"}
+          />
+          <SpeedDialAction
+            key={"Event"}
+            icon={<GroupAddIcon />}
+            tooltipTitle={"Event"}
+            tooltipOpen
+            onClick={handleEventPopupOpen}
+            tooltipPlacement={isSmUp ? "right" : "left"}
+          />
+          <SpeedDialAction
+            key={"Recipe"}
+            icon={<RestaurantMenuIcon />}
+            tooltipTitle={"Recipe"}
+            tooltipOpen
+            onClick={() => navigate("/createRecipe")}
+            tooltipPlacement={isSmUp ? "right" : "left"}
+          />
+        </ActionSpeedDial>
+      )}
       <PostPopup open={postPopupOpen} handleClose={handlePostPopupClose} />
       <EventPopup open={eventPopupOpen} handleClose={handleEventPopupClose} />
     </Box>

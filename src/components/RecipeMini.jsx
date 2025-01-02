@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Typography, Box, Avatar, IconButton } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -40,11 +40,20 @@ export default function RecipeMini({ recipe }) {
   const [errorIsLiked, setErrorIsLiked] = React.useState(null);
   const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
   const [showBanner, setShowBanner] = React.useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+    const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
+    const [loggedInUserData, setLoggedInUserData] = useState(
+      localStorage.getItem("userData")
+        ? JSON.parse(localStorage.getItem("userData"))
+        : null
+    );
 
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
 
   const recipeId = recipe?.id || recipe?.recipeId; // Extract recipeId
+  const isOwnRecipe =
+    JSON.parse(localStorage.getItem("userData"))?.userId === recipe.userId;
 
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
@@ -233,6 +242,82 @@ export default function RecipeMini({ recipe }) {
     }
   };
 
+  useEffect(() => {
+    const fetchLoggedInUserFollowing = async () => {
+      if (loggedInUserData?.userId) {
+        try {
+          const response = await axios.get(
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+          );
+          if (response.status === 200) {
+            setLoggedInUserFollowing(response.data.items);
+          }
+        } catch (error) {
+          console.error(
+            "Error fetching logged in user's following list: ",
+            error
+          );
+        }
+      }
+    };
+    fetchLoggedInUserFollowing();
+  }, [loggedInUserData]);
+
+  useEffect(() => {
+    if (
+      loggedInUserData?.userId &&
+      recipe.userId !== loggedInUserData?.userId &&
+      loggedInUserFollowing
+    ) {
+      const isFollowing = loggedInUserFollowing.some(
+        (following) => following.userId === recipe.userId
+      );
+      setIsFollowing(isFollowing);
+    } else {
+      setIsFollowing(false);
+    }
+  }, [loggedInUserFollowing, recipe.userId, loggedInUserData]);
+
+  const handleFollowUser = async () => {
+    try {
+      const response = await axios.post(
+        `/api/v1/users/follow?targetUserId=${recipe.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(true);
+        setLoggedInUserFollowing((prev) => [...prev, { userId: recipe.userId }]);
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to follow the user."
+      );
+    }
+  };
+
+  const handleUnfollowUser = async () => {
+    try {
+      const response = await axios.delete(
+        `/api/v1/users/unfollow?targetUserId=${recipe.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(false);
+        setLoggedInUserFollowing((prev) =>
+          prev.filter((following) => following.userId !== recipe.userId)
+        );
+      }
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to unfollow the user."
+      );
+    }
+  };
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
@@ -297,43 +382,60 @@ export default function RecipeMini({ recipe }) {
               })}
           </Typography>
         </Box>
-        <IconButton
-          aria-label="more"
-          id="menuButton"
-          aria-controls={open ? "menu" : undefined}
-          aria-expanded={open ? "true" : undefined}
-          aria-haspopup="true"
-          onClick={handleClick}
-        >
-          <MoreHorizIcon sx={{ fontSize: "30px" }} />
-        </IconButton>
-        <Menu
-          id="menu"
-          MenuListProps={{
-            "aria-labelledby": "menuButton",
-          }}
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "left",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={open}
-          onClose={handleClose}
-        >
-          <MenuItem key="Follow" onClick={handleClose}>
-            Follow User
-          </MenuItem>
-          <MenuItem key="Edit" onClick={handleClose}>
-            Edit Recipe
-          </MenuItem>
-          <MenuItem key="Delete" onClick={handleClose}>
-            Delete Recipe
-          </MenuItem>
-        </Menu>
+        {userLogged && (
+          <Box>
+            <IconButton
+              aria-label="more"
+              id="menuButton"
+              aria-controls={open ? "menu" : undefined}
+              aria-expanded={open ? "true" : undefined}
+              aria-haspopup="true"
+              onClick={handleClick}
+            >
+              <MoreHorizIcon sx={{ fontSize: "30px" }} />
+            </IconButton>
+            <Menu
+              id="menu"
+              MenuListProps={{
+                "aria-labelledby": "menuButton",
+              }}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={open}
+              onClose={handleClose}
+            >
+              {!isOwnRecipe ? (
+                <>
+                  {isFollowing ? (
+                    <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                      Unfollow User
+                    </MenuItem>
+                  ) : (
+                    <MenuItem key="Follow" onClick={handleFollowUser}>
+                      Follow User
+                    </MenuItem>
+                  )}
+                </>
+              ) : (
+                <>
+                  <MenuItem key="Edit" onClick={handleClose}>
+                    Edit Recipe
+                  </MenuItem>
+                  <MenuItem key="Delete" onClick={handleClose}>
+                    Delete Recipe
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+          </Box>
+        )}
       </Box>
 
       <Box
