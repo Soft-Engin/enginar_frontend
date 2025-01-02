@@ -1,8 +1,7 @@
 #root {
   display: flex;
-  align-content: center;
   justify-content: center;
-  align-items: center;
   width: 100%;
+  background-color: #FFFCE5;
   height: 100%;
 }
