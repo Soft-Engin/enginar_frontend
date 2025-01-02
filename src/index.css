@@ -5,7 +5,7 @@ html {
 body {
   display: flex;
   place-items: center;
-  background-color: #FFFCE5;
+  background-color: #FFFCE5 !important;
   height: 100%;
 }
 
