@@ -5,13 +5,21 @@ import {
   Avatar,
   CircularProgress,
   IconButton,
+  Menu,
+  MenuItem,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
+import BookmarkBorderOutlinedIcon from "@mui/icons-material/Bookmark";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -29,6 +37,7 @@ const StyledCardMedia = styled("img")({
   display: "block",
   filter: "blur(2px)",
 });
+
 export default function RecipeDetailed({ recipeId }) {
   const navigate = useNavigate();
   const [recipe, setRecipe] = React.useState(null);
@@ -42,14 +51,42 @@ export default function RecipeDetailed({ recipeId }) {
   const [errorProfile, setErrorProfile] = React.useState(null);
   const [errorBanner, setErrorBanner] = React.useState(null);
   const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
+  const [errorDelete, setErrorDelete] = React.useState(null);
   const [stepImages, setStepImages] = React.useState({});
   const [isLiked, setIsLiked] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(0);
   const [commentCount, setCommentCount] = React.useState(0);
   const [isBookmarked, setIsBookmarked] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState("success");
+  const open = Boolean(anchorEl);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
+  const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
   const [showBanner, setShowBanner] = React.useState(false);
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+  const handleEditClick = () => {
+    navigate(`/createRecipe?id=${recipeId}`);
+    handleMenuClose();
+  };
+  const handleSnackbarClose = () => {
+    setOpenSnackbar(false);
+  };
+  const handleDialogOpen = () => {
+    setOpenDialog(true);
+  };
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
 
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
@@ -153,7 +190,7 @@ export default function RecipeDetailed({ recipeId }) {
               `/api/v1/recipes/${recipe.id}/steps/${i}/image`,
               { responseType: "blob" }
             );
-            if (response.data) {
+            if (response.data && response.data.size > 0) {
               const imageUrl = URL.createObjectURL(response.data);
               images[i] = imageUrl;
             } else {
@@ -259,6 +296,24 @@ export default function RecipeDetailed({ recipeId }) {
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     }
   };
+  const handleDelete = async () => {
+    setErrorDelete(null);
+    try {
+      await axios.delete(`/api/v1/recipes/${recipeId}`);
+      setSnackbarMessage("Recipe deleted successfully");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (err) {
+      console.error("Error deleting recipe:", err);
+      setErrorDelete(err.message || "An unexpected error occurred.");
+      setSnackbarMessage("Failed to delete the recipe");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+    }
+  };
   if (loading) {
     return (
       <Box
@@ -306,6 +361,44 @@ export default function RecipeDetailed({ recipeId }) {
         boxShadow: 3,
       }}
     >
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure you want to delete this recipe?"}
+        </DialogTitle>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              handleDelete();
+              handleDialogClose();
+            }}
+            color="error"
+            autoFocus
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Box
         sx={{
           display: "flex",
@@ -348,7 +441,56 @@ export default function RecipeDetailed({ recipeId }) {
             </Box>
           </Link>
         </Box>
-        <MoreHorizIcon sx={{ fontSize: "40px" }} />
+        <Box>
+          {userId === recipe.userId && (
+            <>
+              <IconButton onClick={handleMenuClick}>
+                <MoreHorizIcon sx={{ fontSize: "40px" }} />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleMenuClose}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                    mt: 1.5,
+                    "& .MuiAvatar-root": {
+                      width: 32,
+                      height: 32,
+                      ml: -0.5,
+                      mr: 1,
+                    },
+                    "&:before": {
+                      content: '""',
+                      display: "block",
+                      position: "absolute",
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: "background.paper",
+                      transform: "translateY(-50%) rotate(45deg)",
+                      zIndex: 0,
+                    },
+                  },
+                }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+              >
+                <MenuItem onClick={handleEditClick}>Edit Recipe</MenuItem>
+                <MenuItem onClick={handleDialogOpen} sx={{ color: "red" }}>
+                  Delete Recipe
+                </MenuItem>
+              </Menu>
+            </>
+          )}
+          {userId !== recipe.userId && (
+            <MoreHorizIcon sx={{ fontSize: "40px" }} />
+          )}
+        </Box>
       </Box>
       {
         <Box
@@ -502,9 +644,20 @@ export default function RecipeDetailed({ recipeId }) {
         }}
       >
         {recipe.steps.map((step, index) => (
-          <ListItem key={index}>
+          <ListItem
+            key={index}
+            sx={{
+              flexDirection: "column",
+              alignItems: "flex-start",
+              paddingBottom: 2,
+            }}
+          >
             <Typography
-              sx={{ wordWrap: "break-word", overflowWrap: "break-word" }}
+              sx={{
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                marginBottom: 1,
+              }}
             >
               {step}
             </Typography>
@@ -513,8 +666,7 @@ export default function RecipeDetailed({ recipeId }) {
                 sx={{
                   display: "flex",
                   justifyContent: "flex-start",
-                  mb: 1,
-                  mt: 1,
+                  paddingBottom: 1,
                 }}
               >
                 <img
