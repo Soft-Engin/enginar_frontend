@@ -6,12 +6,19 @@ import {
   ImageList,
   ImageListItem,
   CircularProgress,
+  IconButton,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import axios from "axios";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 
-export default function Comment({ comment, commentImage }) {
+export default function Comment({ comment, type, onDelete }) {
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
   const [userInitials, setUserInitials] = React.useState("");
   const [loadingProfile, setLoadingProfile] = React.useState(true);
@@ -19,6 +26,11 @@ export default function Comment({ comment, commentImage }) {
   const [commentImages, setCommentImages] = React.useState([]);
   const [loadingImages, setLoadingImages] = React.useState(true);
   const [errorImages, setErrorImages] = React.useState(null);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openMenu = Boolean(anchorEl);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
+  const isCommentOwner = userId === comment.userId;
 
   React.useEffect(() => {
     if (comment && comment.userId) {
@@ -71,7 +83,7 @@ export default function Comment({ comment, commentImage }) {
     };
   }, [comment]);
   React.useEffect(() => {
-    if (comment && comment.id) {
+    if (comment && comment.id && type) {
       const fetchCommentImages = async () => {
         setLoadingImages(true);
         setErrorImages(null);
@@ -79,7 +91,7 @@ export default function Comment({ comment, commentImage }) {
         for (let i = 0; i < comment.imagesCount; i++) {
           try {
             const response = await axios.get(
-              `/api/v1/comments/${comment.id}/images/${i}`,
+              `/api/v1/${type}s/comments/${comment.id}/images/${i}`,
               { responseType: "blob" }
             );
             if (response.data) {
@@ -108,8 +120,34 @@ export default function Comment({ comment, commentImage }) {
         }
       }
     };
-  }, [comment]);
+  }, [comment, type]);
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+  const handleDeleteClick = () => {
+    setOpenDialog(true);
+    handleMenuClose();
+  };
+
+  const handleCancelDelete = () => {
+    setOpenDialog(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    setOpenDialog(false);
+    try {
+      await axios.delete(`/api/v1/${type}${type !== "event" ? "s" : ""}/comments/${comment.id}`);
+      // Refresh the page
+      window.location.reload();
+    } catch (error) {
+      console.log("Error deleting comment", error);
+    }
+  };
   return (
     <Box
       sx={{
@@ -120,7 +158,13 @@ export default function Comment({ comment, commentImage }) {
         pt: 2.2,
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          position: "relative",
+        }}
+      >
         <Box sx={{ display: "flex", pb: 1.2 }}>
           {profilePictureUrl ? (
             <Avatar
@@ -158,12 +202,7 @@ export default function Comment({ comment, commentImage }) {
                 <Typography color="error">Error: {errorProfile}</Typography>
               </Box>
             )}
-            <Typography variant="body2" color="text.secondary">
-              {comment.timestamp &&
-                formatDistanceToNow(parseISO(comment.timestamp), {
-                  addSuffix: true,
-                })}
-            </Typography>
+
             {loadingImages ? (
               <Box display="flex" justifyContent="center" my={2}>
                 <CircularProgress size={20} />
@@ -188,11 +227,48 @@ export default function Comment({ comment, commentImage }) {
                 ))}
               </ImageList>
             ) : null}
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ marginTop: 1 }}
+            >
+              {comment.timestamp &&
+                formatDistanceToNow(parseISO(comment.timestamp), {
+                  addSuffix: true,
+                })}
+            </Typography>
           </Box>
         </Box>
-        <Box sx={{ display: "flex", ml: 4 }}>
-          <MoreHorizIcon sx={{ fontSize: "30px" }} />
-        </Box>
+        {isCommentOwner && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              display: "flex",
+              alignItems: "flex-start",
+            }}
+          >
+            <IconButton onClick={handleMenuOpen} sx={{ padding: 0 }}>
+              <MoreHorizIcon sx={{ fontSize: "30px" }} />
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
+              <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
+            </Menu>
+          </Box>
+        )}
+
+        <Dialog open={openDialog} onClose={handleCancelDelete}>
+          <DialogTitle>
+            {"Are you sure you want to delete this comment?"}
+          </DialogTitle>
+          <DialogActions>
+            <Button onClick={handleCancelDelete}>Cancel</Button>
+            <Button onClick={handleConfirmDelete} autoFocus>
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Box>
   );
