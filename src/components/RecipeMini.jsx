@@ -337,6 +337,7 @@ export default function RecipeMini({ recipe }) {
     <Box
       sx={{
         maxWidth: 700,
+        width: "100%",
         outline: "1.5px solid #C0C0C0",
         backgroundColor: "#FFFFFF",
         pl: 3,
@@ -345,6 +346,9 @@ export default function RecipeMini({ recipe }) {
         pb: 1.5,
         borderRadius: 5,
         boxShadow: 5,
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
       }}
     >
       <Box
@@ -467,46 +471,63 @@ export default function RecipeMini({ recipe }) {
 
       <Box
         onClick={() => navigate(`/recipe?id=${recipeId}`)}
-        sx={{ cursor: "pointer" }}
+        sx={{
+          cursor: "pointer",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          flexGrow: 1,
+        }}
       >
-        <Typography
-          variant="h5"
-          fontWeight="bold"
-          sx={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            mb: 1,
-          }}
-        >
-          {recipe.header}
-        </Typography>
+        <Box>
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              mb: 1,
+            }}
+          >
+            {recipe.header}
+          </Typography>
 
-        <Typography
-          variant="body2"
-          sx={{
-            display: "-webkit-box",
-            WebkitBoxOrient: "vertical",
-            WebkitLineClamp: 3,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            lineHeight: "24px",
-            mb: 2,
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
-          }}
-        >
-          {recipe.bodyText}
-        </Typography>
-        <Box sx={{ mb: 0.5 }}>
-          {showBanner && bannerUrl && !loading && (
+          <Typography
+            variant="body2"
+            sx={{
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 3,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              mb: 2,
+              lineHeight: "24px",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            {recipe.bodyText}
+          </Typography>
+        </Box>
+
+        {showBanner && bannerUrl && !loading && (
+          <Box
+            sx={{
+              mb: 1,
+              flexShrink: 0,
+              display: "flex",
+              justifyContent: "center", // Center the image horizontally
+            }}
+          >
             <StyledCardMedia
               src={bannerUrl}
               alt="Recipe Banner"
               onError={() => setBannerUrl(null)}
             />
-          )}
-        </Box>
+          </Box>
+        )}
+
         {error && (
           <Box display="flex" justifyContent="center" my={2}>
             {error !== null && (
@@ -521,6 +542,7 @@ export default function RecipeMini({ recipe }) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          marginTop: "auto",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
