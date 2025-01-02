@@ -405,7 +405,7 @@ export default function UserMini({ user }) {
             </Typography>
           </Box>
         </Box>
-        {userLogged && isAdmin && (
+        {userLogged && isAdmin && !isOwnProfile && (
           <Box sx={{ position: "absolute", right: -10 }}>
             <IconButton
               aria-label="more"

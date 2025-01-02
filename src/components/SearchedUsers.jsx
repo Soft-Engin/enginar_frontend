@@ -108,7 +108,6 @@ export default function SearchedUsers({ query }) {
             pageSize: pageSize,
             pageNumber: 1,
             UserNameContains: query,
-            First_LastNameContains: query,
           },
         });
         setUsers(response.data.items);

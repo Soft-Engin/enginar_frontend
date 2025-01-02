@@ -547,8 +547,7 @@ const UserProfile = () => {
                         <MenuItem key="Edit" onClick={handleEditProfile}>
                           Edit Profile
                         </MenuItem>
-                      ) : null}
-                      {isAdmin ? (
+                      ) : isAdmin ? (
                         <MenuItem key="Ban" onClick={handleBanOpen}>
                           Ban
                         </MenuItem>
