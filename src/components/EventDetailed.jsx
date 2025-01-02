@@ -390,18 +390,51 @@ export default function EventDetailed({ eventId }) {
       handleCloseDeleteDialog();
     };
     return (
-      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog} 
+      PaperProps={{
+        sx: {
+          width: { xs: 250, sm: 400 },
+          borderRadius: 4,
+          backgroundColor: "#C8EFA5",
+          padding: 0.5,
+        },
+      }}>
+        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete this event?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteDialog} color="primary">
+          <Button onClick={handleCloseDeleteDialog}
+          sx={{
+            backgroundColor: "#C8EFA5",
+            color: "black",
+            ":hover": {
+              backgroundColor: "#C8EFA5",
+            },
+            borderRadius: 20,
+            marginTop: 2,
+            display: "block",
+            marginLeft: "auto",
+          }}>
             Cancel
           </Button>
-          <Button onClick={confirmDelete} color="error">
-            Delete
-          </Button>
+          <Button onClick={confirmDelete} 
+              variant="contained"
+              sx={{
+                backgroundColor: "#cc0000",
+                color: "error",
+                ":hover": {
+                  backgroundColor: "#cc0000",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+                fontWeight: "bold",
+              }}
+            >
+              Delete
+            </Button>
         </DialogActions>
       </Dialog>
     );
