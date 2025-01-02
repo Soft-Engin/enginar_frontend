@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -15,8 +15,10 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const StyledCardMedia = styled("img")({
   width: "100%",
@@ -28,7 +30,6 @@ const StyledCardMedia = styled("img")({
 });
 
 export default function BlogDetailed({ blogId }) {
-  const navigate = useNavigate();
   const [blogData, setBlogData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [loadingProfile, setLoadingProfile] = React.useState(true);
@@ -45,7 +46,102 @@ export default function BlogDetailed({ blogId }) {
   const [commentCount, setCommentCount] = React.useState(0);
   const [isBookmarked, setIsBookmarked] = React.useState(false);
   let authButtonId = "loginButton";
+
   let userLogged = localStorage.getItem("userLogged") === "true";
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
+  const [loggedInUserData, setLoggedInUserData] = useState(
+    localStorage.getItem("userData")
+      ? JSON.parse(localStorage.getItem("userData"))
+      : null
+  );
+  const isOwnBlog = blogData?.userId === loggedInUserData?.userId;
+
+  useEffect(() => {
+    const fetchLoggedInUserFollowing = async () => {
+      if (loggedInUserData?.userId) {
+        try {
+          const response = await axios.get(
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+          );
+          if (response.status === 200) {
+            setLoggedInUserFollowing(response.data.items);
+          }
+        } catch (error) {
+          console.error(
+            "Error fetching logged in user's following list: ",
+            error
+          );
+        }
+      }
+    };
+    fetchLoggedInUserFollowing();
+  }, [loggedInUserData?.userId]);
+
+  useEffect(() => {
+    if (blogData && loggedInUserFollowing) {
+      const isFollowing = loggedInUserFollowing.some(
+        (following) => following.userId === blogData.userId
+      );
+      setIsFollowing(isFollowing);
+    } else {
+      setIsFollowing(false);
+    }
+  }, [loggedInUserFollowing, blogData?.userId]);
+
+  const handleFollowUser = async () => {
+    try {
+      const response = await axios.post(
+        `/api/v1/users/follow?targetUserId=${blogData.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(true);
+        setLoggedInUserFollowing((prev) => [
+          ...prev,
+          { userId: blogData.userId },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to follow the user."
+      );
+    }
+  };
+
+  const handleUnfollowUser = async () => {
+    try {
+      const response = await axios.delete(
+        `/api/v1/users/unfollow?targetUserId=${blogData.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(false);
+        setLoggedInUserFollowing((prev) =>
+          prev.filter((following) => following.userId !== blogData.userId)
+        );
+      }
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to unfollow the user."
+      );
+    }
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
@@ -71,6 +167,7 @@ export default function BlogDetailed({ blogId }) {
     };
     fetchBlog();
   }, [blogId]);
+
   React.useEffect(() => {
     if (blogData && blogData.userId) {
       const fetchProfilePicture = async () => {
@@ -102,6 +199,7 @@ export default function BlogDetailed({ blogId }) {
       }
     };
   }, [blogData]);
+
   React.useEffect(() => {
     if (blogData && blogData.id) {
       const fetchBanner = async () => {
@@ -133,6 +231,7 @@ export default function BlogDetailed({ blogId }) {
       }
     };
   }, [blogData]);
+
   React.useEffect(() => {
     if (blogData && blogData.id && userLogged) {
       const fetchIsLiked = async () => {
@@ -149,6 +248,7 @@ export default function BlogDetailed({ blogId }) {
       fetchIsLiked();
     }
   }, [blogData, userLogged]);
+
   React.useEffect(() => {
     if (blogData && blogData.id && userLogged) {
       const fetchIsBookmarked = async () => {
@@ -169,6 +269,7 @@ export default function BlogDetailed({ blogId }) {
       fetchIsBookmarked();
     }
   }, [blogData, userLogged]);
+
   const handleLikeToggle = async () => {
     if (!userLogged) {
       const authButton = document.getElementById(authButtonId);
@@ -195,6 +296,7 @@ export default function BlogDetailed({ blogId }) {
       }
     }
   };
+
   const handleBookmarkToggle = async () => {
     if (!userLogged) {
       const authButton = document.getElementById(authButtonId);
@@ -303,7 +405,60 @@ export default function BlogDetailed({ blogId }) {
             </Box>
           </Link>
         </Box>
-        <MoreHorizIcon sx={{ fontSize: "40px" }} />
+        {userLogged && (
+          <Box>
+            <IconButton
+              aria-label="more"
+              id="menuButton"
+              aria-controls={open ? "menu" : undefined}
+              aria-expanded={open ? "true" : undefined}
+              aria-haspopup="true"
+              onClick={handleClick}
+            >
+              <MoreHorizIcon sx={{ fontSize: "30px" }} />
+            </IconButton>
+            <Menu
+              id="menu"
+              MenuListProps={{
+                "aria-labelledby": "menuButton",
+              }}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={open}
+              onClose={handleClose}
+            >
+              {!isOwnBlog ? (
+                <>
+                  {isFollowing ? (
+                    <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                      Unfollow User
+                    </MenuItem>
+                  ) : (
+                    <MenuItem key="Follow" onClick={handleFollowUser}>
+                      Follow User
+                    </MenuItem>
+                  )}
+                </>
+              ) : (
+                <>
+                  <MenuItem key="Edit" onClick={handleClose}>
+                    Edit Blog
+                  </MenuItem>
+                  <MenuItem key="Delete" onClick={handleClose}>
+                    Delete Blog
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+          </Box>
+        )}
       </Box>
       <Typography
         variant="body1"

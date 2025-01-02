@@ -63,7 +63,7 @@ export default function SearchedBlogs({ query }) {
           pageSize: pageSize,
           pageNumber: pageNumber,
           BodyContains: query,
-          SortBy: "date",
+          SortBy: "createdAt",
         },
       });
       if (blogsResponse.data && blogsResponse.data.items) {
