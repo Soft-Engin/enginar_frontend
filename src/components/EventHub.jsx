@@ -1,7 +1,6 @@
 import * as React from "react";
 import EventMini from "./EventMini";
 import Grid from "@mui/material/Grid2";
-import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { LoadingErrorDisplay } from "./LoadingErrorDisplay";
 import {
@@ -10,7 +9,6 @@ import {
   Select,
   MenuItem,
   Chip,
-  Button,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";

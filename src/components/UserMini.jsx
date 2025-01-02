@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import FollowersListPopup from "./FollowersListPopup";
 import FollowingListPopup from "./FollowingListPopup";
@@ -44,7 +44,6 @@ export default function UserMini({ user }) {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [value, setValue] = React.useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loggedInUserData, setLoggedInUserData] = useState(
     localStorage.getItem("userData")
@@ -276,7 +275,7 @@ export default function UserMini({ user }) {
         sx={{
           height: 170,
           background: `url(${bannerPic || bannerPlaceholder}) no-repeat center`,
-          bgcolor: "#bbbbbb",
+          bgcolor: "#A5E072",
           backgroundSize: "cover",
           boxShadow: 2,
           borderRadius: "12px 12px 0 0",
@@ -298,8 +297,9 @@ export default function UserMini({ user }) {
             position: "absolute",
             top: -65,
             left: 5,
-            bgcolor: profilePic ? "transparent" : "#bdbdbd",
+            bgcolor: profilePic ? "transparent" : "#A5E072",
             boxShadow: 2,
+            fontSize: "3rem",
           }}
         >
           {!profilePic && profilePlaceholder}

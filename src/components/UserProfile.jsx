@@ -132,7 +132,7 @@ const UserProfile = () => {
             setProfilePic(null);
           }
         } catch (error) {
-          console.error("error fetching profile pic", error);
+          console.error("Error fetching profile pic: ", error);
           setProfilePic(null);
         }
         try {
@@ -149,7 +149,7 @@ const UserProfile = () => {
             setBannerPic(null);
           }
         } catch (error) {
-          console.error("error fetching profile pic", error);
+          console.error("Error fetching profile pic: ", error);
           setBannerPic(null);
         }
       } catch (err) {
@@ -195,7 +195,7 @@ const UserProfile = () => {
           }
         } catch (error) {
           console.error(
-            "error fetching logged in user's following list: ",
+            "Error fetching logged in user's following list: ",
             error
           );
         }
@@ -230,7 +230,7 @@ const UserProfile = () => {
         setLoggedInUserFollowing((prev) => [...prev, { userId }]);
       }
     } catch (error) {
-      console.error("Error follow user:", error);
+      console.error("Error following user:", error);
       setError(
         error.response?.data?.message ||
           error.message ||
@@ -252,7 +252,7 @@ const UserProfile = () => {
         );
       }
     } catch (error) {
-      console.error("Error unfollow user:", error);
+      console.error("Error unfollowing user:", error);
       setError(
         error.response?.data?.message ||
           error.message ||
@@ -382,7 +382,7 @@ const UserProfile = () => {
                 background: `url(${
                   bannerPic || bannerPlaceholder
                 }) no-repeat center`,
-                bgcolor: "#bbbbbb",
+                bgcolor: "#A5E072",
                 backgroundSize: "cover",
                 boxShadow: 2,
               }}
@@ -405,8 +405,9 @@ const UserProfile = () => {
                     position: "absolute",
                     top: -90,
                     left: 0,
-                    bgcolor: profilePic ? "transparent" : "#bdbdbd",
+                    bgcolor: profilePic ? "transparent" : "#A5E072",
                     boxShadow: 2,
+                    fontSize: "3rem",
                   }}
                 >
                   {!profilePic && profilePlaceholder}
