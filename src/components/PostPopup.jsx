@@ -26,12 +26,31 @@ export default function PostPopup(props) {
   const [userAvatar, setUserAvatar] = useState(null);
   const [userName, setUserName] = useState("");
   const [userInitials, setUserInitials] = useState("");
+  const [newPost, setNewPost] = useState(props.blogData?.bodyText || "");
   const fileInputRef = useRef(null);
   const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
   // State for banner image URL
-  const [bannerImage, setBannerImage] = useState("");
+  const [bannerImage, setBannerImage] = useState(null);
+  const [bannerImageUrl, setBannerImageUrl] = useState(null);
   const bannerImageInputRef = useRef(null);
-  const [newPost, setNewPost] = React.useState("");
+
+  useEffect(() => {
+    if (props.bannerUrl) {
+      setBannerImageUrl(props.bannerUrl);
+    }
+    if (props.bannerImage) {
+      setBannerImage(props.bannerImage);
+      setBase64Image(props.bannerImage);
+    }
+  }, [props.bannerImage, props.bannerUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (bannerImageUrl) {
+        URL.revokeObjectURL(bannerImageUrl);
+      }
+    };
+  }, [bannerImageUrl]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -81,6 +100,8 @@ export default function PostPopup(props) {
     setPreviewImage(null);
     setBase64Image(null);
     setBannerImage(null);
+    setNewPost(props.blogData?.bodyText || "");
+    setBannerImageUrl(null);
   };
 
   // Handle banner image upload
@@ -92,7 +113,9 @@ export default function PostPopup(props) {
       if (bannerImage) {
         setBannerImage(null);
         setBase64Image(null);
+        setBannerImageUrl(null);
       }
+
       if (file.type.startsWith("image/")) {
         const base64Image = await convertToBase64(file);
         setBannerImage(base64Image);
@@ -121,6 +144,7 @@ export default function PostPopup(props) {
     if (bannerImageInputRef.current) {
       bannerImageInputRef.current.value = "";
     }
+    setBannerImageUrl(null);
   };
 
   const handleSubmit = async (event) => {
@@ -131,21 +155,34 @@ export default function PostPopup(props) {
 
     const formData = new FormData(event.target);
     const bodyText = formData.get("bodyText");
+    let finalBannerImage = bannerImage;
+    if (props.isEditMode && !bannerImage && base64Image) {
+      finalBannerImage = base64Image;
+    }
+    const method = props.isEditMode ? "put" : "post";
+    const apiUrl = props.isEditMode
+      ? `/api/v1/blogs/${props.blogId}`
+      : "/api/v1/blogs";
 
     try {
-      const response = await axios.post(
-        "/api/v1/blogs",
-        {
+      const response = await axios({
+        method: method,
+        url: apiUrl,
+        data: {
           header: "kys",
           bodyText: bodyText,
-          bannerImage: bannerImage,
+          bannerImage: finalBannerImage,
         },
-        {}
-      );
-      if (response.status === 201) {
+      });
+      if (response.status === 201 || response.status === 200) {
         setSuccess(true);
-        navigate(`/blog?id=${response.data.id}`);
-        handleClose();
+        if (props.isEditMode) {
+          props.refreshBlogData();
+          handleClose();
+        } else {
+          navigate(`/blog?id=${response.data.id}`);
+          handleClose();
+        }
       } else {
         setError("Failed to create a post. Please try again later.");
       }
@@ -194,7 +231,7 @@ export default function PostPopup(props) {
             fontSize: "1.25rem",
           }}
         >
-          Create New Post
+          {props.isEditMode ? "Edit Post" : "Create New Post"}
           <IconButton
             onClick={handleClose}
             sx={{
@@ -207,7 +244,9 @@ export default function PostPopup(props) {
         <DialogContent>
           {success && (
             <Typography color={"success"} textAlign={"center"}>
-              Post created successfully!
+              {props.isEditMode
+                ? "Post edited successfully!"
+                : "Post created successfully!"}
             </Typography>
           )}
           {error && (
@@ -290,8 +329,7 @@ export default function PostPopup(props) {
                   borderRadius: 2,
                 }}
               />
-
-              {bannerImage && (
+              {(bannerImage || bannerImageUrl) && (
                 <Box
                   sx={{
                     mt: 2,
@@ -311,7 +349,9 @@ export default function PostPopup(props) {
                     }}
                   >
                     <img
-                      src={`data:image/png;base64,${bannerImage}`}
+                      src={
+                        bannerImageUrl || `data:image/png;base64,${bannerImage}`
+                      }
                       alt="Uploaded Preview"
                       style={{
                         width: "100%",
@@ -376,7 +416,7 @@ export default function PostPopup(props) {
                   }}
                   disabled={!newPost.trim()}
                 >
-                  Post
+                  {props.isEditMode ? "Update" : "Post"}
                 </Button>
               </Box>
             </>
