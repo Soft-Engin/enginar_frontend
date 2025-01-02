@@ -116,7 +116,7 @@ export default function AuthPopup(props) {
           props.setAnchorElUser(null);
           handleClose();
           navigate("/");
-          window.location.reload();
+          setTimeout(function(){window.location.reload();}, 500);
         }
       } else if (response.status === 400) {
         if (isSignup) {
