@@ -113,7 +113,7 @@ const UserProfile = () => {
   const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
   const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
   const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
-  let isAdmin = localStorage.getItem("roleName") === "Admin";
+  let isAdmin = loggedInUserData?.roleName === "Admin";
 
   useEffect(() => {
     const fetchUserData = async () => {

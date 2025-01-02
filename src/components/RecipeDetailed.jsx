@@ -103,7 +103,8 @@ export default function RecipeDetailed({ recipeId }) {
       ? JSON.parse(localStorage.getItem("userData"))
       : null
   );
-  const isOwnBlog = recipeData?.userId === loggedInUserData?.userId;
+  const isOwnRecipe = recipeData?.userId === loggedInUserData?.userId;
+  let isAdmin = loggedInUserData?.roleName === "Admin";
 
   useEffect(() => {
     const fetchLoggedInUserFollowing = async () => {
@@ -578,22 +579,47 @@ export default function RecipeDetailed({ recipeId }) {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
-                {!isOwnBlog ? (
+                {isAdmin || !isOwnRecipe ? (
                   <>
-                    {isFollowing ? (
-                      <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
-                        Unfollow User
-                      </MenuItem>
-                    ) : (
-                      <MenuItem key="Follow" onClick={handleFollowUser}>
-                        Follow User
-                      </MenuItem>
+                    {isAdmin && (
+                      <>
+                        <MenuItem key="Edit" onClick={handleEditClick}>
+                          Edit Recipe
+                        </MenuItem>
+                        <MenuItem
+                          key="Delete"
+                          onClick={handleDialogOpen}
+                          sx={{ color: "red" }}
+                        >
+                          Delete Recipe
+                        </MenuItem>
+                      </>
+                    )}
+
+                    {!isOwnRecipe && (
+                      <>
+                        {isFollowing ? (
+                          <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                            Unfollow User
+                          </MenuItem>
+                        ) : (
+                          <MenuItem key="Follow" onClick={handleFollowUser}>
+                            Follow User
+                          </MenuItem>
+                        )}
+                      </>
                     )}
                   </>
                 ) : (
                   <>
-                    <MenuItem onClick={handleEditClick}>Edit Recipe</MenuItem>
-                    <MenuItem onClick={handleDialogOpen} sx={{ color: "red" }}>
+                    <MenuItem key="Edit" onClick={handleEditClick}>
+                      Edit Recipe
+                    </MenuItem>
+                    <MenuItem
+                      key="Delete"
+                      onClick={handleDialogOpen}
+                      sx={{ color: "red" }}
+                    >
                       Delete Recipe
                     </MenuItem>
                   </>
@@ -813,7 +839,8 @@ export default function RecipeDetailed({ recipeId }) {
           sx={{ marginRight: 0.5 }}
           noWrap
         >
-          {recipeData.createdAt && format(parseISO(recipeData.createdAt), "h:mm a")}
+          {recipeData.createdAt &&
+            format(parseISO(recipeData.createdAt), "h:mm a")}
         </Typography>
         <Typography variant="body1" color="text.secondary" noWrap>
           {recipeData.createdAt &&

@@ -64,7 +64,7 @@ export default function UserMini({ user }) {
   const isOwnProfile =
     JSON.parse(localStorage.getItem("userData"))?.userId === user.userId;
   const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
-  let isAdmin = localStorage.getItem("roleName") === "Admin";
+  let isAdmin = loggedInUserData?.roleName === "Admin";
 
   const profilePlaceholder = user?.firstName
     ? user.firstName.charAt(0).toUpperCase()

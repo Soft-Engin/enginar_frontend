@@ -46,13 +46,14 @@ export default function BlogMini({ blog }) {
       ? JSON.parse(localStorage.getItem("userData"))
       : null
   );
-  
+
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
 
   const blogId = blog?.id || blog?.blogId; // Extract blogId
   const isOwnBlog =
     JSON.parse(localStorage.getItem("userData"))?.userId === blog.userId;
+  let isAdmin = loggedInUserData?.roleName === "Admin";
 
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
@@ -398,16 +399,35 @@ export default function BlogMini({ blog }) {
               open={open}
               onClose={handleClose}
             >
-              {!isOwnBlog ? (
+              {isAdmin || !isOwnBlog ? (
                 <>
-                  {isFollowing ? (
-                    <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
-                      Unfollow User
-                    </MenuItem>
-                  ) : (
-                    <MenuItem key="Follow" onClick={handleFollowUser}>
-                      Follow User
-                    </MenuItem>
+                  {isAdmin && (
+                    <>
+                      <MenuItem key="Edit" onClick={handleClose}>
+                        Edit Blog
+                      </MenuItem>
+                      <MenuItem
+                        key="Delete"
+                        onClick={handleClose}
+                        sx={{ color: "red" }}
+                      >
+                        Delete Blog
+                      </MenuItem>
+                    </>
+                  )}
+
+                  {!isOwnBlog && (
+                    <>
+                      {isFollowing ? (
+                        <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                          Unfollow User
+                        </MenuItem>
+                      ) : (
+                        <MenuItem key="Follow" onClick={handleFollowUser}>
+                          Follow User
+                        </MenuItem>
+                      )}
+                    </>
                   )}
                 </>
               ) : (
@@ -415,7 +435,11 @@ export default function BlogMini({ blog }) {
                   <MenuItem key="Edit" onClick={handleClose}>
                     Edit Blog
                   </MenuItem>
-                  <MenuItem key="Delete" onClick={handleClose}>
+                  <MenuItem
+                    key="Delete"
+                    onClick={handleClose}
+                    sx={{ color: "red" }}
+                  >
                     Delete Blog
                   </MenuItem>
                 </>

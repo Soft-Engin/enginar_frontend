@@ -41,15 +41,16 @@ export default function RecipeMini({ recipe }) {
   const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
   const [showBanner, setShowBanner] = React.useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
-    const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
-    const [loggedInUserData, setLoggedInUserData] = useState(
-      localStorage.getItem("userData")
-        ? JSON.parse(localStorage.getItem("userData"))
-        : null
-    );
+  const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
+  const [loggedInUserData, setLoggedInUserData] = useState(
+    localStorage.getItem("userData")
+      ? JSON.parse(localStorage.getItem("userData"))
+      : null
+  );
 
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
+  let isAdmin = loggedInUserData?.roleName === "Admin";
 
   const recipeId = recipe?.id || recipe?.recipeId; // Extract recipeId
   const isOwnRecipe =
@@ -285,7 +286,10 @@ export default function RecipeMini({ recipe }) {
       );
       if (response.status === 200) {
         setIsFollowing(true);
-        setLoggedInUserFollowing((prev) => [...prev, { userId: recipe.userId }]);
+        setLoggedInUserFollowing((prev) => [
+          ...prev,
+          { userId: recipe.userId },
+        ]);
       }
     } catch (error) {
       console.error("Error following user:", error);
@@ -411,16 +415,35 @@ export default function RecipeMini({ recipe }) {
               open={open}
               onClose={handleClose}
             >
-              {!isOwnRecipe ? (
+              {isAdmin || !isOwnRecipe ? (
                 <>
-                  {isFollowing ? (
-                    <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
-                      Unfollow User
-                    </MenuItem>
-                  ) : (
-                    <MenuItem key="Follow" onClick={handleFollowUser}>
-                      Follow User
-                    </MenuItem>
+                  {isAdmin && (
+                    <>
+                      <MenuItem key="Edit" onClick={handleClose}>
+                        Edit Recipe
+                      </MenuItem>
+                      <MenuItem
+                        key="Delete"
+                        onClick={handleClose}
+                        sx={{ color: "red" }}
+                      >
+                        Delete Recipe
+                      </MenuItem>
+                    </>
+                  )}
+
+                  {!isOwnRecipe && (
+                    <>
+                      {isFollowing ? (
+                        <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                          Unfollow User
+                        </MenuItem>
+                      ) : (
+                        <MenuItem key="Follow" onClick={handleFollowUser}>
+                          Follow User
+                        </MenuItem>
+                      )}
+                    </>
                   )}
                 </>
               ) : (
@@ -428,7 +451,11 @@ export default function RecipeMini({ recipe }) {
                   <MenuItem key="Edit" onClick={handleClose}>
                     Edit Recipe
                   </MenuItem>
-                  <MenuItem key="Delete" onClick={handleClose}>
+                  <MenuItem
+                    key="Delete"
+                    onClick={handleClose}
+                    sx={{ color: "red" }}
+                  >
                     Delete Recipe
                   </MenuItem>
                 </>

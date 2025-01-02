@@ -65,6 +65,7 @@ export default function BlogDetailed({ blogId }) {
       : null
   );
   const isOwnBlog = blogData?.userId === loggedInUserData?.userId;
+  let isAdmin = loggedInUserData?.roleName === "Admin";
 
   useEffect(() => {
     const fetchLoggedInUserFollowing = async () => {
@@ -499,16 +500,35 @@ export default function BlogDetailed({ blogId }) {
               open={open}
               onClose={handleClose}
             >
-              {!isOwnBlog ? (
+              {isAdmin || !isOwnBlog ? (
                 <>
-                  {isFollowing ? (
-                    <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
-                      Unfollow User
-                    </MenuItem>
-                  ) : (
-                    <MenuItem key="Follow" onClick={handleFollowUser}>
-                      Follow User
-                    </MenuItem>
+                  {isAdmin && (
+                    <>
+                      <MenuItem key="Edit" onClick={handleEditClick}>
+                        Edit Blog
+                      </MenuItem>
+                      <MenuItem
+                        key="Delete"
+                        onClick={handleDeleteClick}
+                        sx={{ color: "red" }}
+                      >
+                        Delete Blog
+                      </MenuItem>
+                    </>
+                  )}
+
+                  {!isOwnBlog && (
+                    <>
+                      {isFollowing ? (
+                        <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                          Unfollow User
+                        </MenuItem>
+                      ) : (
+                        <MenuItem key="Follow" onClick={handleFollowUser}>
+                          Follow User
+                        </MenuItem>
+                      )}
+                    </>
                   )}
                 </>
               ) : (
@@ -516,7 +536,11 @@ export default function BlogDetailed({ blogId }) {
                   <MenuItem key="Edit" onClick={handleEditClick}>
                     Edit Blog
                   </MenuItem>
-                  <MenuItem key="Delete" onClick={handleDeleteClick}>
+                  <MenuItem
+                    key="Delete"
+                    onClick={handleDeleteClick}
+                    sx={{ color: "red" }}
+                  >
                     Delete Blog
                   </MenuItem>
                 </>
