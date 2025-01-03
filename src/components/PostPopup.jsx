@@ -11,9 +11,9 @@ import LinkIcon from "@mui/icons-material/Link";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-import { Typography, CircularProgress } from "@mui/material";
-
+import { Typography, CircularProgress, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import RecipeSelectionDialog from "./RecipeSelectionDialog";
 
 export default function PostPopup(props) {
   const navigate = useNavigate();
@@ -29,10 +29,11 @@ export default function PostPopup(props) {
   const [newPost, setNewPost] = useState(props.blogData?.bodyText || "");
   const fileInputRef = useRef(null);
   const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
-  // State for banner image URL
   const [bannerImage, setBannerImage] = useState(null);
   const [bannerImageUrl, setBannerImageUrl] = useState(null);
   const bannerImageInputRef = useRef(null);
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   useEffect(() => {
     if (props.bannerUrl) {
@@ -92,6 +93,22 @@ export default function PostPopup(props) {
     fetchUserData();
   }, [userId]);
 
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      if (props.isEditMode && props.blogData?.recipeId) {
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${props.blogData.recipeId}`
+          );
+          setSelectedRecipe(response.data);
+        } catch (error) {
+          console.error("Error fetching recipe", error);
+          setError("Error fetching recipe on edit");
+        }
+      }
+    };
+    fetchRecipe();
+  }, [props.isEditMode, props.blogData?.recipeId]);
   const handleClose = () => {
     props.handleClose();
     setLoading(false);
@@ -102,14 +119,14 @@ export default function PostPopup(props) {
     setBannerImage(null);
     setNewPost(props.blogData?.bodyText || "");
     setBannerImageUrl(null);
+    setLinkDialogOpen(false);
+    setSelectedRecipe(null);
   };
 
-  // Handle banner image upload
   const handleBannerImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
       setLoading(true);
-      // restrict to only allow one image
       if (bannerImage) {
         setBannerImage(null);
         setBase64Image(null);
@@ -137,7 +154,6 @@ export default function PostPopup(props) {
     });
   };
 
-  // Handle banner image removal
   const handleRemoveBannerImage = () => {
     setBannerImage(null);
     setBase64Image(null);
@@ -145,6 +161,23 @@ export default function PostPopup(props) {
       bannerImageInputRef.current.value = "";
     }
     setBannerImageUrl(null);
+  };
+
+  const handleOpenLinkDialog = () => {
+    setLinkDialogOpen(true);
+  };
+
+  const handleCloseLinkDialog = () => {
+    setLinkDialogOpen(false);
+  };
+
+  const handleRecipeSelect = (recipe) => {
+    setSelectedRecipe(recipe);
+    handleCloseLinkDialog();
+  };
+
+  const handleDeleteSelectedRecipe = () => {
+    setSelectedRecipe(null);
   };
 
   const handleSubmit = async (event) => {
@@ -163,7 +196,7 @@ export default function PostPopup(props) {
     const apiUrl = props.isEditMode
       ? `/api/v1/blogs/${props.blogId}`
       : "/api/v1/blogs";
-
+    const recipeId = selectedRecipe ? selectedRecipe.id : null;
     try {
       const response = await axios({
         method: method,
@@ -172,6 +205,7 @@ export default function PostPopup(props) {
           header: "kys",
           bodyText: bodyText,
           bannerImage: finalBannerImage,
+          recipeId: recipeId,
         },
       });
       if (response.status === 201 || response.status === 200) {
@@ -207,222 +241,252 @@ export default function PostPopup(props) {
   };
 
   return (
-    <Dialog
-      open={props.open}
-      onClose={handleClose}
-      maxWidth={"md"}
-      PaperProps={{
-        sx: {
-          width: { xs: 250, sm: 400, md: 550, lg: 600, xl: 620 },
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          padding: 0.5,
-        },
-      }}
-    >
-      <form onSubmit={handleSubmit}>
-        <DialogTitle
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontWeight: "bold",
-            color: "#333",
-            fontSize: "1.25rem",
-          }}
-        >
-          {props.isEditMode ? "Edit Post" : "Create New Post"}
-          <IconButton
-            onClick={handleClose}
+    <>
+      <RecipeSelectionDialog
+        open={linkDialogOpen}
+        onClose={handleCloseLinkDialog}
+        userId={userId}
+        onRecipeSelect={handleRecipeSelect}
+      />
+      <Dialog
+        open={props.open}
+        onClose={handleClose}
+        maxWidth={"md"}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400, md: 550, lg: 600, xl: 620 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <form onSubmit={handleSubmit}>
+          <DialogTitle
             sx={{
-              color: "#555",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontWeight: "bold",
+              color: "#333",
+              fontSize: "1.25rem",
             }}
           >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          {success && (
-            <Typography color={"success"} textAlign={"center"}>
-              {props.isEditMode
-                ? "Post edited successfully!"
-                : "Post created successfully!"}
-            </Typography>
-          )}
-          {error && (
-            <Typography color="error" textAlign={"center"} mb={2}>
-              {error}
-            </Typography>
-          )}
-          {loading && (
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              minHeight="200px"
+            {props.isEditMode ? "Edit Post" : "Create New Post"}
+            <IconButton
+              onClick={handleClose}
+              sx={{
+                color: "#555",
+              }}
             >
-              <CircularProgress />
-            </Box>
-          )}
-          {!loading && (
-            <>
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            {success && (
+              <Typography color={"success"} textAlign={"center"}>
+                {props.isEditMode
+                  ? "Post edited successfully!"
+                  : "Post created successfully!"}
+              </Typography>
+            )}
+            {error && (
+              <Typography color="error" textAlign={"center"} mb={2}>
+                {error}
+              </Typography>
+            )}
+            {loading && (
               <Box
                 display="flex"
+                justifyContent="center"
                 alignItems="center"
-                sx={{
-                  marginBottom: 2,
-                }}
+                minHeight="200px"
               >
-                {userAvatar ? (
+                <CircularProgress />
+              </Box>
+            )}
+            {!loading && (
+              <>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  sx={{
+                    marginBottom: 2,
+                  }}
+                >
+                  {userAvatar ? (
+                    <Box
+                      component="img"
+                      src={userAvatar}
+                      alt="Profile"
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        marginRight: 1,
+                      }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        marginRight: 2,
+                        backgroundColor: "#ccc",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#fff",
+                        fontSize: "1.2rem",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {userInitials}
+                    </Box>
+                  )}
+
                   <Box
-                    component="img"
-                    src={userAvatar}
-                    alt="Profile"
                     sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      marginRight: 1,
-                    }}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      marginRight: 2,
-                      backgroundColor: "#ccc",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#fff",
-                      fontSize: "1.2rem",
                       fontWeight: "bold",
+                      fontSize: "1.1rem",
                     }}
                   >
-                    {userInitials}
+                    {userName || "User Name"}
+                  </Box>
+                </Box>
+                <TextField
+                  name="bodyText"
+                  autoFocus
+                  fullWidth
+                  multiline
+                  value={newPost}
+                  onChange={(e) => setNewPost(e.target.value)}
+                  rows={4}
+                  placeholder="Write something..."
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: "#fff",
+                    borderRadius: 2,
+                  }}
+                />
+                {selectedRecipe && (
+                  <Box
+                    sx={{
+                      marginTop: 2,
+                      marginBottom: 2,
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography sx={{ marginRight: 1 }}>
+                      Linked recipe:
+                    </Typography>
+                    <Chip
+                      label={selectedRecipe.header}
+                      onDelete={handleDeleteSelectedRecipe}
+                      color="success"
+                    />
+                  </Box>
+                )}
+                {(bannerImage || bannerImageUrl) && (
+                  <Box
+                    sx={{
+                      mt: 2,
+                      mb: 2,
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: "relative",
+                        width: "fit-content",
+                        maxHeight: "300px",
+                        borderRadius: 2,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <img
+                        src={
+                          bannerImageUrl ||
+                          `data:image/png;base64,${bannerImage}`
+                        }
+                        alt="Uploaded Preview"
+                        style={{
+                          width: "100%",
+                          height: "300px",
+                          objectFit: "cover",
+                          display: "block",
+                        }}
+                      />
+                      <IconButton
+                        onClick={handleRemoveBannerImage}
+                        sx={{
+                          position: "absolute",
+                          top: 8,
+                          right: 8,
+                          color: "white",
+                          backgroundColor: "rgba(0,0,0,0.5)",
+                          "&:hover": {
+                            backgroundColor: "rgba(0,0,0,0.7)",
+                          },
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
                   </Box>
                 )}
 
                 <Box
                   sx={{
-                    fontWeight: "bold",
-                    fontSize: "1.1rem",
-                  }}
-                >
-                  {userName || "User Name"}
-                </Box>
-              </Box>
-              <TextField
-                name="bodyText"
-                autoFocus
-                fullWidth
-                multiline
-                value={newPost}
-                onChange={(e) => setNewPost(e.target.value)}
-                rows={4}
-                placeholder="Write something..."
-                variant="outlined"
-                sx={{
-                  backgroundColor: "#fff",
-                  borderRadius: 2,
-                }}
-              />
-              {(bannerImage || bannerImageUrl) && (
-                <Box
-                  sx={{
-                    mt: 2,
-                    mb: 2,
-                    width: "100%",
                     display: "flex",
-                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: 2,
                   }}
                 >
-                  <Box
-                    sx={{
-                      position: "relative",
-                      width: "fit-content",
-                      maxHeight: "300px",
-                      borderRadius: 2,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <img
-                      src={
-                        bannerImageUrl || `data:image/png;base64,${bannerImage}`
-                      }
-                      alt="Uploaded Preview"
-                      style={{
-                        width: "100%",
-                        height: "300px",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
-                    <IconButton
-                      onClick={handleRemoveBannerImage}
-                      sx={{
-                        position: "absolute",
-                        top: 8,
-                        right: 8,
-                        color: "white",
-                        backgroundColor: "rgba(0,0,0,0.5)",
-                        "&:hover": {
-                          backgroundColor: "rgba(0,0,0,0.7)",
-                        },
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </Box>
-              )}
-
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginTop: 2,
-                }}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={handleBannerImageUpload}
-                  ref={bannerImageInputRef}
-                  id="banner-image-upload"
-                />
-                <IconButton onClick={() => bannerImageInputRef.current.click()}>
-                  <AddPhotoAlternateOutlinedIcon
-                    sx={{ fontSize: "35px", color: "#417D1E" }}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleBannerImageUpload}
+                    ref={bannerImageInputRef}
+                    id="banner-image-upload"
                   />
-                </IconButton>
-                <IconButton>
-                  <LinkIcon sx={{ fontSize: "35px", color: "#417D1E" }} />
-                </IconButton>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#4B9023",
-                    color: "#fff",
-                    ":hover": {
+                  <IconButton
+                    onClick={() => bannerImageInputRef.current.click()}
+                  >
+                    <AddPhotoAlternateOutlinedIcon
+                      sx={{ fontSize: "35px", color: "#417D1E" }}
+                    />
+                  </IconButton>
+                  <IconButton onClick={handleOpenLinkDialog}>
+                    <LinkIcon sx={{ fontSize: "35px", color: "#417D1E" }} />
+                  </IconButton>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
                       backgroundColor: "#4B9023",
-                    },
-                    borderRadius: 20,
-                    marginLeft: "auto",
-                  }}
-                  disabled={!newPost.trim()}
-                >
-                  {props.isEditMode ? "Update" : "Post"}
-                </Button>
-              </Box>
-            </>
-          )}
-        </DialogContent>
-      </form>
-    </Dialog>
+                      color: "#fff",
+                      ":hover": {
+                        backgroundColor: "#4B9023",
+                      },
+                      borderRadius: 20,
+                      marginLeft: "auto",
+                    }}
+                    disabled={!newPost.trim()}
+                  >
+                    {props.isEditMode ? "Update" : "Post"}
+                  </Button>
+                </Box>
+              </>
+            )}
+          </DialogContent>
+        </form>
+      </Dialog>
+    </>
   );
 }
