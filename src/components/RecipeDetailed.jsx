@@ -958,7 +958,7 @@ export default function RecipeDetailed({ recipeId }) {
             format(parseISO(recipeData.createdAt), "h:mm a")}
         </Typography>
         <Typography variant="body1" color="text.secondary" noWrap>
-          {recipeData.createdAt &&
+          · {recipeData.createdAt &&
             format(parseISO(recipeData.createdAt), "MMM d, yyyy")}
         </Typography>
       </Box>

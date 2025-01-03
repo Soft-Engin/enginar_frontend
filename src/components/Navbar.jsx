@@ -425,7 +425,7 @@ export default function Navbar(props) {
 
           <SearchBar />
 
-          <RightSection>
+          <RightSection sx={{ mr: 3 }}>
             <IconButton
               onClick={toggleInvertMode}
               sx={{
@@ -437,7 +437,10 @@ export default function Navbar(props) {
             {userLogged ? (
               <>
                 <Tooltip title="Profile Menu">
-                  <IconButton onClick={handleOpenUserMenu}>
+                  <IconButton
+                    onClick={handleOpenUserMenu}
+                    sx={{ borderRadius: 10 }}
+                  >
                     <Avatar
                       alt={
                         user?.firstName
@@ -446,6 +449,11 @@ export default function Navbar(props) {
                       }
                       src={profilePic || "/static/images/avatar/2.jpg"}
                     />
+                    <Typography
+                      sx={{ fontWeight: "bold", color: "white", ml: 1 }}
+                    >
+                      {user.userName}
+                    </Typography>
                   </IconButton>
                 </Tooltip>
                 <Menu
