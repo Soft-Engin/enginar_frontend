@@ -11,9 +11,10 @@ import LinkIcon from "@mui/icons-material/Link";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-import { Typography, CircularProgress } from "@mui/material";
-
+import { Typography, CircularProgress, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import RecipeSelectionDialog from "./RecipeSelectionDialog";
+
 
 export default function PostPopup(props) {
   const navigate = useNavigate();
@@ -29,10 +30,12 @@ export default function PostPopup(props) {
   const [newPost, setNewPost] = useState(props.blogData?.bodyText || "");
   const fileInputRef = useRef(null);
   const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
-  // State for banner image URL
   const [bannerImage, setBannerImage] = useState(null);
   const [bannerImageUrl, setBannerImageUrl] = useState(null);
   const bannerImageInputRef = useRef(null);
+    const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+    const [selectedRecipe, setSelectedRecipe] = useState(null);
+
 
   useEffect(() => {
     if (props.bannerUrl) {
@@ -102,14 +105,14 @@ export default function PostPopup(props) {
     setBannerImage(null);
     setNewPost(props.blogData?.bodyText || "");
     setBannerImageUrl(null);
+    setLinkDialogOpen(false);
+    setSelectedRecipe(null)
   };
 
-  // Handle banner image upload
   const handleBannerImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
       setLoading(true);
-      // restrict to only allow one image
       if (bannerImage) {
         setBannerImage(null);
         setBase64Image(null);
@@ -137,7 +140,6 @@ export default function PostPopup(props) {
     });
   };
 
-  // Handle banner image removal
   const handleRemoveBannerImage = () => {
     setBannerImage(null);
     setBase64Image(null);
@@ -146,6 +148,24 @@ export default function PostPopup(props) {
     }
     setBannerImageUrl(null);
   };
+
+ const handleOpenLinkDialog = () => {
+    setLinkDialogOpen(true);
+  };
+
+const handleCloseLinkDialog = () => {
+    setLinkDialogOpen(false);
+  };
+
+
+  const handleRecipeSelect = (recipe) => {
+    setSelectedRecipe(recipe);
+    handleCloseLinkDialog();
+  };
+
+  const handleDeleteSelectedRecipe = () =>{
+     setSelectedRecipe(null)
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -163,7 +183,7 @@ export default function PostPopup(props) {
     const apiUrl = props.isEditMode
       ? `/api/v1/blogs/${props.blogId}`
       : "/api/v1/blogs";
-
+    const recipeId = selectedRecipe ? selectedRecipe.id : null;
     try {
       const response = await axios({
         method: method,
@@ -172,6 +192,7 @@ export default function PostPopup(props) {
           header: "kys",
           bodyText: bodyText,
           bannerImage: finalBannerImage,
+             recipeId: recipeId,
         },
       });
       if (response.status === 201 || response.status === 200) {
@@ -207,6 +228,13 @@ export default function PostPopup(props) {
   };
 
   return (
+    <>
+        <RecipeSelectionDialog
+            open={linkDialogOpen}
+            onClose={handleCloseLinkDialog}
+            userId={userId}
+            onRecipeSelect={handleRecipeSelect}
+        />
     <Dialog
       open={props.open}
       onClose={handleClose}
@@ -329,6 +357,24 @@ export default function PostPopup(props) {
                   borderRadius: 2,
                 }}
               />
+                 {selectedRecipe && (
+                  <Box
+                    sx={{
+                       marginTop: 2,
+                      marginBottom: 2,
+                      display: "flex",
+                      alignItems: "center",
+
+                    }}
+                  >
+                     <Typography sx={{ marginRight: 1 }}>Linked recipe:</Typography>
+                     <Chip
+                      label={selectedRecipe.header}
+                      onDelete={handleDeleteSelectedRecipe}
+                      color="success"
+                    />
+                 </Box>
+                )}
               {(bannerImage || bannerImageUrl) && (
                 <Box
                   sx={{
@@ -399,9 +445,9 @@ export default function PostPopup(props) {
                     sx={{ fontSize: "35px", color: "#417D1E" }}
                   />
                 </IconButton>
-                <IconButton>
-                  <LinkIcon sx={{ fontSize: "35px", color: "#417D1E" }} />
-                </IconButton>
+                  <IconButton onClick={handleOpenLinkDialog}>
+                     <LinkIcon sx={{ fontSize: "35px", color: "#417D1E" }} />
+                  </IconButton>
                 <Button
                   type="submit"
                   variant="contained"
@@ -424,5 +470,6 @@ export default function PostPopup(props) {
         </DialogContent>
       </form>
     </Dialog>
+        </>
   );
 }
