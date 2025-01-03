@@ -1,0 +1,8 @@
+services:
+  enginar-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: frontend:prod
+    ports:
+      - "80:80"

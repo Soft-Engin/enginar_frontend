@@ -198,7 +198,7 @@ const navbarTitlesIconsAuth = [
   },
 ];
 
-axios.defaults.baseURL = "http://localhost:8090";
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 axios.defaults.headers.common["Authorization"] = localStorage.getItem("token")
   ? `Bearer ${localStorage.getItem("token")}`
   : "";
