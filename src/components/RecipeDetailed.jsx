@@ -578,7 +578,7 @@ export default function RecipeDetailed({ recipeId }) {
               </Typography>
               <Typography variant="body2" color="text.secondary" noWrap>
                 {recipeData.createdAt &&
-                  formatDistanceToNow(parseISO(recipeData.createdAt), {
+                  formatDistanceToNow(parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000, {
                     addSuffix: true,
                   })}
               </Typography>
@@ -956,11 +956,11 @@ export default function RecipeDetailed({ recipeId }) {
           noWrap
         >
           {recipeData.createdAt &&
-            format(parseISO(recipeData.createdAt), "h:mm a")}
+            format(parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000, "h:mm a")}
         </Typography>
         <Typography variant="body1" color="text.secondary" noWrap>
           {recipeData.createdAt &&
-            format(parseISO(recipeData.createdAt), "MMM d, yyyy")}
+            format(parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000, "MMM d, yyyy")}
         </Typography>
       </Box>
       <Box

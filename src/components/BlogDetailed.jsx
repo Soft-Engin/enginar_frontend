@@ -455,9 +455,9 @@ export default function BlogDetailed({ blogId }) {
     return <Typography>No blog data available.</Typography>;
   }
   const formattedTime =
-    blogData.createdAt && format(parseISO(blogData.createdAt), "h:mm a");
+    blogData.createdAt && format(parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000, "h:mm a");
   const formattedDate =
-    blogData.createdAt && format(parseISO(blogData.createdAt), "MMM d, yyyy");
+    blogData.createdAt && format(parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000, "MMM d, yyyy");
 
   return (
     <Box
@@ -509,7 +509,7 @@ export default function BlogDetailed({ blogId }) {
               </Typography>
               <Typography variant="body2" color="text.secondary" noWrap>
                 {blogData.createdAt &&
-                  formatDistanceToNow(parseISO(blogData.createdAt), {
+                  formatDistanceToNow(parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000, {
                     addSuffix: true,
                   })}
               </Typography>
