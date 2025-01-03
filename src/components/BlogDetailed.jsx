@@ -12,6 +12,7 @@ import {
   Button,
   Modal,
   Fade,
+  Chip,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -58,6 +59,10 @@ export default function BlogDetailed({ blogId }) {
   const [isEditing, setIsEditing] = useState(false);
   const [imageEnlarged, setImageEnlarged] = useState(false);
   let authButtonId = "loginButton";
+
+  const [recipeName, setRecipeName] = useState(null);
+  const [loadingRecipe, setLoadingRecipe] = useState(true);
+  const [errorRecipe, setErrorRecipe] = useState(null);
 
   let userLogged = localStorage.getItem("userLogged") === "true";
   const [isFollowing, setIsFollowing] = useState(false);
@@ -279,7 +284,28 @@ export default function BlogDetailed({ blogId }) {
       }
     };
   }, [blogData]);
-
+  useEffect(() => {
+    if (blogData && blogData.recipeId) {
+      const fetchRecipe = async () => {
+        setLoadingRecipe(true);
+        setErrorRecipe(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${blogData.recipeId}`
+          );
+          setRecipeName(response.data.header);
+        } catch (err) {
+          console.error("Error fetching recipe:", err);
+          setErrorRecipe(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingRecipe(false);
+        }
+      };
+      fetchRecipe();
+    } else {
+      setLoadingRecipe(false);
+    }
+  }, [blogData?.recipeId]);
   const convertBlobToBase64 = (blob) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -580,6 +606,24 @@ export default function BlogDetailed({ blogId }) {
       >
         {blogData.bodyText}
       </Typography>
+      {recipeName && (
+        <Box sx={{ mb: 0.5, display: "flex", flexDirection: "row", gap: 1 }}>
+          <Typography variant="subtitle2">{"Linked Recipe: "}</Typography>
+          <Chip
+            label={recipeName}
+            onClick={() => {
+              try {
+                  navigate(`/recipe?id=${blogData.recipeId}`)
+              } catch(e){
+                  console.error("error on navigation", e)
+              }
+          }}
+            clickable
+            size="small"
+            sx={{ backgroundColor: "#4B9023", color: "white" }}
+          />
+        </Box>
+      )}
       {bannerUrl && !loadingBanner && (
         <Box sx={{ mb: 2 }}>
           <StyledCardMedia
@@ -625,23 +669,6 @@ export default function BlogDetailed({ blogId }) {
             <Typography color="error">Error: {errorBanner}</Typography>
           )}
         </Box>
-      )}
-
-      {blogData.recipeId && (
-        <Link
-          to={`/recipe?id=${blogData.recipeId}`}
-          style={{
-            textDecoration: "none",
-            color: "inherit",
-            display: "block",
-            textAlign: "center",
-            marginBottom: 2,
-          }}
-        >
-          <Typography variant="body1" fontWeight={"bold"}>
-            Click here to see the related recipe!
-          </Typography>
-        </Link>
       )}
 
       <Box
