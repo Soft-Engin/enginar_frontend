@@ -116,7 +116,9 @@ export default function AuthPopup(props) {
           props.setAnchorElUser(null);
           handleClose();
           navigate("/");
-          setTimeout(function(){window.location.reload();}, 500);
+          setTimeout(function () {
+            window.location.reload();
+          }, 500);
         }
       } else if (response.status === 400) {
         if (isSignup) {
@@ -131,10 +133,21 @@ export default function AuthPopup(props) {
       }
     } catch (error) {
       console.error("Error:", error);
-      if (error.response) {
-        setFormError(
-          error.response.data.message || "An unexpected error occurred."
-        );
+      if (error.response && error.response.data) {
+        const errorData = error.response.data;
+        let errorMessages = [];
+        if (errorData.errors) {
+          if (Array.isArray(errorData.errors)) {
+            errorMessages = errorData.errors.map(
+              (err) => err.description || err
+            );
+          } else if (typeof errorData.errors === "object") {
+            errorMessages = Object.values(errorData.errors).flat();
+          }
+        } else if (errorData.message) {
+          errorMessages.push(errorData.message);
+        }
+        setFormError(errorMessages.join("\n"));
       } else if (error.request) {
         setFormError(
           "Could not connect to the server. Please try again later."
@@ -194,8 +207,10 @@ export default function AuthPopup(props) {
             </Alert>
           )}
           {formError && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {formError}
+            <Alert severity="error" sx={{ mb: 2 }} icon={false}>
+              <Typography variant="body2" style={{ whiteSpace: "pre-line" }}>
+                {formError}
+              </Typography>
             </Alert>
           )}
           {isSignup ? (
