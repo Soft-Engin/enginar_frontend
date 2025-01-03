@@ -439,7 +439,7 @@ export default function CommentSection({ type, contentId }) {
               marginLeft: "auto",
               textTransform: "none",
               height: "36px",
-              width: "80px",
+              width: "110px",
             }}
             onClick={handleAddComment}
             disabled={loadingComment || !newComment.trim()}
@@ -448,10 +448,10 @@ export default function CommentSection({ type, contentId }) {
               loadingComment ? (
                 <CircularProgress size={20} color="white" />
               ) : (
-                <Typography variant="h6">Post</Typography>
+                <Typography variant="h6">Comment</Typography>
               )
             ) : (
-              <Typography variant="h6">Post</Typography>
+              <Typography variant="h6">Comment</Typography>
             )}
           </Button>
         </Box>

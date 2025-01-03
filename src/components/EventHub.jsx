@@ -359,6 +359,7 @@ export default function EventHub() {
               label="From Date"
               value={fromDate}
               onChange={handleDateChange}
+              format="DD/MM/YYYY"
             />
           </Stack>
         </LocalizationProvider>
