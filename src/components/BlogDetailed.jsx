@@ -10,6 +10,8 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Modal,
+  Fade,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -54,6 +56,7 @@ export default function BlogDetailed({ blogId }) {
   const [commentCount, setCommentCount] = useState(0); // Initialize commentCount state
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [imageEnlarged, setImageEnlarged] = useState(false);
   let authButtonId = "loginButton";
 
   let userLogged = localStorage.getItem("userLogged") === "true";
@@ -583,7 +586,37 @@ export default function BlogDetailed({ blogId }) {
             src={bannerUrl}
             alt={blogData.header}
             onError={() => setBannerUrl(null)}
+            onClick={() => setImageEnlarged(true)}
+            sx={{ cursor: "pointer" }}
           />
+          <Fade in={imageEnlarged}>
+            <Box>
+              <Modal
+                open={imageEnlarged}
+                onClose={() => setImageEnlarged(false)}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: "rgba(0, 0, 0, 0.5)",
+                }}
+              >
+                <Fade in={imageEnlarged} timeout={300}>
+                  <img
+                    src={bannerUrl}
+                    alt={blogData.header}
+                    style={{
+                      maxWidth: "70vw",
+                      maxHeight: "70vh",
+                      aspectRatio: "auto",
+                      objectFit: "contain",
+                      borderRadius: "10px",
+                    }}
+                  />
+                </Fade>
+              </Modal>
+            </Box>
+          </Fade>
         </Box>
       )}
       {errorBanner && (

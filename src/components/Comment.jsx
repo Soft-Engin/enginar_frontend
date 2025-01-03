@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -13,6 +13,8 @@ import {
   DialogTitle,
   DialogActions,
   Button,
+  Modal,
+  Fade,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import axios from "axios";
@@ -32,6 +34,7 @@ export default function Comment({ comment, type, onDelete }) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
   const isCommentOwner = userId === comment.userId;
+  const [imageEnlarged, setImageEnlarged] = useState(false);
 
   React.useEffect(() => {
     if (comment && comment.userId) {
@@ -241,8 +244,38 @@ export default function Comment({ comment, type, onDelete }) {
                         objectFit: "cover",
                         borderRadius: 10,
                         border: "1px solid #C0C0C0",
+                        cursor: "pointer",
                       }}
+                      onClick={() => setImageEnlarged(true)}
                     />
+                    <Fade in={imageEnlarged}>
+                      <Box>
+                        <Modal
+                          open={imageEnlarged}
+                          onClose={() => setImageEnlarged(false)}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            bgcolor: "rgba(0, 0, 0, 0.5)",
+                          }}
+                        >
+                          <Fade in={imageEnlarged} timeout={300}>
+                            <img
+                              src={image}
+                              alt={"Comment image"}
+                              style={{
+                                maxWidth: "70vw",
+                                maxHeight: "70vh",
+                                aspectRatio: "auto",
+                                objectFit: "contain",
+                                borderRadius: "10px",
+                              }}
+                            />
+                          </Fade>
+                        </Modal>
+                      </Box>
+                    </Fade>
                   </ImageListItem>
                 ))}
               </ImageList>
