@@ -51,7 +51,7 @@ export default function BlogDetailed({ blogId }) {
   const [bannerImage, setBannerImage] = useState(null); // New state for base64 banner
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  const [commentCount, setCommentCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0); // Initialize commentCount state
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   let authButtonId = "loginButton";
@@ -300,6 +300,22 @@ export default function BlogDetailed({ blogId }) {
         }
       };
       fetchIsLiked();
+    }
+  }, [blogData, userLogged]);
+
+  useEffect(() => {
+    if (blogData && blogData.id && userLogged) {
+      const fetchCommentCount = async () => {
+        try {
+          const response = await axios.get(
+            `/api/v1/blogs/${blogData.id}/comments`
+          );
+          setCommentCount(response.data.totalCount || 0);
+        } catch (err) {
+          console.error("Error fetching comment count:", err);
+        }
+      };
+      fetchCommentCount();
     }
   }, [blogData, userLogged]);
 
@@ -675,51 +691,59 @@ export default function BlogDetailed({ blogId }) {
           bannerImage={bannerImage} // Pass bannerImage as a prop
         />
       )}
-      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete} 
-      PaperProps={{
-        sx: {
-          width: { xs: 250, sm: 400 },
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          padding: 0.5,
-        },
-      }}>
-        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete this blog post?</Typography>
+          <Typography>
+            Are you sure you want to delete this blog post?
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelDelete}
-          sx={{
-            backgroundColor: "#C8EFA5",
-            color: "black",
-            ":hover": {
+          <Button
+            onClick={handleCancelDelete}
+            sx={{
               backgroundColor: "#C8EFA5",
-            },
-            borderRadius: 20,
-            marginTop: 2,
-            display: "block",
-            marginLeft: "auto",
-          }}>
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={handleDeleteBlog} 
-              variant="contained"
-              sx={{
+          <Button
+            onClick={handleDeleteBlog}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
                 backgroundColor: "#cc0000",
-                color: "error",
-                ":hover": {
-                  backgroundColor: "#cc0000",
-                },
-                borderRadius: 20,
-                marginTop: 2,
-                display: "block",
-                marginLeft: "auto",
-                fontWeight: "bold",
-              }}
-            >
-              Delete
-            </Button>
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

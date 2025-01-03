@@ -325,6 +325,22 @@ export default function RecipeDetailed({ recipeId }) {
 
   React.useEffect(() => {
     if (recipeData && recipeData.id && userLogged) {
+      const fetchCommentCount = async () => {
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${recipeData.id}/comments`
+          );
+          setCommentCount(response.data.totalCount || 0);
+        } catch (err) {
+          console.error("Error fetching comment count:", err);
+        }
+      };
+      fetchCommentCount();
+    }
+  }, [recipeData, userLogged]);
+
+  React.useEffect(() => {
+    if (recipeData && recipeData.id && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
         setErrorIsBookmarked(null);
