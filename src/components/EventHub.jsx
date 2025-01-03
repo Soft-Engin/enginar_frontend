@@ -372,6 +372,7 @@ export default function EventHub() {
               value={fromDate}
               onChange={handleDateChange}
               minDate={dayjs()}
+              format="DD/MM/YYYY"
             />
           </Stack>
         </LocalizationProvider>
