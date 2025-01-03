@@ -357,6 +357,7 @@ export default function RecipeMini({ recipe }) {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          height: 35,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>

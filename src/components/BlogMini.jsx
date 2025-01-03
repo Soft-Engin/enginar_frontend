@@ -341,6 +341,7 @@ export default function BlogMini({ blog }) {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          height: 35,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
