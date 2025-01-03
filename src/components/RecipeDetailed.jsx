@@ -66,6 +66,7 @@ export default function RecipeDetailed({ recipeId }) {
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
   const [snackbarSeverity, setSnackbarSeverity] = React.useState("success");
   const [imageEnlarged, setImageEnlarged] = useState(false);
+  const [enlargedImageIndex, setEnlargedImageIndex] = useState(null);
   const open = Boolean(anchorEl);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
@@ -897,8 +898,42 @@ export default function RecipeDetailed({ recipeId }) {
                     objectFit: "cover",
                     borderRadius: 10,
                     border: "1px solid #C0C0C0",
+                    cursor: "pointer",
                   }}
+                  onClick={() => setEnlargedImageIndex(index)}
                 />
+                <Fade in={imageEnlarged}>
+                  <Box>
+                    <Modal
+                      open={enlargedImageIndex === index}
+                      onClose={() => setEnlargedImageIndex(null)}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        bgcolor: "rgba(0, 0, 0, 0.5)",
+                      }}
+                    >
+                      <Fade in={enlargedImageIndex === index} timeout={300}>
+                        {enlargedImageIndex !== null ? (
+                          <img
+                            src={stepImages[enlargedImageIndex]}
+                            alt={`Step ${enlargedImageIndex + 1}`}
+                            style={{
+                              maxWidth: "70vw",
+                              maxHeight: "70vh",
+                              aspectRatio: "auto",
+                              objectFit: "contain",
+                              borderRadius: "10px",
+                            }}
+                          />
+                        ) : (
+                          <Box />
+                        )}
+                      </Fade>
+                    </Modal>
+                  </Box>
+                </Fade>
               </Box>
             )}
           </ListItem>
