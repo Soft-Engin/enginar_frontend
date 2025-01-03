@@ -14,6 +14,8 @@ import {
   DialogActions,
   Button,
   DialogContent,
+  Fade,
+  Modal,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -63,6 +65,7 @@ export default function RecipeDetailed({ recipeId }) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
   const [snackbarSeverity, setSnackbarSeverity] = React.useState("success");
+  const [imageEnlarged, setImageEnlarged] = useState(false);
   const open = Boolean(anchorEl);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
@@ -483,51 +486,60 @@ export default function RecipeDetailed({ recipeId }) {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-      <Dialog open={openDialog} onClose={handleDialogClose} 
-      PaperProps={{
-        sx: {
-          width: { xs: 250, sm: 400 },
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          padding: 0.5,
-        },
-      }}>
-        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete this recipe?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}
-          sx={{
-            backgroundColor: "#C8EFA5",
-            color: "black",
-            ":hover": {
+          <Button
+            onClick={handleDialogClose}
+            sx={{
               backgroundColor: "#C8EFA5",
-            },
-            borderRadius: 20,
-            marginTop: 2,
-            display: "block",
-            marginLeft: "auto",
-          }}>
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={() => {handleDelete(); handleDialogClose();} }
-              variant="contained"
-              sx={{
+          <Button
+            onClick={() => {
+              handleDelete();
+              handleDialogClose();
+            }}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
                 backgroundColor: "#cc0000",
-                color: "error",
-                ":hover": {
-                  backgroundColor: "#cc0000",
-                },
-                borderRadius: 20,
-                marginTop: 2,
-                display: "block",
-                marginLeft: "auto",
-                fontWeight: "bold",
-              }}
-            >
-              Delete
-            </Button>
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
       <Box
@@ -800,9 +812,39 @@ export default function RecipeDetailed({ recipeId }) {
             objectFit: "cover",
             borderRadius: 10,
             border: "1px solid #C0C0C0",
+            cursor: "pointer",
           }}
+          onClick={() => setImageEnlarged(true)}
         />
       )}
+      <Fade in={imageEnlarged}>
+        <Box>
+          <Modal
+            open={imageEnlarged}
+            onClose={() => setImageEnlarged(false)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bgcolor: "rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <Fade in={imageEnlarged} timeout={300}>
+              <img
+                src={bannerUrl}
+                alt={recipeData.header}
+                style={{
+                  maxWidth: "70vw",
+                  maxHeight: "70vh",
+                  aspectRatio: "auto",
+                  objectFit: "contain",
+                  borderRadius: "10px",
+                }}
+              />
+            </Fade>
+          </Modal>
+        </Box>
+      </Fade>
 
       <Typography
         variant="h4"

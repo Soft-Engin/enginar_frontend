@@ -606,10 +606,9 @@ export default function BlogDetailed({ blogId }) {
                     src={bannerUrl}
                     alt={blogData.header}
                     style={{
-                      maxWidth: "60vw",
+                      maxWidth: "70vw",
                       maxHeight: "70vh",
-                      minWidth: "40vw",
-                      minHeight: "50vh",
+                      aspectRatio: "auto",
                       objectFit: "contain",
                       borderRadius: "10px",
                     }}
