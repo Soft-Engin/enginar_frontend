@@ -29,6 +29,7 @@ const ImagePreview = styled(Box)(({ theme }) => ({
   marginRight: theme.spacing(1),
   marginBottom: theme.spacing(1),
 }));
+
 const StyledCloseButton = styled(IconButton)(({ theme }) => ({
   position: "absolute",
   top: theme.spacing(-1),

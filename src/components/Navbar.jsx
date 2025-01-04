@@ -30,8 +30,6 @@ import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlin
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import LogoutIcon from "@mui/icons-material/Logout";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import LightModeIcon from "@mui/icons-material/LightMode";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
@@ -232,6 +230,21 @@ export default function Navbar(props) {
   const setStoredInvertMode = (value) => {
     localStorage.setItem("isInverted", value.toString());
   };
+  const [userInitials, setUserInitials] = React.useState("");
+
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (user && user.userName) {
+      setUserInitials(generateInitials(user.userName));
+    }
+  }, [user]);
 
   useEffect(() => {
     const storedMode = getStoredInvertMode();
@@ -429,17 +442,30 @@ export default function Navbar(props) {
             {userLogged ? (
               <>
                 <Tooltip title="Profile Menu">
-                  <IconButton
-                    onClick={handleOpenUserMenu}
-                  >
-                    <Avatar
-                      alt={
-                        user?.firstName
-                          ? `${user.firstName} ${user.lastName}`
-                          : "User"
-                      }
-                      src={profilePic || "/static/images/avatar/2.jpg"}
-                    />
+                  <IconButton onClick={handleOpenUserMenu}>
+                    {profilePic ? (
+                      <Avatar
+                        src={profilePic}
+                        sx={{ width: 45, height: 45 }}
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: 45,
+                          height: 45,
+                          borderRadius: "50%",
+                          backgroundColor: "#A5E072",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#fff",
+                          fontSize: "0.9rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {userInitials}
+                      </Box>
+                    )}
                   </IconButton>
                 </Tooltip>
                 <Menu

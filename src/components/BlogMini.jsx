@@ -25,6 +25,7 @@ export default function BlogMini({ blog }) {
   const navigate = useNavigate();
   const [bannerUrl, setBannerUrl] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = React.useState("");
   const [likeCount, setLikeCount] = React.useState(0);
   const [commentCount, setCommentCount] = React.useState(0);
   const [isLiked, setIsLiked] = React.useState(false);
@@ -68,7 +69,7 @@ export default function BlogMini({ blog }) {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (blogId) {
       const fetchBanner = async () => {
         setLoading(true);
@@ -120,7 +121,7 @@ export default function BlogMini({ blog }) {
     }
   }, [blog?.recipeId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (blog && blog.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
@@ -151,7 +152,22 @@ export default function BlogMini({ blog }) {
       }
     };
   }, [blog]);
-  React.useEffect(() => {
+
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (blog && blog.userName) {
+      setUserInitials(generateInitials(blog.userName));
+    }
+  }, [blog]);
+
+  useEffect(() => {
     if (blogId) {
       const fetchLikesAndComments = async () => {
         setLoadingLikesComments(true);
@@ -174,7 +190,8 @@ export default function BlogMini({ blog }) {
       fetchLikesAndComments();
     }
   }, [blogId]);
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (blogId && userLogged) {
       const fetchIsLiked = async () => {
         setLoadingIsLiked(true);
@@ -192,7 +209,8 @@ export default function BlogMini({ blog }) {
       fetchIsLiked();
     }
   }, [blogId, userLogged]);
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (blogId && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
@@ -239,6 +257,7 @@ export default function BlogMini({ blog }) {
       }
     }
   };
+
   const handleBookmarkToggle = async () => {
     if (!userLogged) {
       const authButton = document.getElementById(authButtonId);
@@ -380,11 +399,31 @@ export default function BlogMini({ blog }) {
               alignItems: "center",
             }}
           >
-            <Avatar
-              src={profilePictureUrl}
-              sx={{ width: 30, height: 30, marginRight: 1 }}
-              onError={() => setProfilePictureUrl(null)}
-            />
+            {profilePictureUrl ? (
+              <Avatar
+                src={profilePictureUrl}
+                sx={{ width: 30, height: 30, mr: 1 }}
+                onError={() => setProfilePictureUrl(null)}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  marginRight: 1,
+                  backgroundColor: "#A5E072",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {userInitials}
+              </Box>
+            )}
             <Typography
               variant="body2"
               fontWeight="bold"
@@ -396,9 +435,12 @@ export default function BlogMini({ blog }) {
           </Link>
           <Typography variant="body2" color="text.secondary" noWrap>
             {blog.createdAt &&
-              formatDistanceToNow(parseISO(blog.createdAt).getTime() + 3 * 60 * 60 * 1000, {
-                addSuffix: true,
-              })}
+              formatDistanceToNow(
+                parseISO(blog.createdAt).getTime() + 3 * 60 * 60 * 1000,
+                {
+                  addSuffix: true,
+                }
+              )}
           </Typography>
         </Box>
         {userLogged && (
@@ -509,7 +551,11 @@ export default function BlogMini({ blog }) {
               onClick={() => navigate(`/recipe?id=${blog.recipeId}`)}
               clickable
               size="small"
-              sx={{ backgroundColor: "#4B9023", color: "white", maxWidth: "70%" }}
+              sx={{
+                backgroundColor: "#4B9023",
+                color: "white",
+                maxWidth: "70%",
+              }}
             />
           </Box>
         )}

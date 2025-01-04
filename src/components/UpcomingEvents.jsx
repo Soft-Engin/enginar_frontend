@@ -233,6 +233,7 @@ export default function UpcomingEvents() {
                             key={index}
                             alt={participants[index]?.userName}
                             src={avatar.profilePictureUrl || undefined}
+                            sx={{ backgroundColor: "#A5E072", fontWeight: "bold" }}
                           >
                             {!avatar.profilePictureUrl &&
                               participants[index]?.userName

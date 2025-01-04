@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import axios from "axios";
-import { format, parseISO, formatDistanceToNow } from "date-fns";
+import { parseISO, formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
 
 export default function Comment({ comment, type, onDelete }) {
@@ -37,7 +37,7 @@ export default function Comment({ comment, type, onDelete }) {
   const isCommentOwner = userId === comment.userId;
   const [imageEnlarged, setImageEnlarged] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (comment && comment.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
@@ -87,7 +87,8 @@ export default function Comment({ comment, type, onDelete }) {
       }
     };
   }, [comment]);
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (comment && comment.id && type) {
       const fetchCommentImages = async () => {
         setLoadingImages(true);
@@ -134,6 +135,7 @@ export default function Comment({ comment, type, onDelete }) {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
   const handleDeleteClick = () => {
     setOpenDialog(true);
     handleMenuClose();
@@ -155,6 +157,7 @@ export default function Comment({ comment, type, onDelete }) {
       console.log("Error deleting comment", error);
     }
   };
+
   return (
     <Box
       sx={{
@@ -175,7 +178,7 @@ export default function Comment({ comment, type, onDelete }) {
           {profilePictureUrl ? (
             <Avatar
               src={profilePictureUrl}
-              sx={{ width: 50, height: 50, mr: 1.3 }}
+              sx={{ width: 50, height: 50, mr: 2 }}
               onError={() => setProfilePictureUrl(null)}
             />
           ) : (

@@ -22,10 +22,10 @@ const StyledCardMedia = styled("img")({
 });
 
 export default function RecipeMini({ recipe, disableActions = false }) {
-  // Added disableActions prop
   const navigate = useNavigate();
   const [bannerUrl, setBannerUrl] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = React.useState("");
   const [likeCount, setLikeCount] = React.useState(0);
   const [commentCount, setCommentCount] = React.useState(0);
   const [isLiked, setIsLiked] = React.useState(false);
@@ -133,6 +133,20 @@ export default function RecipeMini({ recipe, disableActions = false }) {
       }
     };
   }, [recipe]);
+
+  const generateInitials = (userName) => {
+      const nameParts = userName.split(" ");
+      return (
+        nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+        userName.charAt(0).toUpperCase()
+      );
+    };
+  
+    useEffect(() => {
+      if (recipe && recipe.userName) {
+        setUserInitials(generateInitials(recipe.userName));
+      }
+    }, [recipe]);
 
   React.useEffect(() => {
     if (recipeId) {
@@ -379,11 +393,31 @@ export default function RecipeMini({ recipe, disableActions = false }) {
               pointerEvents: disableActions ? "none" : "auto",
             }}
           >
-            <Avatar
-              src={profilePictureUrl}
-              sx={{ width: 30, height: 30, marginRight: 1 }}
-              onError={() => setProfilePictureUrl(null)}
-            />
+            {profilePictureUrl ? (
+              <Avatar
+                src={profilePictureUrl}
+                sx={{ width: 30, height: 30, mr: 1 }}
+                onError={() => setProfilePictureUrl(null)}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  marginRight: 1,
+                  backgroundColor: "#A5E072",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {userInitials}
+              </Box>
+            )}
             <Typography
               variant="body2"
               fontWeight="bold"
@@ -395,9 +429,12 @@ export default function RecipeMini({ recipe, disableActions = false }) {
           </Link>
           <Typography variant="body2" color="text.secondary" noWrap>
             {recipe.createdAt &&
-              formatDistanceToNow(parseISO(recipe.createdAt).getTime() + 3 * 60 * 60 * 1000, {
-                addSuffix: true,
-              })}
+              formatDistanceToNow(
+                parseISO(recipe.createdAt).getTime() + 3 * 60 * 60 * 1000,
+                {
+                  addSuffix: true,
+                }
+              )}
           </Typography>
         </Box>
         {userLogged && (
