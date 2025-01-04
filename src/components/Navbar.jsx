@@ -439,7 +439,6 @@ export default function Navbar(props) {
                 <Tooltip title="Profile Menu">
                   <IconButton
                     onClick={handleOpenUserMenu}
-                    sx={{ borderRadius: 10 }}
                   >
                     <Avatar
                       alt={
@@ -449,11 +448,6 @@ export default function Navbar(props) {
                       }
                       src={profilePic || "/static/images/avatar/2.jpg"}
                     />
-                    <Typography
-                      sx={{ fontWeight: "bold", color: "white", ml: 1 }}
-                    >
-                      {user.userName}
-                    </Typography>
                   </IconButton>
                 </Tooltip>
                 <Menu
