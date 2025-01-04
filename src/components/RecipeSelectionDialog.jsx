@@ -32,7 +32,7 @@ function CustomTabPanel(props) {
           sx={{
             height: "100%",
             overflowY: "auto",
-            paddingRight: 1,
+            px: 2
           }}
         >
           {children}
