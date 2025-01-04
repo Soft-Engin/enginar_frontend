@@ -14,8 +14,6 @@ describe('Guest User Journey - Browsing Popular Recipes', () => {
     document.body.appendChild(container);
 
     render(<PopularRecipesTab />, { container });
-
-    console.log("mounted");
   });
 
   test('should display popular recipes and load more on scroll', async () => {
