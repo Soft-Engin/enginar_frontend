@@ -478,6 +478,7 @@ const UserProfile = () => {
                       (userLogged ? (
                         isFollowing ? (
                           <FollowButton
+                            data-testid="unfollow-button"
                             variant="contained"
                             onClick={handleUnfollowUser}
                           >
@@ -485,6 +486,7 @@ const UserProfile = () => {
                           </FollowButton>
                         ) : (
                           <FollowButton
+                            data-testid="follow-button"
                             variant="contained"
                             onClick={handleFollowUser}
                           >

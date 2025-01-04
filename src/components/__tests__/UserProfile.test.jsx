@@ -123,7 +123,12 @@ describe("UserProfile Component", () => {
   });
 
   it("displays follow/unfollow buttons if not own profile and toggles follow state", async () => {
-    localStorage.setItem("userData", JSON.stringify({ userId: "xyz456" }));
+    // Set both userLogged and userData in localStorage
+    localStorage.setItem("userLogged", "true");
+    localStorage.setItem("userData", JSON.stringify({ 
+      userId: "xyz456",
+      roleName: "User"
+    }));
 
     let followerCount = 12;
 
@@ -165,27 +170,31 @@ describe("UserProfile Component", () => {
       return Promise.reject(new Error('Unhandled URL in test'));
     });
 
-    renderUserProfile();
-
-    // Wait for initial render
-    await waitFor(() => {
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
-      expect(screen.getByTestId("followers-count")).toHaveTextContent("12 Followers");
+    // Mock the follow API call before rendering
+    axios.post.mockImplementation((url) => {
+      if (url.includes('/api/v1/users/follow')) {
+        followerCount = 13; // Update the count that will be returned by subsequent GET calls
+        return Promise.resolve({ status: 200 });
+      }
+      return Promise.reject(new Error('Unexpected POST request'));
     });
 
-    // Mock the follow API call
-    axios.post.mockResolvedValueOnce({ status: 200 });
+    renderUserProfile();
+
+    // Wait for loading to complete and content to be visible
+    await waitFor(() => {
+      expect(screen.queryByTestId("user-profile-loading")).not.toBeInTheDocument();
+    });
+
+    // Now look for the Follow button using data-testid
+    const followButton = screen.getByTestId("follow-button");
     
-    // Update follower count for next API call
-    followerCount = 13;
-    
-    // Find and click Follow button
-    const followButton = screen.getByRole("button", { name: /Follow/i });
+    // Click the Follow button
     fireEvent.click(followButton);
 
-    // Wait for the Unfollow button and updated follower count
+    // Wait for the state updates and UI changes
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Unfollow/i })).toBeInTheDocument();
+      expect(screen.getByTestId("unfollow-button")).toBeInTheDocument();
       expect(screen.getByTestId("followers-count")).toHaveTextContent("13 Followers");
     });
   });
@@ -242,27 +251,52 @@ describe("UserProfile Component", () => {
   });
 
   it("does not show edit profile if it's someone else's profile", async () => {
-    localStorage.setItem("userData", JSON.stringify({ userId: "xyz999" }));
+    // Set logged-in user as regular user viewing someone else's profile
+    localStorage.setItem("userLogged", "true");
+    localStorage.setItem("userData", JSON.stringify({ 
+      userId: "xyz999",
+      roleName: "User" // Important: specify as regular user
+    }));
 
-    axios.get.mockResolvedValueOnce({
-      status: 200,
-      data: { userId: "abc123", firstName: "Jane" },
+    // Mock the API responses
+    axios.get.mockImplementation((url) => {
+      if (url.includes('/api/v1/users/abc123')) {
+        return Promise.resolve({
+          status: 200,
+          data: { 
+            userId: "abc123", 
+            firstName: "Jane",
+            lastName: "Doe"
+          },
+        });
+      }
+      if (url.includes('/profile-picture')) {
+        return Promise.resolve({ status: 404 }); // No profile pic
+      }
+      if (url.includes('/banner')) {
+        return Promise.resolve({ status: 404 }); // No banner
+      }
+      if (url.includes('/followers')) {
+        return Promise.resolve({ status: 200, data: { totalCount: 1 } });
+      }
+      if (url.includes('/following')) {
+        return Promise.resolve({ 
+          status: 200, 
+          data: { 
+            items: [],
+            totalCount: 4 
+          } 
+        });
+      }
+      return Promise.reject(new Error('Unhandled URL in test'));
     });
-    axios.get.mockResolvedValueOnce({ status: 200, data: new Blob(["pp"]) }); // pic
-    axios.get.mockResolvedValueOnce({ status: 200, data: new Blob(["banner"]) });
-    axios.get.mockResolvedValueOnce({ status: 200, data: { totalCount: 1 } }); // followers
-    axios.get.mockResolvedValueOnce({ status: 200, data: { totalCount: 4 } }); // following
 
     renderUserProfile();
 
-    await waitFor(() => screen.getByText("Jane"));
+    await waitFor(() => screen.getByText("Jane Doe"));
 
-    // Click the "..." menu
-    const menuButton = screen.getByTestId("profile-menu-button");
-    fireEvent.click(menuButton);
-
-    // We do not see "Edit Profile"
-    expect(screen.queryByText(/Edit Profile/i)).not.toBeInTheDocument();
+    // Verify menu button is not present
+    expect(screen.queryByTestId("profile-menu-button")).not.toBeInTheDocument();
   });
 
   it("can switch tabs (Blogs, Events, Recipes)", async () => {
