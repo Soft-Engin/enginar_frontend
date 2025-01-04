@@ -92,11 +92,13 @@ function UserBlogsTab() {
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      {blogs.map((post, index) => (
-        <Box ata-testid="blogs-stack" key={index} sx={{ width: 600, mb: 2 }}>
-          <BlogMini key={post.id} blog={post} />
-        </Box>
-      ))}
+      <div data-testid="blogs-stack">
+        {blogs.map((post, index) => (
+          <Box key={index} sx={{ width: 600, mb: 2 }}>
+            <BlogMini key={post.id} blog={post} />
+          </Box>
+        ))}
+      </div>
     </div>
   );
 }
