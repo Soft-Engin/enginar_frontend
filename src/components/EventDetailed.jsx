@@ -24,6 +24,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EventPopup from "./EventPopup";
+import dayjs from "dayjs";
 
 export default function EventDetailed({ eventId }) {
   const [participantsPopupOpen, setParticipantsPopupOpen] =
@@ -32,6 +33,7 @@ export default function EventDetailed({ eventId }) {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = React.useState("");
   const [participants, setParticipants] = React.useState([]);
   const [followedParticipants, setFollowedParticipants] = React.useState([]);
   const [isParticipant, setIsParticipant] = React.useState(false);
@@ -206,6 +208,20 @@ export default function EventDetailed({ eventId }) {
     };
   }, [eventData]);
 
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  React.useEffect(() => {
+    if (eventData && eventData.creatorUserName) {
+      setUserInitials(generateInitials(eventData.creatorUserName));
+    }
+  }, [eventData]);
+
   React.useEffect(() => {
     const fetchParticipants = async () => {
       if (eventData && eventData.eventId) {
@@ -353,7 +369,7 @@ export default function EventDetailed({ eventId }) {
   };
 
   const formattedDate = eventData?.date
-    ? format(parseISO(eventData.date), "dd.MM.yyyy, HH:mm")
+    ? format(parseISO(eventData.date), "dd.MM.yyyy")
     : "N/A";
 
   //EDIT FUNCTIONALITY
@@ -511,7 +527,7 @@ export default function EventDetailed({ eventId }) {
               </Typography>
             </Box>
             {userLogged && (
-              <Box sx={{ position: "relative", right: -3, top: -5}}>
+              <Box sx={{ position: "relative", right: -3, top: -5 }}>
                 <IconButton
                   aria-label="more"
                   id="menuButton"
@@ -633,7 +649,7 @@ export default function EventDetailed({ eventId }) {
               noWrap
               sx={{ mr: 1 }}
             >
-              Date and Time:
+              Date:
             </Typography>
             <CalendarMonthIcon
               style={{ fontSize: "28px", marginRight: "3px" }}
@@ -693,11 +709,31 @@ export default function EventDetailed({ eventId }) {
                 alignItems: "center",
               }}
             >
-              <Avatar
-                src={profilePictureUrl}
-                sx={{ width: 38, height: 38, marginRight: 0.7 }}
-                onError={() => setProfilePictureUrl(null)}
-              />
+              {profilePictureUrl ? (
+                <Avatar
+                  src={profilePictureUrl}
+                  sx={{ width: 38, height: 38, mr: 0.7 }}
+                  onError={() => setProfilePictureUrl(null)}
+                />
+              ) : (
+                <Box
+                  sx={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: "50%",
+                    marginRight: 0.7,
+                    backgroundColor: "#A5E072",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {userInitials}
+                </Box>
+              )}
               <Typography variant="body1" component="div" noWrap>
                 <b>{eventData?.creatorUserName}</b>
               </Typography>
@@ -783,27 +819,13 @@ export default function EventDetailed({ eventId }) {
                 }}
                 onClick={handleParticipantsPopupOpen}
               >
-                {participants &&
-                  participants.map((participant) => (
-                    <Avatar
-                      key={participant.userId}
-                      alt={participant.userName}
-                      src={participantProfiles[participant.userId]}
-                      onError={() =>
-                        setParticipantProfiles((prevProfiles) => {
-                          const newProfiles = { ...prevProfiles };
-                          delete newProfiles[participant.userId];
-                          return newProfiles;
-                        })
-                      }
-                    />
-                  ))}
                 {followedParticipants &&
                   followedParticipants.map((participant) => (
                     <Avatar
                       key={participant.userId}
                       alt={participant.userName}
                       src={followedParticipantProfiles[participant.userId]}
+                      sx={{ backgroundColor: "#A5E072", fontWeight: "bold" }}
                       onError={() =>
                         setFollowedParticipantProfiles((prevProfiles) => {
                           const newProfiles = { ...prevProfiles };
@@ -811,7 +833,29 @@ export default function EventDetailed({ eventId }) {
                           return newProfiles;
                         })
                       }
-                    />
+                    >
+                      {!followedParticipantProfiles[participant.userId] &&
+                        participant.userName?.charAt(0).toUpperCase()}
+                    </Avatar>
+                  ))}
+                {participants &&
+                  participants.map((participant) => (
+                    <Avatar
+                      key={participant.userId}
+                      alt={participant.userName}
+                      src={participantProfiles[participant.userId]}
+                      sx={{ backgroundColor: "#A5E072", fontWeight: "bold" }}
+                      onError={() =>
+                        setParticipantProfiles((prevProfiles) => {
+                          const newProfiles = { ...prevProfiles };
+                          delete newProfiles[participant.userId];
+                          return newProfiles;
+                        })
+                      }
+                    >
+                      {!participantProfiles[participant.userId] &&
+                        participant.userName?.charAt(0).toUpperCase()}
+                    </Avatar>
                   ))}
               </AvatarGroup>
               {!loadingParticipants && participants && (
@@ -820,8 +864,7 @@ export default function EventDetailed({ eventId }) {
                   component="div"
                   color="text.secondary"
                 >
-                  {eventData.totalParticipantsCount} people are
-                  going
+                  {eventData.totalParticipantsCount} people are going
                   {followedParticipants && followedParticipants.length > 0 && (
                     <span>
                       {" "}
@@ -840,7 +883,7 @@ export default function EventDetailed({ eventId }) {
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Button
                 variant="contained"
-                style={{
+                sx={{
                   backgroundColor: "#4B9023",
                   borderRadius: 30,
                   width: "110px",
@@ -848,6 +891,7 @@ export default function EventDetailed({ eventId }) {
                   textTransform: "none",
                 }}
                 onClick={handleJoinLeaveToggle}
+                disabled={parseISO(eventData.date) < dayjs()}
               >
                 <Typography variant="h5">
                   {userLogged ? (

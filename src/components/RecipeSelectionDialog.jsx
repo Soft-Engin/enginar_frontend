@@ -32,7 +32,7 @@ function CustomTabPanel(props) {
           sx={{
             height: "100%",
             overflowY: "auto",
-            px: 2
+            px: 2,
           }}
         >
           {children}
@@ -151,6 +151,7 @@ const RecipeSelectionDialog = ({ open, onClose, userId, onRecipeSelect }) => {
     ownPage.current = value;
     await fetchRecipes();
   };
+  
   const handleBookmarkedPageChange = async (event, value) => {
     bookmarkedPage.current = value;
     await fetchRecipes();

@@ -267,7 +267,12 @@ export default function SavedLikedPosts() {
           rowSpacing={4}
           columnSpacing={4}
           justifyContent="center"
-          sx={{ pt: 2, pb: 5, scale: { md: "85%", lg: "85%", xl: "95%" }, transformOrigin: "top" }}
+          sx={{
+            pt: 2,
+            pb: 5,
+            scale: { md: "85%", lg: "85%", xl: "95%" },
+            transformOrigin: "top",
+          }}
         >
           {loadingRecipes && <div>Loading recipes...</div>}
           {errorRecipes && <div>Error loading recipes: {errorRecipes}</div>}

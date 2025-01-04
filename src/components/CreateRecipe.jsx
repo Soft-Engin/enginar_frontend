@@ -26,7 +26,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
-import CloseIcon from "@mui/icons-material/Close"; // Import the CloseIcon
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
