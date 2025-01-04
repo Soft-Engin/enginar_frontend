@@ -213,7 +213,7 @@ export default function EventDetailed({ eventId }) {
         setErrorParticipants(null);
         try {
           const response = await axios.get(
-            `/api/v1/events/${eventData.eventId}/participants?pageSize=100`
+            `/api/v1/events/${eventData.eventId}/participants?pageSize=200`
           );
           if (response.data && response.data.participations) {
             setParticipants(response.data.participations.items || []);
