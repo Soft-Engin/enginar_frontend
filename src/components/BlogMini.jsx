@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Box, Avatar, IconButton } from "@mui/material";
+import { Typography, Box, Avatar, IconButton, Chip } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -46,6 +46,10 @@ export default function BlogMini({ blog }) {
       ? JSON.parse(localStorage.getItem("userData"))
       : null
   );
+
+  const [recipeName, setRecipeName] = useState(null);
+  const [loadingRecipe, setLoadingRecipe] = useState(true);
+  const [errorRecipe, setErrorRecipe] = useState(null);
 
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
@@ -94,6 +98,28 @@ export default function BlogMini({ blog }) {
       }
     };
   }, [blogId]);
+
+  useEffect(() => {
+    if (blog && blog.recipeId) {
+      const fetchRecipe = async () => {
+        setLoadingRecipe(true);
+        setErrorRecipe(null);
+        try {
+          const response = await axios.get(`/api/v1/recipes/${blog.recipeId}`);
+          setRecipeName(response.data.header);
+        } catch (err) {
+          console.error("Error fetching recipe:", err);
+          setErrorRecipe(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingRecipe(false);
+        }
+      };
+      fetchRecipe();
+    } else {
+      setLoadingRecipe(false);
+    }
+  }, [blog?.recipeId]);
+
   React.useEffect(() => {
     if (blog && blog.userId) {
       const fetchProfilePicture = async () => {
@@ -342,6 +368,7 @@ export default function BlogMini({ blog }) {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          height: 35,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -370,7 +397,7 @@ export default function BlogMini({ blog }) {
           </Link>
           <Typography variant="body2" color="text.secondary" noWrap>
             {blog.createdAt &&
-              formatDistanceToNow(parseISO(blog.createdAt), {
+              formatDistanceToNow(parseISO(blog.createdAt).getTime() + 3 * 60 * 60 * 1000, {
                 addSuffix: true,
               })}
           </Typography>
@@ -454,10 +481,7 @@ export default function BlogMini({ blog }) {
         )}
       </Box>
 
-      <Box
-        onClick={() => navigate(`/blog?id=${blogId}`)}
-        sx={{ cursor: "pointer" }}
-      >
+      <Box>
         <Typography
           variant="body2"
           sx={{
@@ -471,12 +495,30 @@ export default function BlogMini({ blog }) {
             wordWrap: "break-word",
             overflowWrap: "break-word",
             flexGrow: 1,
+            cursor: "pointer",
           }}
+          onClick={() => navigate(`/blog?id=${blogId}`)}
         >
           {blog.bodyText}
         </Typography>
 
-        <Box sx={{ mb: 0.5 }}>
+        {recipeName && (
+          <Box sx={{ mb: 0.5, display: "flex", flexDirection: "row", gap: 1 }}>
+            <Typography variant="subtitle2">{"Linked Recipe: "}</Typography>
+            <Chip
+              label={recipeName}
+              onClick={() => navigate(`/recipe?id=${blog.recipeId}`)}
+              clickable
+              size="small"
+              sx={{ backgroundColor: "#4B9023", color: "white", maxWidth: "70%" }}
+            />
+          </Box>
+        )}
+
+        <Box
+          sx={{ mb: 0.5, cursor: "pointer" }}
+          onClick={() => navigate(`/blog?id=${blogId}`)}
+        >
           {bannerUrl && !loading && (
             <StyledCardMedia
               src={bannerUrl}

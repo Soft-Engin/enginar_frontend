@@ -360,22 +360,6 @@ export default function AuthPopup(props) {
               }}
             />
           )}
-
-          {!isSignup && (
-            <Box sx={{ display: "flex", justifyContent: "right" }}>
-              <Typography noWrap component="div" color="#535353">
-                <Link
-                  data-testid="forgot-password-link"
-                  onClick={() => console.log("Forgot Password")}
-                  color="#4B9023"
-                  underline="hover"
-                  sx={{ cursor: "pointer" }}
-                >
-                  Forgot password?
-                </Link>
-              </Typography>
-            </Box>
-          )}
         </DialogContent>
         <DialogActions
           data-testid="auth-dialog-actions"

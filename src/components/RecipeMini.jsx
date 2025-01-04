@@ -21,7 +21,8 @@ const StyledCardMedia = styled("img")({
   height: "225px",
 });
 
-export default function RecipeMini({ recipe }) {
+export default function RecipeMini({ recipe, disableActions = false }) {
+  // Added disableActions prop
   const navigate = useNavigate();
   const [bannerUrl, setBannerUrl] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
@@ -200,6 +201,8 @@ export default function RecipeMini({ recipe }) {
   }, [recipeId, userLogged]);
 
   const handleLikeToggle = async () => {
+    if (disableActions) return; // Prevent action if disabled
+
     if (!userLogged) {
       const authButton = document.getElementById(authButtonId);
       if (authButton) {
@@ -227,6 +230,8 @@ export default function RecipeMini({ recipe }) {
   };
 
   const handleBookmarkToggle = async () => {
+    if (disableActions) return; // Prevent action if disabled
+
     if (!userLogged) {
       const authButton = document.getElementById(authButtonId);
       if (authButton) {
@@ -280,6 +285,7 @@ export default function RecipeMini({ recipe }) {
   }, [loggedInUserFollowing, recipe.userId, loggedInUserData]);
 
   const handleFollowUser = async () => {
+    if (disableActions) return; // Prevent action if disabled
     try {
       const response = await axios.post(
         `/api/v1/users/follow?targetUserId=${recipe.userId}`
@@ -302,6 +308,7 @@ export default function RecipeMini({ recipe }) {
   };
 
   const handleUnfollowUser = async () => {
+    if (disableActions) return; // Prevent action if disabled
     try {
       const response = await axios.delete(
         `/api/v1/users/unfollow?targetUserId=${recipe.userId}`
@@ -326,6 +333,7 @@ export default function RecipeMini({ recipe }) {
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
+    if (disableActions) return;
     setAnchorEl(event.currentTarget);
   };
 
@@ -359,16 +367,18 @@ export default function RecipeMini({ recipe }) {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          height: 35,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Link
-            to={`/profile?id=${recipe.userId}`}
+            to={disableActions ? undefined : `/profile?id=${recipe.userId}`}
             style={{
               textDecoration: "none",
               color: "inherit",
               display: "flex",
               alignItems: "center",
+              pointerEvents: disableActions ? "none" : "auto",
             }}
           >
             <Avatar
@@ -389,7 +399,7 @@ export default function RecipeMini({ recipe }) {
           </Link>
           <Typography data-testid="recipe-created-ago" variant="body2" color="text.secondary" noWrap>
             {recipe.createdAt &&
-              formatDistanceToNow(parseISO(recipe.createdAt), {
+              formatDistanceToNow(parseISO(recipe.createdAt).getTime() + 3 * 60 * 60 * 1000, {
                 addSuffix: true,
               })}
           </Typography>
@@ -403,6 +413,7 @@ export default function RecipeMini({ recipe }) {
               aria-expanded={open ? "true" : undefined}
               aria-haspopup="true"
               onClick={handleClick}
+              disabled={disableActions} // Disable the more button as well
             >
               <MoreHorizIcon data-testid="menu-button" sx={{ fontSize: "30px" }} />
             </IconButton>
@@ -443,11 +454,19 @@ export default function RecipeMini({ recipe }) {
                   {!isOwnRecipe && (
                     <>
                       {isFollowing ? (
-                        <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                        <MenuItem
+                          key="Unfollow"
+                          onClick={handleUnfollowUser}
+                          disabled={disableActions}
+                        >
                           Unfollow User
                         </MenuItem>
                       ) : (
-                        <MenuItem key="Follow" onClick={handleFollowUser}>
+                        <MenuItem
+                          key="Follow"
+                          onClick={handleFollowUser}
+                          disabled={disableActions}
+                        >
                           Follow User
                         </MenuItem>
                       )}
@@ -475,9 +494,11 @@ export default function RecipeMini({ recipe }) {
 
       <Box
         data-testid="recipe-mini-clickable"
-        onClick={() => navigate(`/recipe?id=${recipeId}`)}
+        onClick={
+          disableActions ? undefined : () => navigate(`/recipe?id=${recipeId}`)
+        }
         sx={{
-          cursor: "pointer",
+          cursor: disableActions ? "default" : "pointer",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -556,7 +577,12 @@ export default function RecipeMini({ recipe }) {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton data-testid="like-button" onClick={handleLikeToggle} style={{ padding: 0 }}>
+            <IconButton
+              data-testid="like-button"
+              onClick={handleLikeToggle}
+              style={{ padding: 0 }}
+              disabled={disableActions}
+            >
               {isLiked ? (
                 <FavoriteIcon data-testid="like-icon-filled"
                   style={{ fontSize: "30px", marginRight: 4, color: "red" }}
@@ -575,7 +601,11 @@ export default function RecipeMini({ recipe }) {
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
               style={{ fontSize: "28px", marginRight: 4, color: "#757575" }}
-              onClick={() => navigate(`/recipe?id=${recipeId}`)}
+              onClick={
+                disableActions
+                  ? undefined
+                  : () => navigate(`/recipe?id=${recipeId}`)
+              }
             />
             <Typography data-testid="comment-count" variant="body2" color="text.secondary">
               {commentCount}
@@ -584,7 +614,12 @@ export default function RecipeMini({ recipe }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+          <IconButton
+            data-testid="bookmark-button"
+            onClick={handleBookmarkToggle}
+            style={{ padding: 0 }}
+            disabled={disableActions}
+          >
             {isBookmarked ? (
               <BookmarkIcon data-testid="bookmark-icon-filled" style={{ fontSize: "32px" }} />
             ) : (

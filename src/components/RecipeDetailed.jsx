@@ -14,6 +14,8 @@ import {
   DialogActions,
   Button,
   DialogContent,
+  Fade,
+  Modal,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -63,6 +65,8 @@ export default function RecipeDetailed({ recipeId }) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
   const [snackbarSeverity, setSnackbarSeverity] = React.useState("success");
+  const [imageEnlarged, setImageEnlarged] = useState(false);
+  const [enlargedImageIndex, setEnlargedImageIndex] = useState(null);
   const open = Boolean(anchorEl);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
@@ -325,6 +329,22 @@ export default function RecipeDetailed({ recipeId }) {
 
   React.useEffect(() => {
     if (recipeData && recipeData.id && userLogged) {
+      const fetchCommentCount = async () => {
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${recipeData.id}/comments`
+          );
+          setCommentCount(response.data.totalCount || 0);
+        } catch (err) {
+          console.error("Error fetching comment count:", err);
+        }
+      };
+      fetchCommentCount();
+    }
+  }, [recipeData, userLogged]);
+
+  React.useEffect(() => {
+    if (recipeData && recipeData.id && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
         setErrorIsBookmarked(null);
@@ -470,51 +490,60 @@ export default function RecipeDetailed({ recipeId }) {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-      <Dialog open={openDialog} onClose={handleDialogClose} 
-      PaperProps={{
-        sx: {
-          width: { xs: 250, sm: 400 },
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          padding: 0.5,
-        },
-      }}>
-        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete this recipe?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}
-          sx={{
-            backgroundColor: "#C8EFA5",
-            color: "black",
-            ":hover": {
+          <Button
+            onClick={handleDialogClose}
+            sx={{
               backgroundColor: "#C8EFA5",
-            },
-            borderRadius: 20,
-            marginTop: 2,
-            display: "block",
-            marginLeft: "auto",
-          }}>
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={() => {handleDelete(); handleDialogClose();} }
-              variant="contained"
-              sx={{
+          <Button
+            onClick={() => {
+              handleDelete();
+              handleDialogClose();
+            }}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
                 backgroundColor: "#cc0000",
-                color: "error",
-                ":hover": {
-                  backgroundColor: "#cc0000",
-                },
-                borderRadius: 20,
-                marginTop: 2,
-                display: "block",
-                marginLeft: "auto",
-                fontWeight: "bold",
-              }}
-            >
-              Delete
-            </Button>
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
       <Box
@@ -552,7 +581,7 @@ export default function RecipeDetailed({ recipeId }) {
               </Typography>
               <Typography variant="body2" color="text.secondary" noWrap>
                 {recipeData.createdAt &&
-                  formatDistanceToNow(parseISO(recipeData.createdAt), {
+                  formatDistanceToNow(parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000, {
                     addSuffix: true,
                   })}
               </Typography>
@@ -581,7 +610,6 @@ export default function RecipeDetailed({ recipeId }) {
                   sx: {
                     overflow: "visible",
                     filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                    mt: 1.5,
                     "& .MuiAvatar-root": {
                       width: 32,
                       height: 32,
@@ -787,9 +815,39 @@ export default function RecipeDetailed({ recipeId }) {
             objectFit: "cover",
             borderRadius: 10,
             border: "1px solid #C0C0C0",
+            cursor: "pointer",
           }}
+          onClick={() => setImageEnlarged(true)}
         />
       )}
+      <Fade in={imageEnlarged}>
+        <Box>
+          <Modal
+            open={imageEnlarged}
+            onClose={() => setImageEnlarged(false)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bgcolor: "rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <Fade in={imageEnlarged} timeout={300}>
+              <img
+                src={bannerUrl}
+                alt={recipeData.header}
+                style={{
+                  maxWidth: "70vw",
+                  maxHeight: "70vh",
+                  aspectRatio: "auto",
+                  objectFit: "contain",
+                  borderRadius: "10px",
+                }}
+              />
+            </Fade>
+          </Modal>
+        </Box>
+      </Fade>
 
       <Typography
         variant="h4"
@@ -842,8 +900,42 @@ export default function RecipeDetailed({ recipeId }) {
                     objectFit: "cover",
                     borderRadius: 10,
                     border: "1px solid #C0C0C0",
+                    cursor: "pointer",
                   }}
+                  onClick={() => setEnlargedImageIndex(index)}
                 />
+                <Fade in={imageEnlarged}>
+                  <Box>
+                    <Modal
+                      open={enlargedImageIndex === index}
+                      onClose={() => setEnlargedImageIndex(null)}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        bgcolor: "rgba(0, 0, 0, 0.5)",
+                      }}
+                    >
+                      <Fade in={enlargedImageIndex === index} timeout={300}>
+                        {enlargedImageIndex !== null ? (
+                          <img
+                            src={stepImages[enlargedImageIndex]}
+                            alt={`Step ${enlargedImageIndex + 1}`}
+                            style={{
+                              maxWidth: "70vw",
+                              maxHeight: "70vh",
+                              aspectRatio: "auto",
+                              objectFit: "contain",
+                              borderRadius: "10px",
+                            }}
+                          />
+                        ) : (
+                          <Box />
+                        )}
+                      </Fade>
+                    </Modal>
+                  </Box>
+                </Fade>
               </Box>
             )}
           </ListItem>
@@ -866,11 +958,11 @@ export default function RecipeDetailed({ recipeId }) {
           noWrap
         >
           {recipeData.createdAt &&
-            format(parseISO(recipeData.createdAt), "h:mm a")}
+            format(parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000, "h:mm a")}
         </Typography>
         <Typography variant="body1" color="text.secondary" noWrap>
-          {recipeData.createdAt &&
-            format(parseISO(recipeData.createdAt), "MMM d, yyyy")}
+          · {recipeData.createdAt &&
+            format(parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000, "MMM d, yyyy")}
         </Typography>
       </Box>
       <Box

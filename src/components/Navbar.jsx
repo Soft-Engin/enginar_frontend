@@ -427,19 +427,14 @@ export default function Navbar(props) {
 
           <SearchBar data-testid="navbar-search" />
 
-          <RightSection data-testid="navbar-right-section" >
-            <IconButton
-              onClick={toggleInvertMode}
-              sx={{
-                opacity: 0,
-              }}
-            >
-              {isInverted ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
+          <RightSection data-testid="navbar-right-section" sx={{ mr: 3 }}>
             {userLogged ? (
               <>
                 <Tooltip title="Profile Menu">
-                  <IconButton data-testid="user-avatar-button" onClick={handleOpenUserMenu}>
+                  <IconButton
+                    data-testid="user-avatar-button"
+                    onClick={handleOpenUserMenu}
+                  >
                     <Avatar
                       alt={
                         user?.firstName

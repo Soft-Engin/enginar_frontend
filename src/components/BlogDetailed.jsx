@@ -10,6 +10,9 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Modal,
+  Fade,
+  Chip,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -51,10 +54,15 @@ export default function BlogDetailed({ blogId }) {
   const [bannerImage, setBannerImage] = useState(null); // New state for base64 banner
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  const [commentCount, setCommentCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0); // Initialize commentCount state
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [imageEnlarged, setImageEnlarged] = useState(false);
   let authButtonId = "loginButton";
+
+  const [recipeName, setRecipeName] = useState(null);
+  const [loadingRecipe, setLoadingRecipe] = useState(true);
+  const [errorRecipe, setErrorRecipe] = useState(null);
 
   let userLogged = localStorage.getItem("userLogged") === "true";
   const [isFollowing, setIsFollowing] = useState(false);
@@ -276,7 +284,28 @@ export default function BlogDetailed({ blogId }) {
       }
     };
   }, [blogData]);
-
+  useEffect(() => {
+    if (blogData && blogData.recipeId) {
+      const fetchRecipe = async () => {
+        setLoadingRecipe(true);
+        setErrorRecipe(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${blogData.recipeId}`
+          );
+          setRecipeName(response.data.header);
+        } catch (err) {
+          console.error("Error fetching recipe:", err);
+          setErrorRecipe(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingRecipe(false);
+        }
+      };
+      fetchRecipe();
+    } else {
+      setLoadingRecipe(false);
+    }
+  }, [blogData?.recipeId]);
   const convertBlobToBase64 = (blob) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -298,6 +327,22 @@ export default function BlogDetailed({ blogId }) {
         }
       };
       fetchIsLiked();
+    }
+  }, [blogData, userLogged]);
+
+  useEffect(() => {
+    if (blogData && blogData.id && userLogged) {
+      const fetchCommentCount = async () => {
+        try {
+          const response = await axios.get(
+            `/api/v1/blogs/${blogData.id}/comments`
+          );
+          setCommentCount(response.data.totalCount || 0);
+        } catch (err) {
+          console.error("Error fetching comment count:", err);
+        }
+      };
+      fetchCommentCount();
     }
   }, [blogData, userLogged]);
 
@@ -415,9 +460,9 @@ export default function BlogDetailed({ blogId }) {
   }
 
   const formattedTime =
-    blogData.createdAt && format(parseISO(blogData.createdAt), "h:mm a");
+    blogData.createdAt && format(parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000, "h:mm a");
   const formattedDate =
-    blogData.createdAt && format(parseISO(blogData.createdAt), "MMM d, yyyy");
+    blogData.createdAt && format(parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000, "MMM d, yyyy");
 
   return (
     <Box
@@ -478,7 +523,7 @@ export default function BlogDetailed({ blogId }) {
                 noWrap
               >
                 {blogData.createdAt &&
-                  formatDistanceToNow(parseISO(blogData.createdAt), {
+                  formatDistanceToNow(parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000, {
                     addSuffix: true,
                   })}
               </Typography>
@@ -498,19 +543,34 @@ export default function BlogDetailed({ blogId }) {
               <MoreHorizIcon sx={{ fontSize: "30px" }} />
             </IconButton>
             <Menu
-              id="menu"
-              MenuListProps={{
-                "aria-labelledby": "menuButton",
-              }}
               anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "left",
+              PaperProps={{
+                elevation: 0,
+                sx: {
+                  overflow: "visible",
+                  filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                  "& .MuiAvatar-root": {
+                    width: 32,
+                    height: 32,
+                    ml: -0.5,
+                    mr: 1,
+                  },
+                  "&:before": {
+                    content: '""',
+                    display: "block",
+                    position: "absolute",
+                    top: 0,
+                    right: 14,
+                    width: 10,
+                    height: 10,
+                    bgcolor: "background.paper",
+                    transform: "translateY(-50%) rotate(45deg)",
+                    zIndex: 0,
+                  },
+                },
               }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               open={open}
               onClose={handleClose}
             >
@@ -576,6 +636,24 @@ export default function BlogDetailed({ blogId }) {
       >
         {blogData.bodyText}
       </Typography>
+      {recipeName && (
+        <Box sx={{ mb: 0.5, display: "flex", flexDirection: "row", gap: 1 }}>
+          <Typography variant="subtitle2">{"Linked Recipe: "}</Typography>
+          <Chip
+            label={recipeName}
+            onClick={() => {
+              try {
+                navigate(`/recipe?id=${blogData.recipeId}`);
+              } catch (e) {
+                console.error("error on navigation", e);
+              }
+            }}
+            clickable
+            size="small"
+            sx={{ backgroundColor: "#4B9023", color: "white", maxWidth: "80%" }}
+          />
+        </Box>
+      )}
       {bannerUrl && !loadingBanner && (
         <Box data-testid="blog-banner-container" sx={{ mb: 2 }}>
           <StyledCardMedia
@@ -583,7 +661,37 @@ export default function BlogDetailed({ blogId }) {
             src={bannerUrl}
             alt={blogData.header}
             onError={() => setBannerUrl(null)}
+            onClick={() => setImageEnlarged(true)}
+            sx={{ cursor: "pointer" }}
           />
+          <Fade in={imageEnlarged}>
+            <Box>
+              <Modal
+                open={imageEnlarged}
+                onClose={() => setImageEnlarged(false)}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: "rgba(0, 0, 0, 0.5)",
+                }}
+              >
+                <Fade in={imageEnlarged} timeout={300}>
+                  <img
+                    src={bannerUrl}
+                    alt={blogData.header}
+                    style={{
+                      maxWidth: "70vw",
+                      maxHeight: "70vh",
+                      aspectRatio: "auto",
+                      objectFit: "contain",
+                      borderRadius: "10px",
+                    }}
+                  />
+                </Fade>
+              </Modal>
+            </Box>
+          </Fade>
         </Box>
       )}
       {errorBanner && (
@@ -591,25 +699,6 @@ export default function BlogDetailed({ blogId }) {
           <Typography color="error">Error: {errorBanner}</Typography>
         </Box>
       )}
-
-      {blogData.recipeId && (
-        <Link
-          to={`/recipe?id=${blogData.recipeId}`}
-          style={{
-            textDecoration: "none",
-            color: "inherit",
-            display: "block",
-            textAlign: "center",
-            marginBottom: 2,
-          }}
-          data-testid="related-recipe-link"
-        >
-          <Typography variant="body1" fontWeight={"bold"}>
-            Click here to see the related recipe!
-          </Typography>
-        </Link>
-      )}
-
       <Box
         data-testid="blog-date-time"
         sx={{
@@ -723,51 +812,59 @@ export default function BlogDetailed({ blogId }) {
           bannerImage={bannerImage} // Pass bannerImage as a prop
         />
       )}
-      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete} 
-      PaperProps={{
-        sx: {
-          width: { xs: 250, sm: 400 },
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          padding: 0.5,
-        },
-      }}>
-        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete this blog post?</Typography>
+          <Typography>
+            Are you sure you want to delete this blog post?
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelDelete}
-          sx={{
-            backgroundColor: "#C8EFA5",
-            color: "black",
-            ":hover": {
+          <Button
+            onClick={handleCancelDelete}
+            sx={{
               backgroundColor: "#C8EFA5",
-            },
-            borderRadius: 20,
-            marginTop: 2,
-            display: "block",
-            marginLeft: "auto",
-          }}>
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={handleDeleteBlog} 
-              variant="contained"
-              sx={{
+          <Button
+            onClick={handleDeleteBlog}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
                 backgroundColor: "#cc0000",
-                color: "error",
-                ":hover": {
-                  backgroundColor: "#cc0000",
-                },
-                borderRadius: 20,
-                marginTop: 2,
-                display: "block",
-                marginLeft: "auto",
-                fontWeight: "bold",
-              }}
-            >
-              Delete
-            </Button>
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
