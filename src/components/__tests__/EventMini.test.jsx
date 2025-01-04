@@ -27,7 +27,8 @@ describe('EventMini Component', () => {
   const mockEvent = {
     eventId: 'event-123',
     title: 'Test Event',
-    date: '2024-02-01T15:00:00Z',
+    // Use a fixed future date instead of a dynamic one
+    date: '2029-01-04T15:00:00Z',
     creatorId: 'user-456',
     address: {
       district: {
@@ -80,7 +81,7 @@ describe('EventMini Component', () => {
     expect(screen.getByTestId(`event-mini-${mockEvent.eventId}`)).toBeInTheDocument();
     expect(screen.getByTestId('event-title')).toHaveTextContent('Test Event');
     expect(screen.getByTestId('event-location')).toHaveTextContent('Test City');
-    expect(screen.getByTestId('event-date')).toHaveTextContent('01.02.2024');
+    expect(screen.getByTestId('event-date')).toHaveTextContent('04.01.2029');
     expect(screen.getByTestId('event-description')).toHaveTextContent('This is a test event description');
   });
 
@@ -145,13 +146,35 @@ describe('EventMini Component', () => {
 
   it('toggles participation when logged user clicks join/leave', async () => {
     window.localStorage.setItem('userLogged', 'true');
+    
+    // Mock the POST request
     axios.post.mockResolvedValueOnce({});
+    
+    // Mock the initial state as not participating
+    axios.get.mockImplementation((url) => {
+      if (url.includes('/is-participant')) {
+        return Promise.resolve({ data: { isParticipant: false } });
+      }
+      if (url.includes('/participants')) {
+        return Promise.resolve({ 
+          data: {
+            participations: { items: [] },
+            followedParticipations: { items: [] }
+          }
+        });
+      }
+      return Promise.resolve({ data: {} });
+    });
 
     renderEventMini();
 
+    // Wait for the button to be enabled
     const joinButton = await screen.findByTestId('join-button');
+    
+    // Click the join button
     fireEvent.click(joinButton);
 
+    // Verify the API call was made
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalledWith(
         `/api/v1/events/${mockEvent.eventId}/toggle-event-attendance`

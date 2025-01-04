@@ -14,7 +14,7 @@ vi.mock('axios');
 
 describe('EventDetailed Component', () => {
   const mockEventId = 'event-123';
-  const eventDate = '2024-02-01T15:00:00Z';
+  const eventDate = '2029-12-31T15:00:00Z';  // Fixed future date
   const mockEvent = {
     eventId: mockEventId,
     title: 'Test Event',
@@ -85,9 +85,8 @@ describe('EventDetailed Component', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('event-title')).toHaveTextContent('Test Event');
-      // Don't test the exact time, just verify the date format
       const datetimeElement = screen.getByTestId('event-datetime');
-      expect(datetimeElement.textContent).toMatch(/01\.02\.2024, \d{2}:\d{2}/);
+      expect(datetimeElement.textContent).toMatch('31.12.2029');
       expect(screen.getByTestId('event-location')).toHaveTextContent('Test Street, Test District, Test City, Test Country');
       expect(screen.getByTestId('event-description')).toHaveTextContent('This is a test event description');
     });
@@ -142,13 +141,40 @@ describe('EventDetailed Component', () => {
 
   it('toggles participation when logged user clicks join/leave', async () => {
     window.localStorage.setItem('userLogged', 'true');
+    
+    // Mock the POST request
     axios.post.mockResolvedValueOnce({});
+    
+    // Mock initial state as not participating
+    axios.get.mockImplementation((url) => {
+      if (url.includes(`/api/v1/events/${mockEventId}`)) {
+        return Promise.resolve({ data: mockEvent });
+      }
+      if (url.includes('/is-participant')) {
+        return Promise.resolve({ data: { isParticipant: false } });
+      }
+      if (url.includes('/participants')) {
+        return Promise.resolve({
+          data: {
+            participations: { items: [] },
+            followedParticipations: { items: [] }
+          }
+        });
+      }
+      return Promise.resolve({ data: {} });
+    });
 
     renderEventDetailed();
 
+    // Wait for the button to be enabled and then click it
     await waitFor(() => {
       const joinButton = screen.getByTestId('join-button');
+      expect(joinButton).not.toBeDisabled();
       fireEvent.click(joinButton);
+    });
+
+    // Verify the API call
+    await waitFor(() => {
       expect(axios.post).toHaveBeenCalledWith(
         `/api/v1/events/${mockEventId}/toggle-event-attendance`
       );

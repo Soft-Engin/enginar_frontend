@@ -46,28 +46,37 @@ describe("UserListItem Component", () => {
   });
 
   it("fetches and shows profile picture if available", async () => {
-    // Mock a successful profile-picture response
-    const mockBlob = new Blob(["fakeImageData"], { type: "image/png" });
+    // Create a more realistic mock blob
+    const mockBlob = new Blob(['mock-image'], { type: 'image/jpeg' });
+    
+    // Mock successful profile picture response
     mockGet.mockResolvedValueOnce({
       status: 200,
       data: mockBlob,
+      headers: { 'content-type': 'image/jpeg' }
     });
-  
+
+    // Mock URL.createObjectURL
+    const mockUrl = 'blob:mock-url';
+    global.URL.createObjectURL = vi.fn(() => mockUrl);
+    global.URL.revokeObjectURL = vi.fn();
+
     render(
       <MemoryRouter>
         <UserListItem user={{ userId: "123", userName: "TestUser" }} />
       </MemoryRouter>
     );
-  
-    // Check placeholder is initially rendered
-    expect(screen.getByText("T")).toBeInTheDocument();
-  
-    // Wait for the profile picture to be fetched and applied
+
+    // Wait for the avatar with image to appear and initials to disappear
     await waitFor(() => {
-      const avatarImage = screen.getByTestId("user-avatar");
+      expect(screen.queryByTestId("user-avatar-initials")).not.toBeInTheDocument();
+      expect(screen.getByTestId("user-avatar-with-image")).toBeInTheDocument();
     });
+
+    // Cleanup
+    global.URL.createObjectURL.mockRestore();
+    global.URL.revokeObjectURL.mockRestore();
   });
-  
 
   it("shows placeholder if profile picture fails or returns non-200", async () => {
     mockGet.mockResolvedValueOnce({
@@ -82,9 +91,8 @@ describe("UserListItem Component", () => {
     );
 
     await waitFor(() => expect(mockGet).toHaveBeenCalledTimes(1));
-    // We won't find user-avatar-image, so we rely on text "T" as placeholder
-    expect(screen.getByText("T")).toBeInTheDocument();
-    expect(screen.queryByTestId("user-avatar-image")).not.toBeInTheDocument();
+    expect(screen.getByTestId("user-avatar-initials")).toBeInTheDocument();
+    expect(screen.queryByTestId("user-avatar-with-image")).not.toBeInTheDocument();
   });
 
   it("handles error from axios gracefully and uses placeholder", async () => {

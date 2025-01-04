@@ -72,13 +72,14 @@ const UserListItem = ({ user }) => {
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         {profilePic ? (
           <Avatar
-            data-testid="user-avatar-image"
+            data-testid="user-avatar-with-image"
             src={profilePic}
             sx={{ width: 40, height: 40 }}
             onError={() => setProfilePic(null)}
           />
         ) : (
           <Box
+            data-testid="user-avatar-initials"
             sx={{
               width: 40,
               height: 40,
