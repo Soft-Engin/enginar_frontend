@@ -76,8 +76,8 @@ describe("UserEventsTab component", () => {
           status: 200,
           data: {
             items: [
-              { id: "event1", title: "First event" },
-              { id: "event2", title: "Second event" },
+              { id: "event1", title: "First event", eventId: "event1" },
+              { id: "event2", title: "Second event", eventId: "event2" },
             ],
             totalCount: 2,
           },

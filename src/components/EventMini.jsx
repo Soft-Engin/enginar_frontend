@@ -214,7 +214,7 @@ export default function EventMini({ event }) {
 
   return (
     <Box
-      data-testid={`event-mini-${event.id}`}
+      data-testid={`event-mini-${event.eventId}`}
       sx={{
         maxWidth: 630,
         width: "100%",
@@ -249,6 +249,7 @@ export default function EventMini({ event }) {
           <Typography
             variant="h5"
             fontWeight="bold"
+            data-testid="event-title"
             style={{ marginRight: "15px" }}
             noWrap
             onClick={() => navigate(`/event?id=${event.eventId}`)}
@@ -259,13 +260,23 @@ export default function EventMini({ event }) {
         </Box>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <PlaceOutlinedIcon style={{ fontSize: "30px", marginRight: "2px" }} />
-          <Typography variant="body2" component="div" noWrap>
+          <Typography 
+            variant="body2" 
+            component="div" 
+            data-testid="event-location"
+            noWrap
+          >
             {event?.address?.district?.city?.name || "City"}
           </Typography>
           <CalendarMonthIcon
             style={{ fontSize: "30px", marginRight: "2px", marginLeft: "5px" }}
           />
-          <Typography variant="body2" component="div" noWrap>
+          <Typography 
+            variant="body2" 
+            component="div"
+            data-testid="event-date" 
+            noWrap
+          >
             {formattedDate}
           </Typography>
         </Box>
@@ -317,6 +328,7 @@ export default function EventMini({ event }) {
       <Typography
         variant="body2"
         component="div"
+        data-testid="event-description"
         sx={{
           overflow: "hidden",
           display: "-webkit-box",
@@ -415,6 +427,7 @@ export default function EventMini({ event }) {
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Button
             variant="contained"
+            data-testid="join-button"
             style={{
               backgroundColor: "#4B9023",
               borderRadius: 30,
