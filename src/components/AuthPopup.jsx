@@ -7,6 +7,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -14,6 +15,7 @@ import Alert from "@mui/material/Alert";
 import EmailIcon from "@mui/icons-material/Email";
 import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
+import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
@@ -54,9 +56,12 @@ const SubmitButton = styled(Button)(({ theme }) => ({
   borderRadius: "25px",
   fontSize: "20px",
   fontWeight: "bold",
+  textTransform: "none",
 }));
 
 export default function AuthPopup(props) {
+  const navigate = useNavigate();
+
   const [open, setOpen] = React.useState(false);
   const [isSignup, setIsSignup] = React.useState(true);
   const [formError, setFormError] = React.useState(null);
@@ -108,6 +113,10 @@ export default function AuthPopup(props) {
           axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
           props.setAnchorElUser(null);
           handleClose();
+          navigate("/");
+          setTimeout(function () {
+            window.location.reload();
+          }, 500);
         }
       } else if (response.status === 400) {
         if (isSignup) {
@@ -122,10 +131,21 @@ export default function AuthPopup(props) {
       }
     } catch (error) {
       console.error("Error:", error);
-      if (error.response) {
-        setFormError(
-          error.response.data.message || "An unexpected error occurred."
-        );
+      if (error.response && error.response.data) {
+        const errorData = error.response.data;
+        let errorMessages = [];
+        if (errorData.errors) {
+          if (Array.isArray(errorData.errors)) {
+            errorMessages = errorData.errors.map(
+              (err) => err.description || err
+            );
+          } else if (typeof errorData.errors === "object") {
+            errorMessages = Object.values(errorData.errors).flat();
+          }
+        } else if (errorData.message) {
+          errorMessages.push(errorData.message);
+        }
+        setFormError(errorMessages.join("\n"));
       } else if (error.request) {
         setFormError("Could not connect to the server. Please try again later.");
       } else {
@@ -190,13 +210,15 @@ export default function AuthPopup(props) {
             </Alert>
           )}
           {formError && (
-            <Alert data-testid="error-alert" severity="error" sx={{ mb: 2 }}>
-              {formError}
+            <Alert data-testid="error-alert" severity="error" sx={{ mb: 2 }} icon={false}>
+              <Typography variant="body2" style={{ whiteSpace: "pre-line" }}>
+                {formError}
+              </Typography>
             </Alert>
           )}
           {isSignup ? (
-            <React.Fragment>
-              <Stack direction="row" spacing={2} sx={{ marginBottom: "10px" }}>
+            <>
+              <Stack direction="row" spacing={2} sx={{ marginBottom: "4px" }}>
                 <TextField
                   data-testid="first-name-input"
                   required
@@ -340,17 +362,19 @@ export default function AuthPopup(props) {
           )}
 
           {!isSignup && (
-            <Typography noWrap component="div" color="#535353">
-              <Link
-                data-testid="forgot-password-link"
-                onClick={() => console.log("Forgot Password")}
-                color="#4B9023"
-                underline="hover"
-                sx={{ cursor: "pointer", position: "absolute", right: "6%" }}
-              >
-                Forgot password?
-              </Link>
-            </Typography>
+            <Box sx={{ display: "flex", justifyContent: "right" }}>
+              <Typography noWrap component="div" color="#535353">
+                <Link
+                  data-testid="forgot-password-link"
+                  onClick={() => console.log("Forgot Password")}
+                  color="#4B9023"
+                  underline="hover"
+                  sx={{ cursor: "pointer" }}
+                >
+                  Forgot password?
+                </Link>
+              </Typography>
+            </Box>
           )}
         </DialogContent>
         <DialogActions
@@ -364,7 +388,7 @@ export default function AuthPopup(props) {
           <SubmitButton data-testid="auth-submit-button" type="submit">
             {isSignup ? "Sign Up" : "Log In"}
           </SubmitButton>
-          <Typography noWrap component="div" color="#535353">
+          <Typography noWrap component="div" color="#535353" sx={{ my: 1 }}>
             {isSignup ? "Already have an account? " : "Don't have an account? "}
             <Link
               data-testid="switch-mode-link"

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Typography, Box, Avatar, IconButton } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -6,11 +6,12 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import ShareIcon from "@mui/icons-material/Share";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
-import { format, parseISO, formatDistanceToNow } from "date-fns";
+import { parseISO, formatDistanceToNow } from "date-fns";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 const StyledCardMedia = styled("img")({
   width: "100%",
@@ -38,8 +39,21 @@ export default function BlogMini({ blog }) {
   const [errorLikesComments, setErrorLikesComments] = React.useState(null);
   const [errorIsLiked, setErrorIsLiked] = React.useState(null);
   const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
+  const [loggedInUserData, setLoggedInUserData] = useState(
+    localStorage.getItem("userData")
+      ? JSON.parse(localStorage.getItem("userData"))
+      : null
+  );
+
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
+
+  const blogId = blog?.id || blog?.blogId; // Extract blogId
+  const isOwnBlog =
+    JSON.parse(localStorage.getItem("userData"))?.userId === blog.userId;
+  let isAdmin = loggedInUserData?.roleName === "Admin";
 
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
@@ -51,12 +65,12 @@ export default function BlogMini({ blog }) {
   };
 
   React.useEffect(() => {
-    if (blog && blog.id) {
+    if (blogId) {
       const fetchBanner = async () => {
         setLoading(true);
         setError(null);
         try {
-          const response = await axios.get(`/api/v1/blogs/${blog.id}/banner`, {
+          const response = await axios.get(`/api/v1/blogs/${blogId}/banner`, {
             responseType: "blob",
           });
           if (response.data) {
@@ -79,7 +93,7 @@ export default function BlogMini({ blog }) {
         URL.revokeObjectURL(bannerUrl);
       }
     };
-  }, [blog]);
+  }, [blogId]);
   React.useEffect(() => {
     if (blog && blog.userId) {
       const fetchProfilePicture = async () => {
@@ -112,14 +126,14 @@ export default function BlogMini({ blog }) {
     };
   }, [blog]);
   React.useEffect(() => {
-    if (blog && blog.id) {
+    if (blogId) {
       const fetchLikesAndComments = async () => {
         setLoadingLikesComments(true);
         setErrorLikesComments(null);
         try {
           const [likeResponse, commentResponse] = await Promise.all([
-            axios.get(`/api/v1/blogs/${blog.id}/like-count`),
-            axios.get(`/api/v1/blogs/${blog.id}/comments`),
+            axios.get(`/api/v1/blogs/${blogId}/like-count`),
+            axios.get(`/api/v1/blogs/${blogId}/comments`),
           ]);
 
           setLikeCount(likeResponse.data.likeCount || 0);
@@ -133,14 +147,14 @@ export default function BlogMini({ blog }) {
       };
       fetchLikesAndComments();
     }
-  }, [blog]);
+  }, [blogId]);
   React.useEffect(() => {
-    if (blog && blog.id && userLogged) {
+    if (blogId && userLogged) {
       const fetchIsLiked = async () => {
         setLoadingIsLiked(true);
         setErrorIsLiked(null);
         try {
-          const response = await axios.get(`/api/v1/blogs/${blog.id}/is-liked`);
+          const response = await axios.get(`/api/v1/blogs/${blogId}/is-liked`);
           setIsLiked(response.data.isLiked || false);
         } catch (err) {
           console.error("Error fetching isLiked:", err);
@@ -151,15 +165,15 @@ export default function BlogMini({ blog }) {
       };
       fetchIsLiked();
     }
-  }, [blog, userLogged]);
+  }, [blogId, userLogged]);
   React.useEffect(() => {
-    if (blog && blog.id && userLogged) {
+    if (blogId && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
         setErrorIsBookmarked(null);
         try {
           const response = await axios.get(
-            `/api/v1/blogs/${blog.id}/is-bookmarked`
+            `/api/v1/blogs/${blogId}/is-bookmarked`
           );
           setIsBookmarked(response.data.isBookmarked || false);
         } catch (err) {
@@ -171,7 +185,7 @@ export default function BlogMini({ blog }) {
       };
       fetchIsBookmarked();
     }
-  }, [blog, userLogged]);
+  }, [blogId, userLogged]);
 
   const handleLikeToggle = async () => {
     if (!userLogged) {
@@ -188,7 +202,7 @@ export default function BlogMini({ blog }) {
       setLikeCount((prevLikeCount) => prevLikeCount + 1);
     }
     try {
-      await axios.post(`/api/v1/blogs/${blog.id}/toggle-like`);
+      await axios.post(`/api/v1/blogs/${blogId}/toggle-like`);
     } catch (err) {
       console.error("Error toggling like", err);
       setIsLiked((prevIsLiked) => !prevIsLiked);
@@ -209,17 +223,106 @@ export default function BlogMini({ blog }) {
     }
     setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     try {
-      await axios.post(`/api/v1/blogs/${blog.id}/bookmark`);
+      await axios.post(`/api/v1/blogs/${blogId}/bookmark`);
     } catch (err) {
       console.error("Error toggling bookmark", err);
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     }
   };
+
+  useEffect(() => {
+    const fetchLoggedInUserFollowing = async () => {
+      if (loggedInUserData?.userId) {
+        try {
+          const response = await axios.get(
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+          );
+          if (response.status === 200) {
+            setLoggedInUserFollowing(response.data.items);
+          }
+        } catch (error) {
+          console.error(
+            "Error fetching logged in user's following list: ",
+            error
+          );
+        }
+      }
+    };
+    fetchLoggedInUserFollowing();
+  }, [loggedInUserData]);
+
+  useEffect(() => {
+    if (
+      loggedInUserData?.userId &&
+      blog.userId !== loggedInUserData?.userId &&
+      loggedInUserFollowing
+    ) {
+      const isFollowing = loggedInUserFollowing.some(
+        (following) => following.userId === blog.userId
+      );
+      setIsFollowing(isFollowing);
+    } else {
+      setIsFollowing(false);
+    }
+  }, [loggedInUserFollowing, blog.userId, loggedInUserData]);
+
+  const handleFollowUser = async () => {
+    try {
+      const response = await axios.post(
+        `/api/v1/users/follow?targetUserId=${blog.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(true);
+        setLoggedInUserFollowing((prev) => [...prev, { userId: blog.userId }]);
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to follow the user."
+      );
+    }
+  };
+
+  const handleUnfollowUser = async () => {
+    try {
+      const response = await axios.delete(
+        `/api/v1/users/unfollow?targetUserId=${blog.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(false);
+        setLoggedInUserFollowing((prev) =>
+          prev.filter((following) => following.userId !== blog.userId)
+        );
+      }
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to unfollow the user."
+      );
+    }
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Box 
       data-testid={`blog-mini-${blog.id}`}
       sx={{
         maxWidth: 700,
+        width: "100%",
         outline: "1.5px solid #C0C0C0",
         backgroundColor: "#FFFFFF",
         pl: 3,
@@ -228,6 +331,9 @@ export default function BlogMini({ blog }) {
         pb: 1.5,
         borderRadius: 5,
         boxShadow: 5,
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
       }}
     >
       <Box
@@ -269,11 +375,87 @@ export default function BlogMini({ blog }) {
               })}
           </Typography>
         </Box>
-        <MoreHorizIcon style={{ fontSize: "30px" }} />
+        {userLogged && (
+          <Box>
+            <IconButton
+              aria-label="more"
+              id="menuButton"
+              aria-controls={open ? "menu" : undefined}
+              aria-expanded={open ? "true" : undefined}
+              aria-haspopup="true"
+              onClick={handleClick}
+            >
+              <MoreHorizIcon sx={{ fontSize: "30px" }} />
+            </IconButton>
+            <Menu
+              id="menu"
+              MenuListProps={{
+                "aria-labelledby": "menuButton",
+              }}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={open}
+              onClose={handleClose}
+            >
+              {isAdmin || !isOwnBlog ? (
+                <>
+                  {isAdmin && (
+                    <>
+                      <MenuItem key="Edit" onClick={handleClose}>
+                        Edit Blog
+                      </MenuItem>
+                      <MenuItem
+                        key="Delete"
+                        onClick={handleClose}
+                        sx={{ color: "red" }}
+                      >
+                        Delete Blog
+                      </MenuItem>
+                    </>
+                  )}
+
+                  {!isOwnBlog && (
+                    <>
+                      {isFollowing ? (
+                        <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                          Unfollow User
+                        </MenuItem>
+                      ) : (
+                        <MenuItem key="Follow" onClick={handleFollowUser}>
+                          Follow User
+                        </MenuItem>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <MenuItem key="Edit" onClick={handleClose}>
+                    Edit Blog
+                  </MenuItem>
+                  <MenuItem
+                    key="Delete"
+                    onClick={handleClose}
+                    sx={{ color: "red" }}
+                  >
+                    Delete Blog
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+          </Box>
+        )}
       </Box>
 
       <Box
-        onClick={() => navigate(`/blog?id=${blog.id}`)}
+        onClick={() => navigate(`/blog?id=${blogId}`)}
         sx={{ cursor: "pointer" }}
       >
         <Typography
@@ -286,6 +468,9 @@ export default function BlogMini({ blog }) {
             textOverflow: "ellipsis",
             lineHeight: "24px",
             mb: 2,
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+            flexGrow: 1,
           }}
         >
           {blog.bodyText}
@@ -314,6 +499,7 @@ export default function BlogMini({ blog }) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          marginTop: "auto",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -330,7 +516,7 @@ export default function BlogMini({ blog }) {
                 />
               ) : (
                 <FavoriteBorderIcon
-                  style={{ fontSize: "30px", marginRight: 4 }}
+                  style={{ fontSize: "30px", marginRight: 4, color: "#757575" }}
                   data-testid="not-liked-icon"
                 />
               )}
@@ -342,8 +528,13 @@ export default function BlogMini({ blog }) {
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
-              style={{ fontSize: "28px", marginRight: 4, cursor: "pointer" }}
-              onClick={() => navigate(`/blog?id=${blog.id}`)}
+              style={{
+                fontSize: "28px",
+                marginRight: 4,
+                cursor: "pointer",
+                color: "#757575",
+              }}
+              onClick={() => navigate(`/blog?id=${blogId}`)}
             />
             <Typography variant="body2" color="text.secondary">
               {commentCount}
@@ -352,21 +543,16 @@ export default function BlogMini({ blog }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ShareIcon style={{ fontSize: "28px", marginRight: 6 }} />
-          <IconButton 
-            onClick={handleBookmarkToggle} 
-            style={{ padding: 0 }}
-            data-testid="bookmark-button"
-          >
+          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
               <BookmarkIcon 
                 style={{ fontSize: "32px" }}
                 data-testid="bookmarked-icon"
               />
             ) : (
-              <BookmarkBorderOutlinedIcon 
-                style={{ fontSize: "32px" }}
+              <BookmarkBorderOutlinedIcon
                 data-testid="not-bookmarked-icon"
+                style={{ fontSize: "32px", color: "#757575" }}
               />
             )}
           </IconButton>

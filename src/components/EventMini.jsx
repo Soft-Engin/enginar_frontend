@@ -6,13 +6,11 @@ import {
   AvatarGroup,
   Button,
   CircularProgress,
-  IconButton,
 } from "@mui/material";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import axios from "axios";
 import { format, parseISO } from "date-fns";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function EventMini({ event }) {
@@ -218,7 +216,8 @@ export default function EventMini({ event }) {
     <Box
       data-testid={`event-mini-${event.id}`}
       sx={{
-        maxWidth: 700,
+        maxWidth: 630,
+        width: "100%",
         outline: "1.5px solid #C0C0C0",
         backgroundColor: "#FFFFFF",
         pl: 3,
@@ -227,6 +226,9 @@ export default function EventMini({ event }) {
         pb: 1.5,
         borderRadius: 5,
         boxShadow: 5,
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
       }}
     >
       <Box
@@ -237,24 +239,32 @@ export default function EventMini({ event }) {
           mb: 1,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            maxWidth: { sm: 250, md: 350, lg: 250, xl: 350 },
+          }}
+        >
           <Typography
             variant="h5"
             fontWeight="bold"
-            style={{ marginRight: "15px", maxWidth: "400px" }}
+            style={{ marginRight: "15px" }}
             noWrap
             onClick={() => navigate(`/event?id=${event.eventId}`)}
             sx={{ cursor: "pointer" }}
           >
             {event?.title || "Event Title"}
           </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <PlaceOutlinedIcon style={{ fontSize: "30px", marginRight: "2px" }} />
           <Typography variant="body2" component="div" noWrap>
             {event?.address?.district?.city?.name || "City"}
           </Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CalendarMonthIcon style={{ fontSize: "30px", marginRight: "2px" }} />
+          <CalendarMonthIcon
+            style={{ fontSize: "30px", marginRight: "2px", marginLeft: "5px" }}
+          />
           <Typography variant="body2" component="div" noWrap>
             {formattedDate}
           </Typography>
@@ -302,7 +312,6 @@ export default function EventMini({ event }) {
             </Typography>
           </Link>
         </Box>
-        <MoreHorizIcon style={{ fontSize: "30px" }} />
       </Box>
 
       <Typography
@@ -315,6 +324,9 @@ export default function EventMini({ event }) {
           WebkitLineClamp: 5,
           textOverflow: "ellipsis",
           mb: 1,
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
+          flexGrow: 1,
         }}
       >
         {event?.bodyText || "Event Description"}
@@ -326,6 +338,7 @@ export default function EventMini({ event }) {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          marginTop: "auto",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -334,6 +347,7 @@ export default function EventMini({ event }) {
             component="div"
             fontWeight="bold"
             style={{ marginRight: "6px" }}
+            noWrap
           >
             Participants:
           </Typography>
@@ -390,11 +404,10 @@ export default function EventMini({ event }) {
               component="div"
               color="text.secondary"
             >
-              {participants.length + followedParticipants.length} people are going
+              {participants.length + followedParticipants.length} people are
+              going
               {followedParticipants && followedParticipants.length > 0 && (
-                <span>
-                  , and {followedParticipants.length} whom you follow
-                </span>
+                <span> ({followedParticipants.length} whom you follow)</span>
               )}
             </Typography>
           )}
@@ -412,10 +425,14 @@ export default function EventMini({ event }) {
             onClick={handleJoinLeaveToggle}
           >
             <Typography variant="h6">
-              {loadingIsParticipant ? (
-                <CircularProgress size={15} color="inherit" />
-              ) : isParticipant ? (
-                "Leave"
+              {userLogged ? (
+                loadingIsParticipant ? (
+                  <CircularProgress size={15} color="inherit" />
+                ) : isParticipant ? (
+                  "Leave"
+                ) : (
+                  "Join"
+                )
               ) : (
                 "Join"
               )}

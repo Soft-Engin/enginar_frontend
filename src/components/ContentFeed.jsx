@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 import PropTypes from "prop-types";
@@ -18,6 +18,7 @@ function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      style={{ display: "flex", justifyContent: "center" }}
       {...other}
     >
       {value === index && <Box>{children}</Box>}
@@ -45,9 +46,14 @@ export default function ContentFeed() {
     setValue(newValue);
   };
 
+  const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
 
   return (
-    <Box sx={{ width: { xs: "40%", sm: "60%", md: "75%", lg: "75%", xl: "85%" }, margin: "0 auto" }}>
+    <Box
+      sx={{
+        margin: "0 auto",
+      }}
+    >
       <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
         <Tabs
           centered
@@ -55,7 +61,23 @@ export default function ContentFeed() {
           onChange={handleChange}
           aria-label="Feed Tabs"
           variant="fullWidth"
-          sx={{ "& .MuiTabs-indicator": { backgroundColor: "#4B9023" } }}
+          sx={{
+            "& .MuiTabs-indicator": {
+              backgroundColor: "#4B9023",
+            },
+            "& .MuiTab-root": {
+              fontSize: "1.1rem",
+              fontWeight: "bold",
+              textTransform: "none",
+              padding: "12px 20px",
+            },
+            "& .MuiTab-root.Mui-selected": {
+              color: "#4B9023",
+            },
+            "& .MuiTab-root:hover": {
+              color: "#66c72e",
+            },
+          }}
         >
           <Tab
             label="Popular Recipes"
@@ -67,11 +89,13 @@ export default function ContentFeed() {
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
             {...a11yProps(1)}
           />
-          <Tab
-            label="Following"
-            sx={{ "&.Mui-selected": { color: "#4B9023" } }}
-            {...a11yProps(2)}
-          />
+          {userLogged && (
+            <Tab
+              label="Following"
+              sx={{ "&.Mui-selected": { color: "#4B9023" } }}
+              {...a11yProps(2)}
+            />
+          )}
         </Tabs>
       </Box>
 
@@ -81,7 +105,7 @@ export default function ContentFeed() {
       <CustomTabPanel value={value} index={1}>
         <PopularBlogsTab />
       </CustomTabPanel>
-       <CustomTabPanel value={value} index={2}>
+      <CustomTabPanel value={value} index={2}>
         <FollowingTab />
       </CustomTabPanel>
       <RecommendedUsers />

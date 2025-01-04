@@ -150,7 +150,7 @@ const ProfileEditDialog = ({
           alignItems: "center",
           fontWeight: "bold",
           color: "#333",
-          fontSize: "1.25rem",
+          fontSize: "1.5rem",
         }}
       >
         Edit Profile
@@ -205,13 +205,21 @@ const ProfileEditDialog = ({
           <Box
             sx={{
               display: "flex",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               position: "relative",
             }}
           >
             <Avatar
               src={editedProfile.profileImage}
-              sx={{ width: 120, height: 120, border: "4px solid white" }}
+              sx={{
+                width: 125,
+                height: 125,
+                border: "4px solid white",
+                position: "absolute",
+                top: -100,
+                left: 18,
+                boxShadow: 2,
+              }}
             />
             <input
               type="file"
@@ -225,8 +233,8 @@ const ProfileEditDialog = ({
                 component="span"
                 sx={{
                   position: "absolute",
-                  bottom: -10,
-                  right: "40%",
+                  bottom: -25,
+                  left: 100,
                   backgroundColor: "white",
                   "&:hover": {
                     backgroundColor: "rgba(0,0,0,0.1)",
@@ -236,20 +244,24 @@ const ProfileEditDialog = ({
                 <PhotoCameraIcon />
               </IconButton>
             </label>
-          </Box>
-          {/* User Name and Email Edit */}
-          <Stack direction="column" spacing={2}>
+
+            {/* Username Edit */}
             <TextField
-              fullWidth
               label="User Name"
               value={editedProfile.userName}
               onChange={handleChange("userName")}
               variant="outlined"
               sx={{
+                position: "absolute",
+                bottom: -29,
+                left: 155,
                 backgroundColor: "#fff",
                 borderRadius: 2,
               }}
             />
+          </Box>
+          {/* Email Edit */}
+          <Stack direction="column" spacing={2} sx={{ mt: 3 }}>
             <TextField
               fullWidth
               label="Email"

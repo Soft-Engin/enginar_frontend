@@ -1,10 +1,15 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
   Avatar,
   CircularProgress,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -12,11 +17,13 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import ShareIcon from "@mui/icons-material/Share";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
-import { useNavigate, Link } from "react-router-dom";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import PostPopup from "./PostPopup";
+import { Link, useNavigate } from "react-router-dom";
 
 const StyledCardMedia = styled("img")({
   width: "100%",
@@ -29,23 +36,122 @@ const StyledCardMedia = styled("img")({
 
 export default function BlogDetailed({ blogId }) {
   const navigate = useNavigate();
-  const [blogData, setBlogData] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const [loadingProfile, setLoadingProfile] = React.useState(true);
-  const [loadingBanner, setLoadingBanner] = React.useState(true);
-  const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
-  const [error, setError] = React.useState(null);
-  const [errorProfile, setErrorProfile] = React.useState(null);
-  const [errorBanner, setErrorBanner] = React.useState(null);
-  const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
-  const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
-  const [bannerUrl, setBannerUrl] = React.useState(null);
-  const [isLiked, setIsLiked] = React.useState(false);
-  const [likeCount, setLikeCount] = React.useState(0);
-  const [commentCount, setCommentCount] = React.useState(0);
-  const [isBookmarked, setIsBookmarked] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [blogData, setBlogData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [loadingBanner, setLoadingBanner] = useState(true);
+  const [loadingIsBookmarked, setLoadingIsBookmarked] = useState(true);
+  const [error, setError] = useState(null);
+  const [errorProfile, setErrorProfile] = useState(null);
+  const [errorBanner, setErrorBanner] = useState(null);
+  const [errorIsBookmarked, setErrorIsBookmarked] = useState(null);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+  const [bannerUrl, setBannerUrl] = useState(null);
+  const [bannerImage, setBannerImage] = useState(null); // New state for base64 banner
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   let authButtonId = "loginButton";
+
   let userLogged = localStorage.getItem("userLogged") === "true";
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
+  const [loggedInUserData, setLoggedInUserData] = useState(
+    localStorage.getItem("userData")
+      ? JSON.parse(localStorage.getItem("userData"))
+      : null
+  );
+  const isOwnBlog = blogData?.userId === loggedInUserData?.userId;
+  let isAdmin = loggedInUserData?.roleName === "Admin";
+
+  useEffect(() => {
+    const fetchLoggedInUserFollowing = async () => {
+      if (loggedInUserData?.userId) {
+        try {
+          const response = await axios.get(
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+          );
+          if (response.status === 200) {
+            setLoggedInUserFollowing(response.data.items);
+          }
+        } catch (error) {
+          console.error(
+            "Error fetching logged in user's following list: ",
+            error
+          );
+        }
+      }
+    };
+    fetchLoggedInUserFollowing();
+  }, [loggedInUserData?.userId]);
+
+  useEffect(() => {
+    if (blogData && loggedInUserFollowing) {
+      const isFollowing = loggedInUserFollowing.some(
+        (following) => following.userId === blogData.userId
+      );
+      setIsFollowing(isFollowing);
+    } else {
+      setIsFollowing(false);
+    }
+  }, [loggedInUserFollowing, blogData?.userId]);
+
+  const handleFollowUser = async () => {
+    try {
+      const response = await axios.post(
+        `/api/v1/users/follow?targetUserId=${blogData.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(true);
+        setLoggedInUserFollowing((prev) => [
+          ...prev,
+          { userId: blogData.userId },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to follow the user."
+      );
+    }
+  };
+
+  const handleUnfollowUser = async () => {
+    try {
+      const response = await axios.delete(
+        `/api/v1/users/unfollow?targetUserId=${blogData.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(false);
+        setLoggedInUserFollowing((prev) =>
+          prev.filter((following) => following.userId !== blogData.userId)
+        );
+      }
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to unfollow the user."
+      );
+    }
+  };
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
@@ -56,7 +162,37 @@ export default function BlogDetailed({ blogId }) {
     }
   };
 
-  React.useEffect(() => {
+  const refreshBlogData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`/api/v1/blogs/${blogId}`);
+      setBlogData(response.data);
+    } catch (err) {
+      setError(err.message || "Failed to fetch blog data");
+    } finally {
+      setLoading(false);
+      setIsEditing(false);
+    }
+  };
+  const handleDeleteBlog = async () => {
+    setLoading(true);
+    try {
+      await axios.delete(`/api/v1/blogs/${blogId}`);
+      setDeleteDialogOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete the blog."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     const fetchBlog = async () => {
       setLoading(true);
       setError(null);
@@ -72,7 +208,7 @@ export default function BlogDetailed({ blogId }) {
     fetchBlog();
   }, [blogId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (blogData && blogData.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
@@ -104,7 +240,7 @@ export default function BlogDetailed({ blogId }) {
     };
   }, [blogData]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (blogData && blogData.id) {
       const fetchBanner = async () => {
         setLoadingBanner(true);
@@ -115,14 +251,19 @@ export default function BlogDetailed({ blogId }) {
             { responseType: "blob" }
           );
           if (response.data) {
+            const base64 = await convertBlobToBase64(response.data);
+            setBannerImage(base64);
             const imageUrl = URL.createObjectURL(response.data);
             setBannerUrl(imageUrl);
           } else {
             setBannerUrl(null);
+            setBannerImage(null);
           }
         } catch (err) {
           console.error("Error fetching banner image:", err);
           handleImageError(err, setErrorBanner);
+          setBannerUrl(null);
+          setBannerImage(null);
         } finally {
           setLoadingBanner(false);
         }
@@ -136,7 +277,16 @@ export default function BlogDetailed({ blogId }) {
     };
   }, [blogData]);
 
-  React.useEffect(() => {
+  const convertBlobToBase64 = (blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+    });
+  };
+
+  useEffect(() => {
     if (blogData && blogData.id && userLogged) {
       const fetchIsLiked = async () => {
         try {
@@ -151,7 +301,7 @@ export default function BlogDetailed({ blogId }) {
     }
   }, [blogData, userLogged]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (blogData && blogData.id && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
@@ -215,6 +365,18 @@ export default function BlogDetailed({ blogId }) {
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     }
   };
+  const handleEditClick = () => {
+    setIsEditing(true);
+    handleClose();
+  };
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+    handleClose();
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+  };
 
   if (loading) {
     return (
@@ -261,11 +423,10 @@ export default function BlogDetailed({ blogId }) {
     <Box
       data-testid="blog-detailed-container"
       sx={{
-        maxWidth: 1500,
+        width: "100%",
         outline: "1.5px solid #C0C0C0",
         backgroundColor: "#FFFFFF",
-        pl: 4,
-        pr: 4,
+        px: 4,
         pt: 2,
         pb: 1,
         borderRadius: "20px 20px 0 0",
@@ -324,13 +485,94 @@ export default function BlogDetailed({ blogId }) {
             </Box>
           </Link>
         </Box>
-        <MoreHorizIcon sx={{ fontSize: "40px" }} />
+        {userLogged && (
+          <Box>
+            <IconButton
+              aria-label="more"
+              id="menuButton"
+              aria-controls={open ? "menu" : undefined}
+              aria-expanded={open ? "true" : undefined}
+              aria-haspopup="true"
+              onClick={handleClick}
+            >
+              <MoreHorizIcon sx={{ fontSize: "30px" }} />
+            </IconButton>
+            <Menu
+              id="menu"
+              MenuListProps={{
+                "aria-labelledby": "menuButton",
+              }}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={open}
+              onClose={handleClose}
+            >
+              {isAdmin || !isOwnBlog ? (
+                <>
+                  {isAdmin && (
+                    <>
+                      <MenuItem key="Edit" onClick={handleEditClick}>
+                        Edit Blog
+                      </MenuItem>
+                      <MenuItem
+                        key="Delete"
+                        onClick={handleDeleteClick}
+                        sx={{ color: "red" }}
+                      >
+                        Delete Blog
+                      </MenuItem>
+                    </>
+                  )}
+
+                  {!isOwnBlog && (
+                    <>
+                      {isFollowing ? (
+                        <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                          Unfollow User
+                        </MenuItem>
+                      ) : (
+                        <MenuItem key="Follow" onClick={handleFollowUser}>
+                          Follow User
+                        </MenuItem>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <MenuItem key="Edit" onClick={handleEditClick}>
+                    Edit Blog
+                  </MenuItem>
+                  <MenuItem
+                    key="Delete"
+                    onClick={handleDeleteClick}
+                    sx={{ color: "red" }}
+                  >
+                    Delete Blog
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+          </Box>
+        )}
       </Box>
       <Typography
         data-testid="blog-body-text"
         variant="body1"
         component="div"
-        sx={{ lineHeight: "28px", mb: 2 }}
+        sx={{
+          lineHeight: "28px",
+          mb: 2,
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
+        }}
       >
         {blogData.bodyText}
       </Typography>
@@ -362,8 +604,8 @@ export default function BlogDetailed({ blogId }) {
           }}
           data-testid="related-recipe-link"
         >
-          <Typography variant="body1" fontWeight="bold">
-            Click here to see related recipe
+          <Typography variant="body1" fontWeight={"bold"}>
+            Click here to see the related recipe!
           </Typography>
         </Link>
       )}
@@ -424,7 +666,7 @@ export default function BlogDetailed({ blogId }) {
               ) : (
                 <FavoriteBorderIcon
                   data-testid="like-icon-border"
-                  style={{ fontSize: "45px", marginRight: 4 }}
+                  style={{ fontSize: "45px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
@@ -441,7 +683,7 @@ export default function BlogDetailed({ blogId }) {
             sx={{ display: "flex", alignItems: "center" }}
           >
             <ChatBubbleOutlineIcon
-              style={{ fontSize: "42px", marginRight: 4 }}
+              style={{ fontSize: "42px", marginRight: 4, color: "#757575" }}
               data-testid="comment-icon"
             />
             <Typography
@@ -453,20 +695,9 @@ export default function BlogDetailed({ blogId }) {
             </Typography>
           </Box>
         </Box>
-
-        <Box
-          data-testid="right-actions"
-          sx={{ display: "flex", alignItems: "center" }}
-        >
-          <ShareIcon
-            data-testid="share-icon"
-            style={{ fontSize: "42px", marginRight: 6 }}
-          />
-          <IconButton
-            data-testid="bookmark-button"
-            onClick={handleBookmarkToggle}
-            style={{ padding: 0 }}
-          >
+        
+        <Box data-testid="right-actions" sx={{ display: "flex", alignItems: "center" }}>
+          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
               <BookmarkIcon
                 data-testid="bookmark-icon-filled"
@@ -475,12 +706,70 @@ export default function BlogDetailed({ blogId }) {
             ) : (
               <BookmarkBorderOutlinedIcon
                 data-testid="bookmark-icon-border"
-                style={{ fontSize: "48px" }}
+                style={{ fontSize: "48px", color: "#757575" }}
               />
             )}
           </IconButton>
         </Box>
       </Box>
+      {isEditing && (
+        <PostPopup
+          open={isEditing}
+          handleClose={() => setIsEditing(false)}
+          blogData={blogData}
+          blogId={blogId}
+          isEditMode={true}
+          refreshBlogData={refreshBlogData}
+          bannerImage={bannerImage} // Pass bannerImage as a prop
+        />
+      )}
+      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete} 
+      PaperProps={{
+        sx: {
+          width: { xs: 250, sm: 400 },
+          borderRadius: 4,
+          backgroundColor: "#C8EFA5",
+          padding: 0.5,
+        },
+      }}>
+        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this blog post?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}
+          sx={{
+            backgroundColor: "#C8EFA5",
+            color: "black",
+            ":hover": {
+              backgroundColor: "#C8EFA5",
+            },
+            borderRadius: 20,
+            marginTop: 2,
+            display: "block",
+            marginLeft: "auto",
+          }}>
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteBlog} 
+              variant="contained"
+              sx={{
+                backgroundColor: "#cc0000",
+                color: "error",
+                ":hover": {
+                  backgroundColor: "#cc0000",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+                fontWeight: "bold",
+              }}
+            >
+              Delete
+            </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

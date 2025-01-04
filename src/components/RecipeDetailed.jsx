@@ -1,10 +1,19 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
   Avatar,
   CircularProgress,
   IconButton,
+  Menu,
+  MenuItem,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  Button,
+  DialogContent,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -13,7 +22,6 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import ShareIcon from "@mui/icons-material/Share";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import LocalDiningIcon from "@mui/icons-material/LocalDining";
@@ -30,9 +38,10 @@ const StyledCardMedia = styled("img")({
   display: "block",
   filter: "blur(2px)",
 });
+
 export default function RecipeDetailed({ recipeId }) {
   const navigate = useNavigate();
-  const [recipe, setRecipe] = React.useState(null);
+  const [recipeData, setRecipeData] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
   const [bannerUrl, setBannerUrl] = React.useState(null);
   const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
@@ -43,14 +52,41 @@ export default function RecipeDetailed({ recipeId }) {
   const [errorProfile, setErrorProfile] = React.useState(null);
   const [errorBanner, setErrorBanner] = React.useState(null);
   const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
+  const [errorDelete, setErrorDelete] = React.useState(null);
   const [stepImages, setStepImages] = React.useState({});
   const [isLiked, setIsLiked] = React.useState(false);
   const [likeCount, setLikeCount] = React.useState(0);
   const [commentCount, setCommentCount] = React.useState(0);
   const [isBookmarked, setIsBookmarked] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState("success");
+  const open = Boolean(anchorEl);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
   const [showBanner, setShowBanner] = React.useState(false);
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+  const handleEditClick = () => {
+    navigate(`/createRecipe?id=${recipeId}`);
+    handleMenuClose();
+  };
+  const handleSnackbarClose = () => {
+    setOpenSnackbar(false);
+  };
+  const handleDialogOpen = () => {
+    setOpenDialog(true);
+  };
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
 
   const handleImageError = (error, setErrorState) => {
     if (error.response && error.response.status === 404) {
@@ -61,13 +97,98 @@ export default function RecipeDetailed({ recipeId }) {
     }
   };
 
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
+  const [loggedInUserData, setLoggedInUserData] = useState(
+    localStorage.getItem("userData")
+      ? JSON.parse(localStorage.getItem("userData"))
+      : null
+  );
+  const isOwnRecipe = recipeData?.userId === loggedInUserData?.userId;
+  let isAdmin = loggedInUserData?.roleName === "Admin";
+
+  useEffect(() => {
+    const fetchLoggedInUserFollowing = async () => {
+      if (loggedInUserData?.userId) {
+        try {
+          const response = await axios.get(
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+          );
+          if (response.status === 200) {
+            setLoggedInUserFollowing(response.data.items);
+          }
+        } catch (error) {
+          console.error(
+            "Error fetching logged in user's following list: ",
+            error
+          );
+        }
+      }
+    };
+    fetchLoggedInUserFollowing();
+  }, [loggedInUserData?.userId]);
+
+  useEffect(() => {
+    if (recipeData && loggedInUserFollowing) {
+      const isFollowing = loggedInUserFollowing.some(
+        (following) => following.userId === recipeData.userId
+      );
+      setIsFollowing(isFollowing);
+    } else {
+      setIsFollowing(false);
+    }
+  }, [loggedInUserFollowing, recipeData?.userId]);
+
+  const handleFollowUser = async () => {
+    try {
+      const response = await axios.post(
+        `/api/v1/users/follow?targetUserId=${recipeData.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(true);
+        setLoggedInUserFollowing((prev) => [
+          ...prev,
+          { userId: recipeData.userId },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to follow the user."
+      );
+    }
+  };
+
+  const handleUnfollowUser = async () => {
+    try {
+      const response = await axios.delete(
+        `/api/v1/users/unfollow?targetUserId=${recipeData.userId}`
+      );
+      if (response.status === 200) {
+        setIsFollowing(false);
+        setLoggedInUserFollowing((prev) =>
+          prev.filter((following) => following.userId !== recipeData.userId)
+        );
+      }
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to unfollow the user."
+      );
+    }
+  };
+
   React.useEffect(() => {
     const fetchRecipe = async () => {
       setLoading(true);
       setError(null);
       try {
         const response = await axios.get(`/api/v1/recipes/${recipeId}`);
-        setRecipe(response.data);
+        setRecipeData(response.data);
       } catch (err) {
         console.error("Error fetching recipe:", err);
         setError(err.message || "An unexpected error occurred.");
@@ -77,14 +198,15 @@ export default function RecipeDetailed({ recipeId }) {
     };
     fetchRecipe();
   }, [recipeId]);
+
   React.useEffect(() => {
-    if (recipe && recipe.userId) {
+    if (recipeData && recipeData.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
         setErrorProfile(null);
         try {
           const response = await axios.get(
-            `/api/v1/users/${recipe.userId}/profile-picture`,
+            `/api/v1/users/${recipeData.userId}/profile-picture`,
             { responseType: "blob" }
           );
           if (response.data) {
@@ -107,15 +229,16 @@ export default function RecipeDetailed({ recipeId }) {
         URL.revokeObjectURL(profilePictureUrl);
       }
     };
-  }, [recipe]);
+  }, [recipeData]);
+
   React.useEffect(() => {
-    if (recipe && recipe.id) {
+    if (recipeData && recipeData.id) {
       const fetchBanner = async () => {
         setLoadingBanner(true);
         setErrorBanner(null);
         try {
           const response = await axios.get(
-            `/api/v1/recipes/${recipe.id}/banner`,
+            `/api/v1/recipes/${recipeData.id}/banner`,
             { responseType: "blob" }
           );
           if (response.data) {
@@ -143,18 +266,19 @@ export default function RecipeDetailed({ recipeId }) {
         URL.revokeObjectURL(bannerUrl);
       }
     };
-  }, [recipe]);
+  }, [recipeData]);
+
   React.useEffect(() => {
-    if (recipe && recipe.id && recipe.steps) {
+    if (recipeData && recipeData.id && recipeData.steps) {
       const fetchStepImages = async () => {
         const images = {};
-        for (let i = 0; i < recipe.steps.length; i++) {
+        for (let i = 0; i < recipeData.steps.length; i++) {
           try {
             const response = await axios.get(
-              `/api/v1/recipes/${recipe.id}/steps/${i}/image`,
+              `/api/v1/recipes/${recipeData.id}/steps/${i}/image`,
               { responseType: "blob" }
             );
-            if (response.data) {
+            if (response.data && response.data.size > 0) {
               const imageUrl = URL.createObjectURL(response.data);
               images[i] = imageUrl;
             } else {
@@ -180,13 +304,14 @@ export default function RecipeDetailed({ recipeId }) {
         }
       }
     };
-  }, [recipe]);
+  }, [recipeData]);
+
   React.useEffect(() => {
-    if (recipe && recipe.id && userLogged) {
+    if (recipeData && recipeData.id && userLogged) {
       const fetchIsLiked = async () => {
         try {
           const response = await axios.get(
-            `/api/v1/recipes/${recipe.id}/is-liked`
+            `/api/v1/recipes/${recipeData.id}/is-liked`
           );
           setIsLiked(response.data.isLiked || false);
           setLikeCount(response.data.likeCount || 0);
@@ -196,15 +321,16 @@ export default function RecipeDetailed({ recipeId }) {
       };
       fetchIsLiked();
     }
-  }, [recipe, userLogged]);
+  }, [recipeData, userLogged]);
+
   React.useEffect(() => {
-    if (recipe && recipe.id && userLogged) {
+    if (recipeData && recipeData.id && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
         setErrorIsBookmarked(null);
         try {
           const response = await axios.get(
-            `/api/v1/recipes/${recipe.id}/is-bookmarked`
+            `/api/v1/recipes/${recipeData.id}/is-bookmarked`
           );
           setIsBookmarked(response.data.isBookmarked || false);
         } catch (err) {
@@ -216,7 +342,7 @@ export default function RecipeDetailed({ recipeId }) {
       };
       fetchIsBookmarked();
     }
-  }, [recipe, userLogged]);
+  }, [recipeData, userLogged]);
 
   const handleLikeToggle = async () => {
     if (!userLogged) {
@@ -244,6 +370,7 @@ export default function RecipeDetailed({ recipeId }) {
       }
     }
   };
+
   const handleBookmarkToggle = async () => {
     if (!userLogged) {
       const authButton = document.getElementById(authButtonId);
@@ -260,6 +387,26 @@ export default function RecipeDetailed({ recipeId }) {
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     }
   };
+
+  const handleDelete = async () => {
+    setErrorDelete(null);
+    try {
+      await axios.delete(`/api/v1/recipes/${recipeId}`);
+      setSnackbarMessage("Recipe deleted successfully");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (err) {
+      console.error("Error deleting recipe:", err);
+      setErrorDelete(err.message || "An unexpected error occurred.");
+      setSnackbarMessage("Failed to delete the recipe");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+    }
+  };
+
   if (loading) {
     return (
       <Box
@@ -288,7 +435,7 @@ export default function RecipeDetailed({ recipeId }) {
     );
   }
 
-  if (!recipe) {
+  if (!recipeData) {
     return (
       <Typography data-testid="recipe-detailed-nodata" color="error" textAlign={"center"}>
         No recipe information available for this ID
@@ -297,11 +444,91 @@ export default function RecipeDetailed({ recipeId }) {
   }
 
   return (
-    <Box data-testid="recipe-detailed-container" sx={{ width: "100%", outline: "1.5px solid #C0C0C0", backgroundColor: "#FFFFFF", px: 4, pt: 2, pb: 1, borderRadius: "20px 20px 0 0", boxShadow: 3 }} >
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1.5, borderBottom: "1px solid #E0E0E0" }}>
+    <Box
+      data-testid="recipe-detailed-container"
+      sx={{
+        width: "100%",
+        outline: "1.5px solid #C0C0C0",
+        backgroundColor: "#FFFFFF",
+        px: 4,
+        pt: 2,
+        pb: 1,
+        borderRadius: "20px 20px 0 0",
+        boxShadow: 3,
+      }}
+    >
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+      <Dialog open={openDialog} onClose={handleDialogClose} 
+      PaperProps={{
+        sx: {
+          width: { xs: 250, sm: 400 },
+          borderRadius: 4,
+          backgroundColor: "#C8EFA5",
+          padding: 0.5,
+        },
+      }}>
+        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this recipe?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose}
+          sx={{
+            backgroundColor: "#C8EFA5",
+            color: "black",
+            ":hover": {
+              backgroundColor: "#C8EFA5",
+            },
+            borderRadius: 20,
+            marginTop: 2,
+            display: "block",
+            marginLeft: "auto",
+          }}>
+            Cancel
+          </Button>
+          <Button onClick={() => {handleDelete(); handleDialogClose();} }
+              variant="contained"
+              sx={{
+                backgroundColor: "#cc0000",
+                color: "error",
+                ":hover": {
+                  backgroundColor: "#cc0000",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+                fontWeight: "bold",
+              }}
+            >
+              Delete
+            </Button>
+        </DialogActions>
+      </Dialog>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          pb: 1.5,
+          borderBottom: "1px solid #E0E0E0",
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Link
-            to={`/profile?id=${recipe.userId}`}
+            to={`/profile?id=${recipeData.userId}`}
             style={{
               textDecoration: "none",
               color: "inherit",
@@ -321,18 +548,112 @@ export default function RecipeDetailed({ recipeId }) {
                 sx={{ marginRight: 0.5 }}
                 noWrap
               >
-                {recipe.userName}
+                {recipeData.userName}
               </Typography>
               <Typography variant="body2" color="text.secondary" noWrap>
-                {recipe.createdAt &&
-                  formatDistanceToNow(parseISO(recipe.createdAt), {
+                {recipeData.createdAt &&
+                  formatDistanceToNow(parseISO(recipeData.createdAt), {
                     addSuffix: true,
                   })}
               </Typography>
             </Box>
           </Link>
         </Box>
-        <MoreHorizIcon sx={{ fontSize: "40px" }} />
+        <Box>
+          {userLogged && (
+            <Box>
+              <IconButton
+                aria-label="more"
+                id="menuButton"
+                aria-controls={open ? "menu" : undefined}
+                aria-expanded={open ? "true" : undefined}
+                aria-haspopup="true"
+                onClick={handleMenuClick}
+              >
+                <MoreHorizIcon sx={{ fontSize: "30px" }} />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleMenuClose}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                    mt: 1.5,
+                    "& .MuiAvatar-root": {
+                      width: 32,
+                      height: 32,
+                      ml: -0.5,
+                      mr: 1,
+                    },
+                    "&:before": {
+                      content: '""',
+                      display: "block",
+                      position: "absolute",
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: "background.paper",
+                      transform: "translateY(-50%) rotate(45deg)",
+                      zIndex: 0,
+                    },
+                  },
+                }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+              >
+                {isAdmin || !isOwnRecipe ? (
+                  <>
+                    {isAdmin && (
+                      <>
+                        <MenuItem key="Edit" onClick={handleEditClick}>
+                          Edit Recipe
+                        </MenuItem>
+                        <MenuItem
+                          key="Delete"
+                          onClick={handleDialogOpen}
+                          sx={{ color: "red" }}
+                        >
+                          Delete Recipe
+                        </MenuItem>
+                      </>
+                    )}
+
+                    {!isOwnRecipe && (
+                      <>
+                        {isFollowing ? (
+                          <MenuItem key="Unfollow" onClick={handleUnfollowUser}>
+                            Unfollow User
+                          </MenuItem>
+                        ) : (
+                          <MenuItem key="Follow" onClick={handleFollowUser}>
+                            Follow User
+                          </MenuItem>
+                        )}
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <MenuItem key="Edit" onClick={handleEditClick}>
+                      Edit Recipe
+                    </MenuItem>
+                    <MenuItem
+                      key="Delete"
+                      onClick={handleDialogOpen}
+                      sx={{ color: "red" }}
+                    >
+                      Delete Recipe
+                    </MenuItem>
+                  </>
+                )}
+              </Menu>
+            </Box>
+          )}
+        </Box>
       </Box>
       {
         <Box
@@ -369,7 +690,7 @@ export default function RecipeDetailed({ recipeId }) {
                 textShadow: "1px 1px 2px black",
               }}
             >
-              {recipe.header}
+              {recipeData.header}
             </Typography>
             <Box
               sx={{
@@ -394,7 +715,7 @@ export default function RecipeDetailed({ recipeId }) {
                 }}
               >
                 <LocalDiningIcon />
-                <b>Servings:</b> {recipe.servingSize}
+                <b>Servings:</b> {recipeData.servingSize}
               </Typography>
               <Typography
                 variant="body2"
@@ -407,7 +728,7 @@ export default function RecipeDetailed({ recipeId }) {
                 }}
               >
                 <AccessTimeFilledIcon />
-                <b>Total Time:</b> {recipe.preparationTime} mins
+                <b>Total Time:</b> {recipeData.preparationTime} mins
               </Typography>
             </Box>
           </Box>
@@ -420,8 +741,17 @@ export default function RecipeDetailed({ recipeId }) {
           )}
         </Box>
       )}
-      <Typography variant="body1" sx={{ lineHeight: "30px", mb: 2, px: 2 }}>
-        {recipe.bodyText}
+      <Typography
+        variant="body1"
+        sx={{
+          lineHeight: "30px",
+          mb: 2,
+          px: 2,
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
+        }}
+      >
+        {recipeData.bodyText}
       </Typography>
       <Typography
         variant="h4"
@@ -439,7 +769,7 @@ export default function RecipeDetailed({ recipeId }) {
         }}
       >
         <Grid container>
-          {recipe.ingredients.map((ingredient, index) => (
+          {recipeData.ingredients.map((ingredient, index) => (
             <Grid item size={6} key={index} sx={{ pr: 10 }}>
               <ListItem>{`${ingredient.quantity} ${ingredient.unit} ${ingredient.ingredientName}`}</ListItem>
             </Grid>
@@ -449,7 +779,7 @@ export default function RecipeDetailed({ recipeId }) {
       {showBanner && bannerUrl && (
         <img
           src={bannerUrl}
-          alt={recipe.header}
+          alt={recipeData.header}
           style={{
             width: "100%",
             height: "450px",
@@ -476,16 +806,30 @@ export default function RecipeDetailed({ recipeId }) {
           "& .MuiListItem-root": { display: "list-item", pl: 0, mb: 0 },
         }}
       >
-        {recipe.steps.map((step, index) => (
-          <ListItem key={index}>
-            {step}
+        {recipeData.steps.map((step, index) => (
+          <ListItem
+            key={index}
+            sx={{
+              flexDirection: "column",
+              alignItems: "flex-start",
+              paddingBottom: 2,
+            }}
+          >
+            <Typography
+              sx={{
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                marginBottom: 1,
+              }}
+            >
+              {step}
+            </Typography>
             {stepImages[index] && (
               <Box
                 sx={{
                   display: "flex",
                   justifyContent: "flex-start",
-                  mb: 1,
-                  mt: 1,
+                  paddingBottom: 1,
                 }}
               >
                 <img
@@ -521,11 +865,12 @@ export default function RecipeDetailed({ recipeId }) {
           sx={{ marginRight: 0.5 }}
           noWrap
         >
-          {recipe.createdAt && format(parseISO(recipe.createdAt), "h:mm a")}
+          {recipeData.createdAt &&
+            format(parseISO(recipeData.createdAt), "h:mm a")}
         </Typography>
         <Typography variant="body1" color="text.secondary" noWrap>
-          {recipe.createdAt &&
-            format(parseISO(recipe.createdAt), "MMM d, yyyy")}
+          {recipeData.createdAt &&
+            format(parseISO(recipeData.createdAt), "MMM d, yyyy")}
         </Typography>
       </Box>
       <Box
@@ -546,7 +891,7 @@ export default function RecipeDetailed({ recipeId }) {
               ) : (
                 <FavoriteBorderIcon
                   data-testid="like-icon-border"
-                  style={{ fontSize: "45px", marginRight: 4 }}
+                  style={{ fontSize: "45px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
@@ -556,7 +901,7 @@ export default function RecipeDetailed({ recipeId }) {
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <ChatBubbleOutlineIcon
-              style={{ fontSize: "42px", marginRight: 4 }}
+              style={{ fontSize: "42px", marginRight: 4, color: "#757575" }}
             />
             <Typography variant="body1" color="text.secondary">
               {commentCount}
@@ -565,12 +910,14 @@ export default function RecipeDetailed({ recipeId }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ShareIcon style={{ fontSize: "42px", marginRight: 6 }} />
           <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
               <BookmarkIcon data-testid="bookmark-icon-filled" style={{ fontSize: "48px" }} />
             ) : (
-              <BookmarkBorderOutlinedIcon data-testid="bookmark-icon-border" style={{ fontSize: "48px" }} />
+              <BookmarkBorderOutlinedIcon
+                data-testid="bookmark-icon-border"
+                style={{ fontSize: "48px", color: "#757575" }}
+              />
             )}
           </IconButton>
         </Box>

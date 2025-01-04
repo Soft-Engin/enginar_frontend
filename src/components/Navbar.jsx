@@ -22,7 +22,6 @@ import Tooltip from "@mui/material/Tooltip";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import KitchenOutlinedIcon from "@mui/icons-material/KitchenOutlined";
 import CasinoOutlinedIcon from "@mui/icons-material/CasinoOutlined";
@@ -32,16 +31,15 @@ import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlin
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import LogoutIcon from "@mui/icons-material/Logout";
-
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
-
 import AuthPopup from "./AuthPopup";
 import SearchBar from "./SearchBar";
 import PostPopup from "./PostPopup";
 import EventPopup from "./EventPopup";
-
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -89,7 +87,7 @@ const ActionSpeedDial = styled(SpeedDial)(({ theme }) => ({
   right: 8,
   [theme.breakpoints.up("sm")]: {
     right: "auto",
-    left: 5,
+    left: 8,
   },
 }));
 
@@ -159,7 +157,7 @@ const navbarTitlesIconsBase = [
       </Typography>
     ),
     icon: <KitchenOutlinedIcon sx={drawerIconStyle} />,
-    link: "/profile",
+    link: "/fromMyKitchen",
   },
   {
     text: (
@@ -180,7 +178,6 @@ const navbarTitlesIconsBase = [
     link: "/eventhub",
   },
 ];
-
 const navbarTitlesIconsAuth = [
   {
     text: (
@@ -189,7 +186,7 @@ const navbarTitlesIconsAuth = [
       </Typography>
     ),
     icon: <FavoriteBorderOutlinedIcon sx={drawerIconStyle} />,
-    link: "/savedliked",
+    link: "/savedliked?mode=likes",
   },
   {
     text: (
@@ -198,7 +195,7 @@ const navbarTitlesIconsAuth = [
       </Typography>
     ),
     icon: <BookmarkBorderOutlinedIcon sx={drawerIconStyle} />,
-    link: "/savedliked",
+    link: "/savedliked?mode=bookmarkes",
   },
 ];
 
@@ -216,7 +213,7 @@ export default function Navbar(props) {
   const [userLogged, setUserLogged] = useState(
     localStorage.getItem("userLogged") === "true"
   );
-
+  const [isInverted, setIsInverted] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [speedDialOpen, setSpeedDialOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -226,16 +223,54 @@ export default function Navbar(props) {
       ? JSON.parse(localStorage.getItem("userData"))
       : null
   );
-
   const [navbarTitlesIcons, setNavbarTitlesIcons] = useState(
     navbarTitlesIconsBase
   );
+  const [showSpeedDial, setShowSpeedDial] = useState(false);
+  const getStoredInvertMode = () => {
+    return localStorage.getItem("isInverted") === "true";
+  };
+  const setStoredInvertMode = (value) => {
+    localStorage.setItem("isInverted", value.toString());
+  };
+
+  useEffect(() => {
+    const storedMode = getStoredInvertMode();
+    setIsInverted(storedMode);
+
+    if (storedMode) {
+      document.body.classList.add("invert-mode");
+    }
+
+    return () => {
+      document.body.classList.remove("invert-mode");
+    };
+  }, []);
+
+  const toggleInvertMode = () => {
+    const newInverted = !isInverted;
+    setIsInverted(newInverted);
+    if (newInverted) {
+      document.body.classList.add("invert-mode");
+    } else {
+      document.body.classList.remove("invert-mode");
+    }
+    setStoredInvertMode(newInverted);
+  };
+
   const drawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
-
   const handleSpeedDialOpen = () => setSpeedDialOpen(true);
   const handleSpeedDialClose = () => setSpeedDialOpen(false);
+
+  useEffect(() => {
+    if (userLogged) {
+      setShowSpeedDial(true);
+    } else {
+      setShowSpeedDial(false);
+    }
+  }, [userLogged]);
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -243,16 +278,15 @@ export default function Navbar(props) {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-
   const handleLogout = () => {
     localStorage.setItem("userLogged", false);
     setUserLogged(false);
     localStorage.removeItem("userData");
     setUser(null);
-    navigate("/");
     setProfilePic(null);
+    navigate("/");
+    window.location.reload();
   };
-
   useEffect(() => {
     setNavbarTitlesIcons(
       userLogged
@@ -260,7 +294,6 @@ export default function Navbar(props) {
         : navbarTitlesIconsBase
     );
   }, [userLogged]);
-
   const fetchUserData = async () => {
     if (userLogged) {
       try {
@@ -294,20 +327,14 @@ export default function Navbar(props) {
       setProfilePic(null);
     }
   };
-
   useEffect(() => {
     fetchUserData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   useEffect(() => {
     fetchUserData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userLogged]);
-
   const [postPopupOpen, setPostPopupOpen] = React.useState(false);
   const [eventPopupOpen, setEventPopupOpen] = React.useState(false);
-
   const handleEventPopupOpen = () => {
     setEventPopupOpen(true);
     setSpeedDialOpen(false);
@@ -324,7 +351,6 @@ export default function Navbar(props) {
     setPostPopupOpen(false);
     setSpeedDialOpen(false);
   };
-
   const handleFeelinHungry = async () => {
     const randomSeed = Math.floor(Math.random() * 1000);
     try {
@@ -339,7 +365,6 @@ export default function Navbar(props) {
       console.error("Error fetching random recipe", error);
     }
   };
-
   const userActions = [
     {
       text: "Profile",
@@ -354,8 +379,10 @@ export default function Navbar(props) {
     {
       text: "Settings",
       icon: <SettingsApplicationsIcon />,
-      action: handleCloseUserMenu,
-      link: "/settings",
+      action: () => {
+        handleCloseUserMenu();
+        navigate("/settings");
+      },
     },
     {
       text: "Logout",
@@ -363,7 +390,6 @@ export default function Navbar(props) {
       action: handleLogout,
     },
   ];
-
   return (
     <Box sx={{ display: "flex" }} data-testid="navbar-container">
       <CssBaseline />
@@ -390,7 +416,9 @@ export default function Navbar(props) {
                   fontSize: "2.3rem",
                   cursor: "pointer",
                 }}
-                onClick={() => navigate("/")}
+                onClick={() => {
+                  navigate("/");
+                }}
               >
                 ENGINAR
               </Typography>
@@ -399,14 +427,19 @@ export default function Navbar(props) {
 
           <SearchBar data-testid="navbar-search" />
 
-          <RightSection data-testid="navbar-right-section">
+          <RightSection data-testid="navbar-right-section" >
+            <IconButton
+              onClick={toggleInvertMode}
+              sx={{
+                opacity: 0,
+              }}
+            >
+              {isInverted ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
             {userLogged ? (
               <>
-                <Tooltip title="Open settings">
-                  <IconButton
-                    data-testid="user-avatar-button"
-                    onClick={handleOpenUserMenu}
-                  >
+                <Tooltip title="Profile Menu">
+                  <IconButton data-testid="user-avatar-button" onClick={handleOpenUserMenu}>
                     <Avatar
                       alt={
                         user?.firstName
@@ -547,49 +580,51 @@ export default function Navbar(props) {
         <DrawerHeader />
         {props.body}
       </Box>
-      <ActionSpeedDial
-        data-testid="navbar-speed-dial"
-        ariaLabel="SpeedDial actions"
-        icon={<SpeedDialIcon />}
-        onClose={handleSpeedDialClose}
-        onOpen={handleSpeedDialOpen}
-        open={speedDialOpen}
-        FabProps={{
-          sx: {
-            bgcolor: "#4B9023",
-            "&:hover": {
+      {showSpeedDial && (
+        <ActionSpeedDial
+          data-testid="navbar-speed-dial"
+          ariaLabel="SpeedDial tooltip example"
+          icon={<SpeedDialIcon />}
+          onClose={handleSpeedDialClose}
+          onOpen={handleSpeedDialOpen}
+          open={speedDialOpen}
+          FabProps={{
+            sx: {
               bgcolor: "#4B9023",
+              "&:hover": {
+                bgcolor: "#4B9023",
+              },
+              width: "50px",
+              height: "50px",
             },
-            width: "50px",
-            height: "50px",
-          },
-        }}
-      >
-        <SpeedDialAction
-          key={"Post"}
-          icon={<PostAddIcon />}
-          tooltipTitle={"Post"}
-          tooltipOpen
-          onClick={handlePostPopupOpen}
-          tooltipPlacement={isSmUp ? "right" : "left"}
-        />
-        <SpeedDialAction
-          key={"Etkinlik"}
-          icon={<GroupAddIcon />}
-          tooltipTitle={"Etkinlik"}
-          tooltipOpen
-          onClick={handleEventPopupOpen}
-          tooltipPlacement={isSmUp ? "right" : "left"}
-        />
-        <SpeedDialAction
-          key={"Tarif"}
-          icon={<RestaurantMenuIcon />}
-          tooltipTitle={"Tarif"}
-          tooltipOpen
-          onClick={() => navigate("/createRecipe")}
-          tooltipPlacement={isSmUp ? "right" : "left"}
-        />
-      </ActionSpeedDial>
+          }}
+        >
+          <SpeedDialAction
+            key={"Blog"}
+            icon={<PostAddIcon />}
+            tooltipTitle={"Blog"}
+            tooltipOpen
+            onClick={handlePostPopupOpen}
+            tooltipPlacement={isSmUp ? "right" : "left"}
+          />
+          <SpeedDialAction
+            key={"Event"}
+            icon={<GroupAddIcon />}
+            tooltipTitle={"Event"}
+            tooltipOpen
+            onClick={handleEventPopupOpen}
+            tooltipPlacement={isSmUp ? "right" : "left"}
+          />
+          <SpeedDialAction
+            key={"Recipe"}
+            icon={<RestaurantMenuIcon />}
+            tooltipTitle={"Recipe"}
+            tooltipOpen
+            onClick={() => navigate("/createRecipe")}
+            tooltipPlacement={isSmUp ? "right" : "left"}
+          />
+        </ActionSpeedDial>
+      )}
       <PostPopup open={postPopupOpen} handleClose={handlePostPopupClose} />
       <EventPopup open={eventPopupOpen} handleClose={handleEventPopupClose} />
     </Box>

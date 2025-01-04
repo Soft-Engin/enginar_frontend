@@ -9,11 +9,12 @@ import {
   Button,
   TextField,
   IconButton,
+  Divider,
 } from "@mui/material";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
 import Comment from "./Comment";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import AddPhotoAlternateOutlinedIcon from "@mui/icons-material/AddPhotoAlternateOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 
 const StyledCommentItem = styled(ListItem)(({ theme }) => ({
@@ -49,9 +50,13 @@ export default function CommentSection({ type, contentId }) {
   const [commentImages, setCommentImages] = React.useState({});
   const [newComment, setNewComment] = React.useState("");
   const [newImages, setNewImages] = React.useState([]);
+  const [userAvatar, setUserAvatar] = React.useState(null);
+  const [userName, setUserName] = React.useState("");
+  const [userInitials, setUserInitials] = React.useState("");
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
   let userLogged = localStorage.getItem("userLogged") === "true";
-  let userId = localStorage.getItem("userId");
+  const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
+  const authButtonId = "loginButton";
 
   React.useEffect(() => {
     const fetchComments = async () => {
@@ -72,33 +77,78 @@ export default function CommentSection({ type, contentId }) {
     fetchComments();
   }, [type, contentId]);
   React.useEffect(() => {
-    if (comments && comments.length > 0) {
-      const fetchCommentImages = async () => {
-        const images = {};
-        for (let i = 0; i < comments.length; i++) {
+    if (userLogged && userId) {
+      const fetchUserData = async () => {
+        try {
+          const userDataResponse = await axios.get(`/api/v1/users/${userId}`);
+          if (userDataResponse.status === 200) {
+            setUserName(userDataResponse.data.userName);
+            //Generate user initials from username
+            const nameParts = userDataResponse.data.userName.split(" ");
+            const initials = nameParts
+              .map((part) => part.charAt(0).toUpperCase())
+              .join("");
+            setUserInitials(initials);
+          }
           try {
-            const response = await axios.get(
-              `/api/v1/comments/${comments[i].id}/images/0`,
+            const avatarResponse = await axios.get(
+              `/api/v1/users/${userId}/profile-picture`,
               { responseType: "blob" }
             );
-            if (response.data) {
-              const imageUrl = URL.createObjectURL(response.data);
-              images[comments[i].id] = imageUrl;
-            } else {
-              images[comments[i].id] = null;
+            if (avatarResponse.status === 200) {
+              const imageUrl = URL.createObjectURL(avatarResponse.data);
+              setUserAvatar(imageUrl);
             }
           } catch (error) {
-            console.error(
-              `Error fetching image for comment ${comments[i].id}:`,
-              error
-            );
-            images[comments[i].id] = null;
+            if (error.response && error.response.status === 404) {
+              setUserAvatar(null);
+            } else {
+              console.error("Error fetching user profile picture", error);
+              setError("Error fetching user profile picture");
+            }
           }
+        } catch (err) {
+          console.error("Error fetching user data:", err);
+          setError("Error fetching user data.");
         }
-        setCommentImages(images);
       };
-      fetchCommentImages();
+      fetchUserData();
     }
+  }, [userLogged, userId]);
+
+  React.useEffect(() => {
+    // this handles images for each comment
+    const fetchCommentImages = async () => {
+      if (!comments || comments.length === 0) {
+        setCommentImages({});
+        return;
+      }
+
+      const images = {};
+      for (const comment of comments) {
+        try {
+          const response = await axios.get(
+            `/api/v1/${type}s/comments/${comment.id}/images/0`,
+            { responseType: "blob" }
+          );
+          if (response.data) {
+            const imageUrl = URL.createObjectURL(response.data);
+            images[comment.id] = imageUrl;
+          } else {
+            images[comment.id] = null;
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching image for comment ${comment.id}:`,
+            error
+          );
+          images[comment.id] = null;
+        }
+      }
+      setCommentImages(images);
+    };
+
+    fetchCommentImages();
     return () => {
       for (const commentId in commentImages) {
         if (commentImages[commentId]) {
@@ -106,7 +156,8 @@ export default function CommentSection({ type, contentId }) {
         }
       }
     };
-  }, [comments]);
+  }, [comments, type]);
+
   React.useEffect(() => {
     if (userLogged && userId) {
       const fetchProfilePicture = async () => {
@@ -160,6 +211,13 @@ export default function CommentSection({ type, contentId }) {
     );
   }
   const handleAddComment = async () => {
+    if (!userLogged) {
+      const authButton = document.getElementById(authButtonId);
+      if (authButton) {
+        authButton.click();
+      }
+      return;
+    }
     setLoadingComment(true);
     setError(null);
     try {
@@ -217,7 +275,7 @@ export default function CommentSection({ type, contentId }) {
         backgroundColor: "#EAEAEA",
         px: 3,
         py: 2,
-        borderRadius: "0 0 15px 15px",
+        borderRadius: "0 0 20px 20px",
         boxShadow: 3,
       }}
     >
@@ -228,7 +286,6 @@ export default function CommentSection({ type, contentId }) {
           alignItems: "center",
           mb: 0.5,
           mr: 2.5,
-          pb: 1.6,
         }}
       >
         <Box
@@ -239,20 +296,48 @@ export default function CommentSection({ type, contentId }) {
             flexDirection: "row",
           }}
         >
-          <Avatar
-            src={profilePictureUrl}
-            sx={{ width: 50, height: 50, marginRight: 0.5 }}
-            onError={() => setProfilePictureUrl(null)}
-          />
+          {userAvatar ? (
+            <Avatar
+              src={userAvatar}
+              sx={{ width: 50, height: 50, marginRight: 0.5, mt: 1 }}
+              onError={() => setUserAvatar(null)}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: 50,
+                height: 50,
+                borderRadius: "50%",
+                marginRight: 0.5,
+                backgroundColor: "#A5E072",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontSize: "1.2rem",
+                fontWeight: "bold",
+                flexShrink: 0,
+                mt: 1
+              }}
+            >
+              {userInitials}
+            </Box>
+          )}
           <Box
             sx={{
-              position: "relative",
               display: "flex",
-              alignItems: "flex-start",
               flexDirection: "column",
               width: "100%",
             }}
           >
+            <Typography
+              variant="body1"
+              fontWeight="bold"
+              noWrap
+              sx={{ mb: 0, ml: 1.8 }}
+            >
+              {userName || "User Name"}
+            </Typography>
             <TextField
               fullWidth
               multiline
@@ -275,6 +360,8 @@ export default function CommentSection({ type, contentId }) {
                     fontSize: "18px",
                   },
                 },
+                position: "relative",
+                top: -12
               }}
             />
             <Box
@@ -298,14 +385,20 @@ export default function CommentSection({ type, contentId }) {
                   variant="outlined"
                   component="span"
                   style={{
-                    backgroundColor: "white",
                     borderRadius: 30,
                     textTransform: "none",
-                    marginLeft: 1,
+                    marginLeft: 15,
                     padding: 0,
+                    top: -20
                   }}
                 >
-                  <AddPhotoAlternateIcon />
+                  <AddPhotoAlternateOutlinedIcon
+                    sx={{
+                      fontSize: "25px",
+                      color: "#417D1E",
+                      position: "relative",
+                    }}
+                  />
                 </IconButton>
               </label>
               {newImages &&
@@ -333,34 +426,41 @@ export default function CommentSection({ type, contentId }) {
             </Box>
           </Box>
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center", ml: 5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", ml: 5, mb: 5 }}>
           <Button
             variant="contained"
-            style={{
+            sx={{
               backgroundColor: "#4B9023",
-              borderRadius: 30,
-              width: "90px",
-              height: "40px",
+              color: "#fff",
+              ":hover": {
+                backgroundColor: "#4B9023",
+              },
+              borderRadius: 20,
+              marginLeft: "auto",
               textTransform: "none",
+              height: "36px",
+              width: "80px",
             }}
             onClick={handleAddComment}
-            disabled={loadingComment}
+            disabled={loadingComment || !newComment.trim()}
           >
-            {loadingComment ? (
-              <CircularProgress size={20} color="white" />
+            {userLogged ? (
+              loadingComment ? (
+                <CircularProgress size={20} color="white" />
+              ) : (
+                <Typography variant="h6">Post</Typography>
+              )
             ) : (
               <Typography variant="h6">Post</Typography>
             )}
           </Button>
         </Box>
       </Box>
+      <Divider></Divider>
       <List>
         {comments.map((comment, index) => (
           <StyledCommentItem key={index} disableGutters>
-            <Comment
-              comment={comment}
-              commentImage={commentImages[comment.id]}
-            />
+            <Comment comment={comment} type={type} />
           </StyledCommentItem>
         ))}
       </List>

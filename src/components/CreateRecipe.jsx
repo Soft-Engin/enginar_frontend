@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   TextField,
   Button,
@@ -26,12 +26,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
+import CloseIcon from "@mui/icons-material/Close"; // Import the CloseIcon
 import axios from "axios";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 // Styled Components for Quantity and Unit fields - Identical to the SearchBar
 const StyledSelect = styled(Select)(({ theme }) => ({
   color: "inherit",
-  backgroundColor: "#A5E072", // Make background white
+  backgroundColor: "#A5E072",
   "&:hover": {
     backgroundColor: alpha("#A5E072", 0.85),
   },
@@ -61,7 +63,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   width: "100%",
   height: "100%",
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: "#A5E072", // Make background white
+  backgroundColor: "#A5E072",
   "&:hover": {
     backgroundColor: alpha("#A5E072", 0.85),
   },
@@ -91,21 +93,258 @@ const CreateRecipe = () => {
   const [servingSize, setServingSize] = useState("1");
   const [prepTime, setPrepTime] = useState("0-10 minutes");
   const [description, setDescription] = useState("");
-  // State for banner image URL
   const [bannerImage, setBannerImage] = useState("");
   const [ingredients, setIngredients] = useState([]);
-  // Initialize steps to be an array of objects each containing text and imageUrl
-  const [steps, setSteps] = useState([{ text: "", imageUrl: "" }]);
+  const [steps, setSteps] = useState([{ text: "", imageUrl: null }]);
+  const [stepImageUrls, setStepImageUrls] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [ingredientsList, setIngredientsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [recipeLoading, setRecipeLoading] = useState(false);
+  const [recipeError, setRecipeError] = useState(null);
+  const [bannerUrl, setBannerUrl] = useState(null);
   const [creating, setCreating] = useState(false);
   const [creationError, setCreationError] = useState(null);
   const [creationSuccess, setCreationSuccess] = useState(false);
-  //New State for Images
   const [ingredientImages, setIngredientImages] = useState({});
-  // Filter and categorize ingredients
+  const [showBanner, setShowBanner] = useState(false);
+  const [loadingBanner, setLoadingBanner] = React.useState(true);
+  const [errorBanner, setErrorBanner] = React.useState(null);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const recipeId = searchParams.get("id");
+  const [isEditing, setIsEditing] = useState(!!recipeId);
+
+  const handleImageError = (error, setErrorState) => {
+    if (error.response && error.response.status === 404) {
+      setErrorState(null);
+    } else {
+      setErrorState(error.message || "An unexpected error occurred.");
+    }
+  };
+
+  const stepsRef = useRef(steps);
+
+  useEffect(() => {
+    stepsRef.current = steps;
+  }, [steps]);
+
+  const [editRecipeFetched, setEditRecipeFetched] = useState(false);
+
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      if (recipeId) {
+        setRecipeLoading(true);
+        setRecipeError(null);
+        try {
+          const response = await axios.get(`/api/v1/recipes/${recipeId}`);
+          const recipeData = response.data;
+          setRecipeName(recipeData.header || "");
+          setServingSize(String(recipeData.servingSize || "1"));
+          setPrepTime(
+            prepTimeOptions[Math.floor(recipeData.preparationTime / 10)] ||
+              "0-10 minutes"
+          );
+          setDescription(recipeData.bodyText || "");
+          setIngredients(
+            recipeData.ingredients?.map((ingredient) => ({
+              id: ingredient.ingredientId,
+              name: ingredient.ingredientName,
+              quantity: String(ingredient.quantity),
+              unit: ingredient.unit,
+            })) || []
+          );
+
+          // First set initial steps with base64 images if available
+          const initialSteps =
+            recipeData.steps?.map((step, index) => ({
+              text: step || "",
+              imageUrl: recipeData.stepImages?.[index] || null,
+            })) || [];
+          setSteps(initialSteps);
+
+          // Initialize stepImageUrls with base64 images
+          const initialImageUrls = initialSteps.reduce((acc, step, index) => {
+            acc[index] = step.imageUrl
+              ? `data:image/png;base64,${step.imageUrl}`
+              : null;
+            return acc;
+          }, {});
+          setStepImageUrls(initialImageUrls);
+
+          for (let i = 0; i < initialSteps.length; i++) {
+            if (!initialSteps[i].imageUrl) {
+              try {
+                const response = await axios.get(
+                  `/api/v1/recipes/${recipeId}/steps/${i}/image`,
+                  { responseType: "blob" }
+                );
+                if (response.data && response.data.size > 0) {
+                  // Convert blob to base64
+                  const reader = new FileReader();
+                  reader.readAsDataURL(response.data);
+                  reader.onloadend = () => {
+                    // Remove the data:image/png;base64, prefix
+                    const base64String = reader.result.split(",")[1];
+
+                    setStepImageUrls((prev) => ({
+                      ...prev,
+                      [i]: `data:image/png;base64,${base64String}`,
+                    }));
+                    setSteps((prevSteps) => {
+                      const updatedSteps = [...prevSteps];
+                      updatedSteps[i] = {
+                        ...updatedSteps[i],
+                        imageUrl: base64String, // Store just the base64 string without prefix
+                      };
+                      return updatedSteps;
+                    });
+                  };
+                }
+              } catch (error) {
+                console.error(`Error fetching image for step ${i}:`, error);
+                handleImageError(error, (errorMessage) => {
+                  setStepImageUrls((prev) => ({
+                    ...prev,
+                    [i]: null,
+                  }));
+                  setSteps((prevSteps) => {
+                    const updatedSteps = [...prevSteps];
+                    updatedSteps[i] = { ...updatedSteps[i], imageUrl: null };
+                    return updatedSteps;
+                  });
+                });
+              }
+            }
+          }
+
+          // Fetch banner image URL
+          if (recipeData.id) {
+            const fetchBanner = async () => {
+              setLoadingBanner(true);
+              setErrorBanner(null);
+              try {
+                const response = await axios.get(
+                  `/api/v1/recipes/${recipeData.id}/banner`,
+                  { responseType: "blob" }
+                );
+                if (response.data) {
+                  // Convert blob to base64
+                  const reader = new FileReader();
+                  reader.readAsDataURL(response.data);
+                  reader.onloadend = () => {
+                    const base64data = reader.result.split(",")[1];
+                    setBannerUrl(`data:image/png;base64,${base64data}`);
+                    // Update banner image state with the base64 so it can persist on edit
+                    setBannerImage(base64data); // Set to bannerImage to persist banner image on edit
+                    setShowBanner(true);
+                  };
+                } else {
+                  setBannerUrl(null);
+                  setBannerImage(""); // Clear when no image present
+                  setShowBanner(false);
+                }
+              } catch (err) {
+                console.error("Error fetching banner image:", err);
+                handleImageError(err, (errorMessage) => {
+                  setBannerUrl(null);
+                  setBannerImage(""); // Clear when error fetching banner
+                  setShowBanner(false);
+                });
+              } finally {
+                setLoadingBanner(false);
+              }
+            };
+            fetchBanner();
+          }
+        } catch (err) {
+          console.error("Error fetching recipe:", err);
+          setRecipeError(err.message || "Failed to load recipe data.");
+        } finally {
+          setRecipeLoading(false);
+        }
+      }
+    };
+    fetchRecipe();
+    setEditRecipeFetched(true);
+    return () => {
+      if (bannerUrl) {
+        URL.revokeObjectURL(bannerUrl);
+      }
+      // Clean up step image URLs
+      for (const step in stepImageUrls) {
+        if (stepImageUrls[step]) {
+          URL.revokeObjectURL(stepImageUrls[step]);
+        }
+      }
+    };
+  }, [recipeId]);
+
+  const [stepImagesFetched, setStepImagesFetched] = useState(false);
+
+  useEffect(() => {
+    const fetchStepImages = async () => {
+      if (
+        recipeId &&
+        steps &&
+        steps.length > 0 &&
+        editRecipeFetched &&
+        !stepImagesFetched
+      ) {
+        const images = {};
+        for (let i = 0; i < steps.length; i++) {
+          if (steps[i].imageUrl) {
+            // Check if there is a base64 image
+            images[i] = `data:image/png;base64,${steps[i].imageUrl}`;
+            setStepImageUrls((prevImageUrls) => ({
+              ...prevImageUrls,
+              [i]: `data:image/png;base64,${steps[i].imageUrl}`,
+            }));
+          } else {
+            try {
+              const response = await axios.get(
+                `/api/v1/recipes/${recipeId}/steps/${i}/image`,
+                { responseType: "blob" }
+              );
+              if (response.data && response.data.size > 0) {
+                const imageUrl = URL.createObjectURL(response.data);
+                images[i] = imageUrl;
+                setStepImageUrls((prevImageUrls) => ({
+                  ...prevImageUrls,
+                  [i]: imageUrl,
+                }));
+              } else {
+                images[i] = null;
+                setStepImageUrls((prevImageUrls) => ({
+                  ...prevImageUrls,
+                  [i]: null,
+                }));
+              }
+            } catch (error) {
+              console.error(`Error fetching image for step ${i}:`, error);
+              handleImageError(error, (errorMessage) => {
+                images[i] = null;
+                setStepImageUrls((prevImageUrls) => ({
+                  ...prevImageUrls,
+                  [i]: null,
+                }));
+              });
+            }
+          }
+        }
+      }
+    };
+
+    fetchStepImages();
+    return () => {
+      for (const step in stepImageUrls) {
+        if (stepImageUrls[step]) {
+          URL.revokeObjectURL(stepImageUrls[step]);
+        }
+      }
+    };
+  }, [recipeId, steps]);
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -120,7 +359,6 @@ const CreateRecipe = () => {
             a.name.localeCompare(b.name)
           );
           setIngredientsList(sortedIngredients);
-          // Fetch images for all ingredients
           await fetchIngredientImages(
             sortedIngredients.map((ingredient) => ingredient.id)
           );
@@ -163,26 +401,22 @@ const CreateRecipe = () => {
   );
   const categorizedIngredients = categorizeIngredients(filteredIngredients);
 
-  // Add ingredient
   const addIngredient = (ingredient) => {
     if (ingredients.some((item) => item.id === ingredient.id)) {
-      // Ingredient already exists, do not add
       return;
     }
     const newIngredient = {
       ...ingredient,
-      quantity: "0.25", // Default quantity
-      unit: "", // Default unit
+      quantity: "0.25",
+      unit: "",
     };
     setIngredients([...ingredients, newIngredient]);
   };
 
-  // Remove ingredient
   const removeIngredient = (ingredient) => {
     setIngredients(ingredients.filter((item) => item.id !== ingredient.id));
   };
 
-  // Update ingredient quantity
   const updateIngredientQuantity = (id, quantity) => {
     setIngredients((prevIngredients) =>
       prevIngredients.map((item) =>
@@ -191,26 +425,22 @@ const CreateRecipe = () => {
     );
   };
 
-  // Update ingredient unit
   const updateIngredientUnit = (id, unit) => {
     setIngredients((prevIngredients) =>
       prevIngredients.map((item) => (item.id === id ? { ...item, unit } : item))
     );
   };
 
-  // Add step
   const addStep = () => {
-    setSteps([...steps, { text: "", imageUrl: "" }]);
+    setSteps([...steps, { text: "", imageUrl: null }]);
   };
 
-  // Update step
   const updateStep = (index, field, value) => {
     const newSteps = [...steps];
     newSteps[index][field] = value;
     setSteps(newSteps);
   };
 
-  // Handle banner image upload
   const handleBannerImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -218,9 +448,9 @@ const CreateRecipe = () => {
       const base64Image = await convertToBase64(file);
       setBannerImage(base64Image);
       setLoading(false);
+      setBannerUrl(`data:image/png;base64,${base64Image}`);
     }
   };
-
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -230,32 +460,59 @@ const CreateRecipe = () => {
     });
   };
 
-  // Handle banner image removal
   const handleRemoveBannerImage = () => {
+    setBannerUrl(null);
     setBannerImage("");
   };
 
-  // Handle image upload
   const handleImageUpload = async (index, event) => {
     const file = event.target.files[0];
     if (file) {
       setLoading(true);
       const base64Image = await convertToBase64(file);
-      updateStep(index, "imageUrl", base64Image);
+      setSteps((prevSteps) => {
+        const newSteps = [...prevSteps];
+        newSteps[index] = { ...newSteps[index], imageUrl: base64Image };
+        return newSteps;
+      });
+      setStepImageUrls((prevImageUrls) => ({
+        ...prevImageUrls,
+        [index]: `data:image/png;base64,${base64Image}`,
+      }));
       setLoading(false);
     }
   };
+  // Remove step image
+  const removeStepImage = (index) => {
+    console.log(steps);
+    setSteps((prevSteps) => {
+      const newSteps = [...prevSteps];
+      newSteps[index] = { ...newSteps[index], imageUrl: null };
+      return newSteps;
+    });
+    console.log(steps);
 
-  // Remove step
+    setStepImageUrls((prevImageUrls) => {
+      const imageUrl = prevImageUrls[index];
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+      const { [index]: removed, ...rest } = prevImageUrls;
+      return rest;
+    });
+  };
+
   const removeStep = (index) => {
     const newSteps = steps.filter((_, i) => i !== index);
     setSteps(newSteps);
+    setStepImageUrls((prevImageUrls) => {
+      const { [index]: removed, ...rest } = prevImageUrls;
+      return rest;
+    });
   };
 
-  // Predefined quantity options
   const quantityOptions = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5];
 
-  // Generate options for serving size and prep time from 1 to 10+, with "10+" as last option
   const numberOptions = Array.from({ length: 10 }, (_, i) => i + 1);
   const servingSizeOptions = [...numberOptions.map(String), "10+"];
   const prepTimeOptions = numberOptions.map((num) => `${num * 10} minutes`);
@@ -273,42 +530,62 @@ const CreateRecipe = () => {
         quantity: parseFloat(ingredient.quantity),
         unit: ingredient.unit,
       }));
+      const stepImagesData = steps.map((step) => step.imageUrl || null);
 
-      console.log("Transformed Ingredients", transformedIngredients);
+      //   If new banner image is uploaded then use it else use the existing bannerUrl
+      const bannerData = bannerImage
+        ? bannerImage
+        : bannerUrl
+        ? bannerUrl.split(",")[1]
+        : null;
 
-      const stepImages = steps
-        .map((step) => step.imageUrl)
-        .filter((imageUrl) => imageUrl !== "");
       const recipeData = {
         header: recipeName,
         bodyText: description,
-        bannerImage: bannerImage || null,
-        stepImages: stepImages.length > 0 ? stepImages : null,
+        bannerImage: bannerData,
+        stepImages: stepImagesData.length > 0 ? stepImagesData : null,
         servingSize: parseInt(servingSize),
         preparationTime:
           prepTimeOptions.findIndex((option) => option === prepTime) * 10,
         steps: stepsWithTextOnly,
         ingredients: transformedIngredients,
       };
-      console.log("Payload: ", recipeData);
-      const response = await axios.post("/api/v1/recipes", recipeData);
 
-      console.log("Response: ", response);
-      if (response.status === 201) {
+      let response;
+      if (isEditing) {
+        response = await axios.put(`/api/v1/recipes/${recipeId}`, recipeData);
+      } else {
+        response = await axios.post("/api/v1/recipes", recipeData);
+      }
+
+      if (response.status === 201 || response.status === 200) {
         setCreationSuccess(true);
-        setRecipeName("");
-        setServingSize("1");
-        setPrepTime("0-10 minutes");
-        setDescription("");
-        setBannerImage("");
-        setIngredients([]);
-        setSteps([{ text: "", imageUrl: "" }]);
-        console.log("Recipe created successfully:", response.data);
+        navigate(`/recipe?id=${response.data.id}`);
+        if (!isEditing) {
+          setRecipeName("");
+          setServingSize("1");
+          setPrepTime("0-10 minutes");
+          setDescription("");
+          setBannerImage("");
+          setIngredients([]);
+          setSteps([{ text: "", imageUrl: null }]);
+          setStepImageUrls({});
+        }
+        console.log(
+          `${isEditing ? "Recipe updated" : "Recipe created"} successfully:`,
+          response.data
+        );
       } else {
         setCreationError(
-          response.data?.message || "Failed to create recipe. Please try again."
+          response.data?.message ||
+            `Failed to ${
+              isEditing ? "update" : "create"
+            } recipe. Please try again.`
         );
-        console.error("Failed to create recipe:", response);
+        console.error(
+          `Failed to ${isEditing ? "update" : "create"} recipe:`,
+          response
+        );
       }
     } catch (error) {
       setCreationError(
@@ -316,7 +593,10 @@ const CreateRecipe = () => {
           error.message ||
           "An unexpected error occurred."
       );
-      console.error("Error creating recipe:", error.response?.data?.message);
+      console.error(
+        `Error ${isEditing ? "updating" : "creating"} recipe:`,
+        error.response?.data?.message
+      );
     } finally {
       setCreating(false);
     }
@@ -331,9 +611,33 @@ const CreateRecipe = () => {
     setCreationError(null);
   };
 
-  // Constant image width
   const imageWidth = "100px";
 
+  if (recipeLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (recipeError) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <Typography color="error">Error: {recipeError}</Typography>
+      </Box>
+    );
+  }
   if (loading) {
     return (
       <Box
@@ -374,7 +678,9 @@ const CreateRecipe = () => {
           severity="success"
           sx={{ width: "100%" }}
         >
-          Recipe created successfully!
+          {isEditing
+            ? "Recipe Updated Successfully!"
+            : "Recipe created successfully!"}
         </Alert>
       </Snackbar>
       <Snackbar
@@ -391,7 +697,7 @@ const CreateRecipe = () => {
         </Alert>
       </Snackbar>
       <Typography variant="h4" gutterBottom>
-        Create a Recipe
+        {isEditing ? "Edit Recipe" : "Create a Recipe"}
       </Typography>
       <Grid container spacing={3} sx={{ height: "fit-content" }}>
         {/* Left Block - Recipe Info */}
@@ -510,7 +816,7 @@ const CreateRecipe = () => {
                     Upload Image
                   </Button>
                 </label>
-                {bannerImage && (
+                {bannerUrl && (
                   <Button
                     variant="outlined"
                     color="error"
@@ -522,10 +828,10 @@ const CreateRecipe = () => {
                   </Button>
                 )}
               </Box>
-              {bannerImage && (
+              {bannerUrl && (
                 <Box sx={{ mt: 2, width: "200px", height: "200px" }}>
                   <img
-                    src={`data:image/png;base64,${bannerImage}`}
+                    src={bannerUrl}
                     alt="Banner Preview"
                     style={{
                       width: "100%",
@@ -533,6 +839,13 @@ const CreateRecipe = () => {
                       objectFit: "cover",
                     }}
                   />
+                </Box>
+              )}
+              {errorBanner && (
+                <Box display="flex" justifyContent="center" my={2}>
+                  {errorBanner !== null && (
+                    <Typography color="error">Error: {errorBanner}</Typography>
+                  )}
                 </Box>
               )}
             </Box>
@@ -697,11 +1010,11 @@ const CreateRecipe = () => {
                     value={step.text}
                     onChange={(e) => updateStep(index, "text", e.target.value)}
                     InputProps={{
-                      startAdornment: step.imageUrl ? (
+                      startAdornment: stepImageUrls[index] ? (
                         <InputAdornment position="start">
                           <Box sx={{ width: "70px", height: "70px" }}>
                             <img
-                              src={`data:image/png;base64,${step.imageUrl}`}
+                              src={stepImageUrls[index]}
                               alt={`step ${index + 1}`}
                               style={{
                                 height: "100%",
@@ -714,6 +1027,18 @@ const CreateRecipe = () => {
                       ) : null,
                       endAdornment: (
                         <InputAdornment position="end">
+                          {stepImageUrls[index] && (
+                            <IconButton
+                              color="error"
+                              onClick={() => {
+                                setStepImagesFetched(true);
+                                removeStepImage(index);
+                              }}
+                              sx={{ mr: 1 }}
+                            >
+                              <CloseIcon />
+                            </IconButton>
+                          )}
                           <input
                             type="file"
                             accept="image/*"
@@ -746,24 +1071,30 @@ const CreateRecipe = () => {
                 </Box>
               ))}
             </Box>
-            <Button
-              variant="contained"
-              startIcon={<AddCircleIcon />}
-              sx={{ mt: 2 }}
-              onClick={addStep}
-            >
-              Add Step
-            </Button>
-            <Button
-              data-testid="create-recipe-button"
-              variant="contained"
-              sx={{ mt: 2 }}
-              color="success"
-              onClick={handleCreateRecipe}
-              disabled={creating}
-            >
-              {creating ? "Creating..." : "Create Recipe"}
-            </Button>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Button
+                variant="contained"
+                startIcon={<AddCircleIcon />}
+                sx={{ mt: 2 }}
+                onClick={addStep}
+              >
+                Add Step
+              </Button>
+              <Button
+                data-testid="create-recipe-button"
+                variant="contained"
+                sx={{ mt: 2 }}
+                color="success"
+                onClick={handleCreateRecipe}
+                disabled={creating}
+              >
+                {creating
+                  ? "Saving..."
+                  : isEditing
+                  ? "Save Recipe"
+                  : "Create Recipe"}
+              </Button>
+            </Box>
           </Box>
         </Grid>
 
@@ -802,16 +1133,18 @@ const CreateRecipe = () => {
                 border: "1px solid #ccc",
                 p: 1,
                 backgroundColor: "white",
-                display: "flex", // Added flex display
-                flexDirection: "column", // Added flex direction
+                display: "flex",
+                flexDirection: "column",
                 justifyContent:
                   filteredIngredients.length === 0 && searchTerm
                     ? "center"
-                    : "flex-start", // Changed condition for alignment
+                    : "flex-start",
                 alignItems:
                   filteredIngredients.length === 0 && searchTerm
                     ? "center"
-                    : "stretch", // Changed condition for alignment
+                    : "stretch",
+                maxWidth: "100%", // Ensure no X-overflow
+                overflowX: "hidden", // Prevent X-overflow
               }}
             >
               {filteredIngredients.length === 0 && searchTerm ? ( // Condition to render the message
@@ -826,10 +1159,15 @@ const CreateRecipe = () => {
                         {letter}
                       </Typography>
                     </Divider>
-                    <div style={{ display: "flex" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap" }}>
                       {categorizedIngredients[letter].map((ingredient) => (
                         <div
-                          style={{ marginRight: 5, marginLeft: 5 }}
+                          style={{
+                            marginRight: 5,
+                            marginLeft: 5,
+                            marginTop: 5,
+                            marginBottom: 5,
+                          }}
                           key={ingredient.id}
                         >
                           <Card
@@ -856,6 +1194,7 @@ const CreateRecipe = () => {
                               </Typography>
                             </CardContent>
                             <CardActions sx={{ padding: 0.5 }}>
+                              {" "}
                               <Button
                                 size="small"
                                 fullWidth

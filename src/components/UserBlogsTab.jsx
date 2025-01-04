@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Stack, Box, CircularProgress, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import BlogMini from "./BlogMini";
 import { LoadingErrorDisplay } from "./LoadingErrorDisplay";
 import { useSearchParams } from "react-router-dom";
@@ -32,7 +32,7 @@ function UserBlogsTab() {
       }
       pageNumber += 1;
     } catch (err) {
-      console.error("Error fetching more data:", err);
+      console.error("Error fetching more data: ", err);
       setErrorMore(err.message || "An unexpected error occurred.");
     } finally {
       setLoadingMore(false);
@@ -71,7 +71,7 @@ function UserBlogsTab() {
         pageNumber = 2;
         totalPages = Math.ceil(response.data.totalCount / pageSize);
       } catch (err) {
-        console.error("Error fetching user blogs:", err);
+        console.error("Error fetching user blogs: ", err);
         setError(err.message || "An unexpected error occurred.");
       } finally {
         setLoading(false);
@@ -84,7 +84,7 @@ function UserBlogsTab() {
   }, [userId]);
 
   return (
-    <Box data-testid="user-blogs-tab-container" sx={{ display: "flex", justifyContent: "center" }}>
+    <div data-testid="user-blogs-tab-container">
       <LoadingErrorDisplay
         data-testid="loading-error-display"
         loading={loading}
@@ -92,12 +92,12 @@ function UserBlogsTab() {
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      <Stack data-testid="blogs-stack" spacing={2} direction={"column"} alignItems={"center"}>
-        {blogs.map((post) => (
+      {blogs.map((post, index) => (
+        <Box ata-testid="blogs-stack" key={index} sx={{ width: 600, mb: 2 }}>
           <BlogMini key={post.id} blog={post} />
-        ))}
-      </Stack>
-    </Box>
+        </Box>
+      ))}
+    </div>
   );
 }
 

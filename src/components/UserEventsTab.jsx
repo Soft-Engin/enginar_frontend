@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Stack, Box, CircularProgress, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import EventMini from "./EventMini";
 import { LoadingErrorDisplay } from "./LoadingErrorDisplay";
 import { useSearchParams } from "react-router-dom";
@@ -35,7 +35,7 @@ function UserEventsTab() {
       }
       pageNumber += 1;
     } catch (err) {
-      console.error("Error fetching more data:", err);
+      console.error("Error fetching more data: ", err);
       setErrorMore(err.message || "An unexpected error occurred.");
     } finally {
       setLoadingMore(false);
@@ -74,7 +74,7 @@ function UserEventsTab() {
         pageNumber = 2;
         totalPages = Math.ceil(response.data.totalCount / pageSize);
       } catch (err) {
-        console.error("Error fetching user events:", err);
+        console.error("Error fetching user events: ", err);
         setError(err.message || "An unexpected error occurred.");
       } finally {
         setLoading(false);
@@ -88,19 +88,19 @@ function UserEventsTab() {
   }, [userId]);
 
   return (
-    <Box data-testid="user-events-tab-container" sx={{ display: "flex", justifyContent: "center" }}>
+    <div data-testid="user-events-tab-container">
       <LoadingErrorDisplay
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      <Stack data-testid="events-stack" spacing={2} direction={"column"} alignItems={"center"}>
-        {events.map((event) => (
+      {events.map((event, index) => (
+        <Box  data-testid="events-stack" key={index} sx={{ width: 600, mb: 2 }}>
           <EventMini key={event.id} event={event} />
-        ))}
-      </Stack>
-    </Box>
+        </Box>
+      ))}
+    </div>
   );
 }
 

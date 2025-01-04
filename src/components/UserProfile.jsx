@@ -7,7 +7,6 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Stack from "@mui/material/Stack";
 import {
   Box,
   Typography,
@@ -16,6 +15,10 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import axios from "axios";
 import ProfileEditDialog from "./ProfileEditDialog";
@@ -24,6 +27,8 @@ import UserEventsTab from "./UserEventsTab";
 import UserRecipesTab from "./UserRecipesTab";
 import FollowersListPopup from "./FollowersListPopup";
 import FollowingListPopup from "./FollowingListPopup";
+import RecommendedUsers from "./RecommendedUsers";
+import UpcomingEvents from "./UpcomingEvents";
 import { useSearchParams } from "react-router-dom";
 
 const SharedButton = styled(Button)(({ theme }) => ({
@@ -58,7 +63,17 @@ function CustomTabPanel(props) {
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       {...other}
     >
-      {value === index && <Box sx={{ pt: 0 }}>{children}</Box>}
+      {value === index && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {children}
+        </Box>
+      )}
     </div>
   );
 }
@@ -87,6 +102,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [banDialogOpen, setBanDialogOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   const [loggedInUserData, setLoggedInUserData] = useState(
@@ -101,6 +117,8 @@ const UserProfile = () => {
   const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
   const [followingPopupOpen, setFollowingPopupOpen] = React.useState(false);
   const [followersPopupOpen, setFollowersPopupOpen] = React.useState(false);
+  const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
+  let isAdmin = loggedInUserData?.roleName === "Admin";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -121,7 +139,7 @@ const UserProfile = () => {
             setProfilePic(null);
           }
         } catch (error) {
-          console.error("error fetching profile pic", error);
+          console.error("Error fetching profile pic: ", error);
           setProfilePic(null);
         }
         try {
@@ -138,7 +156,7 @@ const UserProfile = () => {
             setBannerPic(null);
           }
         } catch (error) {
-          console.error("error fetching profile pic", error);
+          console.error("Error fetching profile pic: ", error);
           setBannerPic(null);
         }
       } catch (err) {
@@ -184,7 +202,7 @@ const UserProfile = () => {
           }
         } catch (error) {
           console.error(
-            "error fetching logged in user's following list: ",
+            "Error fetching logged in user's following list: ",
             error
           );
         }
@@ -219,7 +237,7 @@ const UserProfile = () => {
         setLoggedInUserFollowing((prev) => [...prev, { userId }]);
       }
     } catch (error) {
-      console.error("Error follow user:", error);
+      console.error("Error following user:", error);
       setError(
         error.response?.data?.message ||
           error.message ||
@@ -241,7 +259,7 @@ const UserProfile = () => {
         );
       }
     } catch (error) {
-      console.error("Error unfollow user:", error);
+      console.error("Error unfollowing user:", error);
       setError(
         error.response?.data?.message ||
           error.message ||
@@ -260,6 +278,40 @@ const UserProfile = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+  const handleBanOpen = () => {
+    setBanDialogOpen(true);
+  };
+
+  const handleBanClose = () => {
+    setBanDialogOpen(false);
+    handleClose();
+  };
+
+  const handleBanConfirm = async () => {
+    try {
+      const response = await axios.delete(`/api/v1/users/${userId}`);
+
+      if (response.status === 200) {
+        console.log(`User ${userId} banned successfully.`);
+        // Remove user from UI or provide user feedback on successful ban
+      } else {
+        console.error(
+          `Failed to ban user ${userId}. Status: ${response.status}`
+        );
+        setError(`Failed to ban user. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error banning user:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to ban the user."
+      );
+    } finally {
+      setBanDialogOpen(false); // Close the dialog after either success or error.
+      handleClose();
+    }
   };
 
   const handleEditProfile = () => {
@@ -335,197 +387,289 @@ const UserProfile = () => {
   const bannerPlaceholder = "#ffffff";
 
   return (
-    <Box
-      data-testid="user-profile-container"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minWidth: "730px",
-        maxWidth: "730px",
-      }}
-    >
-      {/* Profile Edit Dialog */}
-      <ProfileEditDialog
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        profileData={profileData}
-        profilePic={profilePic}
-        bannerPic={bannerPic}
-        onProfileUpdate={handleUpdateProfile}
-      />
+    <Box>
+      <Box
+        data-testid="user-profile-container"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          scale: { xs: "70%", sm: "80%", md: "95%", lg: "95%", xl: "100%" },
+          transformOrigin: "top",
+          width: { md: 650, lg: 620, xl: 730 },
+          margin: "0 auto",
+        }}
+      >
+        {/* Profile Edit Dialog */}
+        <ProfileEditDialog
+          open={editDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
+          profileData={profileData}
+          profilePic={profilePic}
+          bannerPic={bannerPic}
+          onProfileUpdate={handleUpdateProfile}
+        />
 
-      {/* Profile Column */}
-      <Box>
-        <Card
-          sx={{
-            position: "relative",
-            overflow: "visible",
-            backgroundColor: "#E9F6BC",
-          }}
-        >
-          {/* Cover Image */}
-          <Box
+        {/* Profile Column */}
+        <Box>
+          <Card
             sx={{
-              height: 200,
-              background: `url(${
-                bannerPic || bannerPlaceholder
-              }) no-repeat center`,
-              bgcolor: "#bbbbbb",
-              backgroundSize: "cover",
+              position: "relative",
+              overflow: "visible",
+              backgroundColor: "#E9F6BC",
+              outline: "1px solid rgb(196, 196, 196)",
             }}
-          />
-
-          {/* Profile Header */}
-          <CardContent>
+          >
+            {/* Cover Image */}
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "flex-start",
-                position: "relative",
+                height: 225,
+                background: `url(${
+                  bannerPic || bannerPlaceholder
+                }) no-repeat center`,
+                bgcolor: "#A5E072",
+                backgroundSize: "cover",
+                boxShadow: 2,
               }}
-            >
-              <Avatar
+            />
+
+            {/* Profile Header */}
+            <CardContent>
+              <Box
                 sx={{
-                  width: 120,
-                  height: 120,
-                  border: "4px solid white",
-                  position: "absolute",
-                  top: -80,
-                  left: 0,
-                  bgcolor: profilePic ? "transparent" : "#bdbdbd",
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  position: "relative",
                 }}
               >
-                {!profilePic && profilePlaceholder}
-                {profilePic && (
-                  <Avatar
-                    src={profilePic}
-                    sx={{ width: "100%", height: "100%" }}
-                  />
+                <Avatar
+                  sx={{
+                    width: 150,
+                    height: 150,
+                    border: "4px solid white",
+                    position: "absolute",
+                    top: -90,
+                    left: 0,
+                    bgcolor: profilePic ? "transparent" : "#A5E072",
+                    boxShadow: 2,
+                    fontSize: "3rem",
+                  }}
+                >
+                  {!profilePic && profilePlaceholder}
+                  {profilePic && (
+                    <Avatar
+                      src={profilePic}
+                      sx={{ width: "100%", height: "100%" }}
+                    />
+                  )}
+                </Avatar>
+                <Box sx={{ mt: -2, ml: 20 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      mt: 1,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="h4" fontWeight="bold">
+                      {profileData.firstName} {profileData.lastName}
+                    </Typography>
+                    {!isOwnProfile &&
+                      (userLogged ? (
+                        isFollowing ? (
+                          <FollowButton
+                            variant="contained"
+                            onClick={handleUnfollowUser}
+                          >
+                            Unfollow
+                          </FollowButton>
+                        ) : (
+                          <FollowButton
+                            variant="contained"
+                            onClick={handleFollowUser}
+                          >
+                            Follow
+                          </FollowButton>
+                        )
+                      ) : null)}
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ ml: 0.2 }}
+                  >
+                    {profileData.userName}
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+                    <Typography
+                      variant="body2"
+                      data-testid="following-count"
+                      onClick={handleFollowingPopupOpen}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <strong>{followingCount}</strong> Following
+                    </Typography>
+                    <Typography
+                      data-testid="followers-count"
+                      variant="body2"
+                      onClick={handleFollowersPopupOpen}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <strong>{followersCount}</strong> Followers
+                    </Typography>
+                  </Box>
+                </Box>
+                {(isOwnProfile || isAdmin) && (
+                  <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
+                    <IconButton
+                      data-testid="profile-menu-button"
+                      aria-label="more"
+                      id="menuButton"
+                      aria-controls={open ? "menu" : undefined}
+                      aria-expanded={open ? "true" : undefined}
+                      aria-haspopup="true"
+                      onClick={handleClick}
+                    >
+                      <MoreVertIcon sx={{ fontSize: "30px" }} />
+                    </IconButton>
+                    <Menu
+                      id="menu"
+                      MenuListProps={{
+                        "aria-labelledby": "menuButton",
+                      }}
+                      anchorEl={anchorEl}
+                      anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "left",
+                      }}
+                      transformOrigin={{
+                        vertical: "top",
+                        horizontal: "right",
+                      }}
+                      open={open}
+                      onClose={handleClose}
+                    >
+                      {isOwnProfile ? (
+                        <MenuItem key="Edit" onClick={handleEditProfile}>
+                          Edit Profile
+                        </MenuItem>
+                      ) : isAdmin ? (
+                        <MenuItem key="Ban" onClick={handleBanOpen}>
+                          Ban
+                        </MenuItem>
+                      ) : null}
+                    </Menu>
+                    <Dialog
+                      open={banDialogOpen}
+                      onClose={handleBanClose}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                      PaperProps={{
+                        sx: {
+                          width: { xs: 250, sm: 400 },
+                          borderRadius: 4,
+                          backgroundColor: "#C8EFA5",
+                          padding: 0.5,
+                        },
+                      }}
+                    >
+                      <DialogTitle sx={{ fontWeight: "bold" }}>
+                        Confirm Ban
+                      </DialogTitle>
+                      <DialogContent>
+                        <Typography>
+                          Are you sure you want to ban this user?
+                        </Typography>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button
+                          onClick={handleBanClose}
+                          sx={{
+                            backgroundColor: "#C8EFA5",
+                            color: "black",
+                            ":hover": {
+                              backgroundColor: "#C8EFA5",
+                            },
+                            borderRadius: 20,
+                            marginTop: 2,
+                            display: "block",
+                            marginLeft: "auto",
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleBanConfirm}
+                          variant="contained"
+                          sx={{
+                            backgroundColor: "#cc0000",
+                            color: "error",
+                            ":hover": {
+                              backgroundColor: "#cc0000",
+                            },
+                            borderRadius: 20,
+                            marginTop: 2,
+                            display: "block",
+                            marginLeft: "auto",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          Confirm Ban
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </Box>
                 )}
-              </Avatar>
-              <Box sx={{ mt: -2, ml: 17 }}>
-                <Box
-                  sx={{ display: "flex", gap: 2, mt: 1, alignItems: "center" }}
-                >
-                  <Typography variant="h5" fontWeight="bold">
-                    {profileData.firstName} {profileData.lastName}
-                  </Typography>
-                  {!isOwnProfile &&
-                    (isFollowing ? (
-                      <FollowButton
-                        variant="contained"
-                        onClick={handleUnfollowUser}
-                      >
-                        Unfollow
-                      </FollowButton>
-                    ) : (
-                      <FollowButton
-                        variant="contained"
-                        onClick={handleFollowUser}
-                      >
-                        Follow
-                      </FollowButton>
-                    ))}
-                </Box>
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  sx={{ ml: 0.2 }}
-                >
-                  {profileData.userName}
-                </Typography>
-                <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                  <Typography
-                    variant="body2"
-                    onClick={handleFollowingPopupOpen}
-                    sx={{ cursor: "pointer" }}
-                    data-testid="following-count"
-                  >
-                    <strong>{followingCount}</strong> Following
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    onClick={handleFollowersPopupOpen}
-                    sx={{ cursor: "pointer" }}
-                    data-testid="followers-count"
-                  >
-                    <strong>{followersCount}</strong> Followers
-                  </Typography>
-                </Box>
               </Box>
-              <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
-                <IconButton
-                  data-testid="profile-menu-button"
-                  aria-label="more"
-                  id="menuButton"
-                  aria-controls={open ? "menu" : undefined}
-                  aria-expanded={open ? "true" : undefined}
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-                <Menu
-                  id="menu"
-                  MenuListProps={{
-                    "aria-labelledby": "menuButton",
-                  }}
-                  anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={open}
-                  onClose={handleClose}
-                >
-                  {isOwnProfile ? (
-                    <MenuItem key="Edit" onClick={handleEditProfile}>
-                      Edit Profile
-                    </MenuItem>
-                  ) : null}
-                  <MenuItem key="Ban" onClick={handleClose}>
-                    Ban
-                  </MenuItem>
-                </Menu>
-              </Box>
-            </Box>
 
-            {/* Profile Info */}
-            <Box>
-              <Typography sx={{ mt: 1, ml: 2 }}>{profileData.bio}</Typography>
+              {/* Profile Info */}
+              <Box>
+                <Typography sx={{ mt: 1, ml: 2 }}>{profileData.bio}</Typography>
+              </Box>
+            </CardContent>
+            {/* User Content */}
+            <Box sx={{ width: "100%", pb: 2, px: 2 }}>
+              <Box sx={{ borderTop: 1, borderColor: "divider", mb: 1 }}>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  aria-label="basic tabs example"
+                  centered
+                  sx={{
+                    "& .MuiTabs-indicator": {
+                      backgroundColor: "#4B9023",
+                    },
+                    "& .MuiTab-root": {
+                      fontSize: "1.1rem",
+                      fontWeight: "bold",
+                      textTransform: "none",
+                      padding: "12px 20px",
+                    },
+                    "& .MuiTab-root.Mui-selected": {
+                      color: "#4B9023",
+                    },
+                    "& .MuiTab-root:hover": {
+                      color: "#66c72e",
+                    },
+                  }}
+                >
+                  <Tab label="Blogs" {...a11yProps(0)} />
+                  <Tab label="Events" {...a11yProps(1)} />
+                  <Tab label="Recipes" {...a11yProps(2)} />
+                </Tabs>
+              </Box>
+              <CustomTabPanel value={value} index={0}>
+                <UserBlogsTab />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={1}>
+                <UserEventsTab />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={2}>
+                <UserRecipesTab />
+              </CustomTabPanel>
             </Box>
-          </CardContent>
-          {/* User Content */}
-          <Box sx={{ width: "100%", pb: 2 }}>
-            <Box sx={{ borderTop: 1, borderColor: "divider" }}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label="basic tabs example"
-                centered
-                textColor="secondary"
-                indicatorColor="secondary"
-              >
-                <Tab label="Blogs" {...a11yProps(0)} />
-                <Tab label="Events" {...a11yProps(1)} />
-                <Tab label="Recipes" {...a11yProps(2)} />
-              </Tabs>
-            </Box>
-            <CustomTabPanel value={value} index={0}>
-              <UserBlogsTab />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-              <UserEventsTab />
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={2}>
-              <UserRecipesTab />
-            </CustomTabPanel>
-          </Box>
-        </Card>
+          </Card>
+        </Box>
       </Box>
       <FollowersListPopup
         open={followersPopupOpen}
@@ -537,6 +681,8 @@ const UserProfile = () => {
         handleClose={handleFollowingPopupClose}
         userId={userId}
       />
+      <RecommendedUsers />
+      <UpcomingEvents />
     </Box>
   );
 };

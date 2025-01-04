@@ -1,7 +1,6 @@
 import * as React from "react";
 import EventMini from "./EventMini";
 import Grid from "@mui/material/Grid2";
-import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { LoadingErrorDisplay } from "./LoadingErrorDisplay";
 import {
@@ -10,7 +9,6 @@ import {
   Select,
   MenuItem,
   Chip,
-  Button,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -63,7 +61,7 @@ export default function EventHub() {
 
       if (isNewSearch) {
         setEvents([]);
-        setPageNumber(1);
+        setPageNumber(2);
       }
 
       setLoadingMore(!isNewSearch);
@@ -265,7 +263,14 @@ export default function EventHub() {
   }, [handleScroll]); // Depend only on handleScroll
 
   return (
-    <Grid container rowSpacing={4} columnSpacing={2.5} sx={{ pt: 3, pb: 5, pl: 12, pr: 12 }} justifyContent="center" alignItems="center">
+    <Grid
+      container
+      rowSpacing={4}
+      columnSpacing={2.5}
+      sx={{ pt: 3, pb: 5, pl: 12, pr: 12 }}
+      justifyContent="center"
+      alignItems="stretch"
+    >
       <LoadingErrorDisplay
         loading={loading}
         error={error}
@@ -274,8 +279,14 @@ export default function EventHub() {
       />
       <Grid
         item
-        xs={12}
-        sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", mb: 2 }}
+        size={12}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          mb: 2,
+        }}
       >
         <FormControl sx={{ m: 1, minWidth: 180 }}>
           <InputLabel id="country-select-label">Country</InputLabel>
@@ -367,8 +378,23 @@ export default function EventHub() {
       </Grid>
 
       {events.map((event, index) => (
-        <Grid item xs={12} sm={12} md={12} lg={6} xl={6} key={index} display="flex" justifyContent="center" alignItems="center" sx={{ maxWidth: { xs: 500, sm: 500, md: 600, lg: 490, xl: 630 } }}>
-          <EventMini event={event} />
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={6}
+          lg={6}
+          xl={6}
+          key={index}
+          display="flex"
+          justifyContent="center"
+          alignItems="stretch"
+          sx={{
+            width: "100%",
+            maxWidth: { xs: 500, sm: 500, md: 600, lg: 490, xl: 630 },
+          }}
+        >
+          <EventMini event={event} sx={{ width: "100%" }} />
         </Grid>
       ))}
     </Grid>

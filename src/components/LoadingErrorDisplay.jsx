@@ -62,5 +62,5 @@ export function LoadingErrorDisplay({
     );
   }
 
-  return null; 
+  return null;
 }
