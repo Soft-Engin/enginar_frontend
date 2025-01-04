@@ -77,6 +77,7 @@ export default function CommentSection({ type, contentId }) {
     };
     fetchComments();
   }, [type, contentId]);
+
   React.useEffect(() => {
     if (userLogged && userId) {
       const fetchUserData = async () => {
@@ -264,6 +265,7 @@ export default function CommentSection({ type, contentId }) {
         console.log("Error parsing images:", error);
       });
   };
+  
   const removeImage = (index) => {
     setNewImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
@@ -440,7 +442,7 @@ export default function CommentSection({ type, contentId }) {
               marginLeft: "auto",
               textTransform: "none",
               height: "36px",
-              width: "110px",
+              width: "115px",
             }}
             onClick={handleAddComment}
             disabled={loadingComment || !newComment.trim()}

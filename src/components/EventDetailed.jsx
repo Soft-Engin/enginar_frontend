@@ -369,7 +369,7 @@ export default function EventDetailed({ eventId }) {
   };
 
   const formattedDate = eventData?.date
-    ? format(parseISO(eventData.date), "dd.MM.yyyy, HH:mm")
+    ? format(parseISO(eventData.date), "dd.MM.yyyy")
     : "N/A";
 
   //EDIT FUNCTIONALITY
@@ -649,7 +649,7 @@ export default function EventDetailed({ eventId }) {
               noWrap
               sx={{ mr: 1 }}
             >
-              Date and Time:
+              Date:
             </Typography>
             <CalendarMonthIcon
               style={{ fontSize: "28px", marginRight: "3px" }}

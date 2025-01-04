@@ -279,6 +279,7 @@ const UserProfile = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  
   const handleBanOpen = () => {
     setBanDialogOpen(true);
   };

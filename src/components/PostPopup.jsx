@@ -109,6 +109,7 @@ export default function PostPopup(props) {
     };
     fetchRecipe();
   }, [props.isEditMode, props.blogData?.recipeId]);
+  
   const handleClose = () => {
     props.handleClose();
     setLoading(false);

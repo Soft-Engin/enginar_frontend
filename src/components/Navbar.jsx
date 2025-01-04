@@ -175,6 +175,7 @@ const navbarTitlesIconsBase = [
     link: "/eventhub",
   },
 ];
+
 const navbarTitlesIconsAuth = [
   {
     text: (
@@ -287,9 +288,11 @@ export default function Navbar(props) {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
   const handleLogout = () => {
     localStorage.setItem("userLogged", false);
     setUserLogged(false);
@@ -299,6 +302,7 @@ export default function Navbar(props) {
     navigate("/");
     window.location.reload();
   };
+
   useEffect(() => {
     setNavbarTitlesIcons(
       userLogged
@@ -306,6 +310,7 @@ export default function Navbar(props) {
         : navbarTitlesIconsBase
     );
   }, [userLogged]);
+
   const fetchUserData = async () => {
     if (userLogged) {
       try {
@@ -339,12 +344,15 @@ export default function Navbar(props) {
       setProfilePic(null);
     }
   };
+
   useEffect(() => {
     fetchUserData();
   }, []);
+
   useEffect(() => {
     fetchUserData();
   }, [userLogged]);
+
   const [postPopupOpen, setPostPopupOpen] = React.useState(false);
   const [eventPopupOpen, setEventPopupOpen] = React.useState(false);
   const handleEventPopupOpen = () => {
@@ -363,6 +371,7 @@ export default function Navbar(props) {
     setPostPopupOpen(false);
     setSpeedDialOpen(false);
   };
+
   const handleFeelinHungry = async () => {
     const randomSeed = Math.floor(Math.random() * 1000);
     try {
@@ -377,6 +386,7 @@ export default function Navbar(props) {
       console.error("Error fetching random recipe", error);
     }
   };
+
   const userActions = [
     {
       text: "Profile",
@@ -402,6 +412,7 @@ export default function Navbar(props) {
       action: handleLogout,
     },
   ];
+  
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -444,10 +455,7 @@ export default function Navbar(props) {
                 <Tooltip title="Profile Menu">
                   <IconButton onClick={handleOpenUserMenu}>
                     {profilePic ? (
-                      <Avatar
-                        src={profilePic}
-                        sx={{ width: 45, height: 45 }}
-                      />
+                      <Avatar src={profilePic} sx={{ width: 45, height: 45 }} />
                     ) : (
                       <Box
                         sx={{

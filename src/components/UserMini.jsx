@@ -172,18 +172,18 @@ export default function UserMini({ user }) {
   }, [user.userId]);
 
   const generateInitials = (userName) => {
-      const nameParts = userName.split(" ");
-      return (
-        nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
-        userName.charAt(0).toUpperCase()
-      );
-    };
-  
-    useEffect(() => {
-      if (user && user.userName) {
-        setUserInitials(generateInitials(user.userName));
-      }
-    }, [user]);
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (user && user.userName) {
+      setUserInitials(generateInitials(user.userName));
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchLoggedInUserFollowing = async () => {
