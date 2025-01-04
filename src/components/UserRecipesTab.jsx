@@ -98,11 +98,13 @@ function UserRecipesTab() {
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      {recipes.map((recipe, index) => (
-        <Box data-testid="recipes-stack" key={index} sx={{ width: 600, mb: 2 }}>
-          <RecipeMini key={recipe.id} recipe={recipe} />
-        </Box>
-      ))}
+      <div data-testid="recipes-stack">
+        {recipes.map((recipe, index) => (
+          <Box key={index} sx={{ width: 600, mb: 2 }}>
+            <RecipeMini key={recipe.id} recipe={recipe} />
+          </Box>
+        ))}
+      </div>
     </div>
   );
 }
