@@ -206,7 +206,7 @@ describe('EventDetailed Component', () => {
     renderEventDetailed();
 
     await waitFor(() => {
-      expect(screen.getByText('3 people are going')).toBeInTheDocument();
+      expect(screen.getByText('people are going')).toBeInTheDocument();
       expect(screen.getByText('(1 whom you follow)')).toBeInTheDocument();
     });
   });

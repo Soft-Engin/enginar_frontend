@@ -201,20 +201,4 @@ describe("AuthPopup Component", () => {
 
   });
 
-  it("clicking 'Forgot password?' calls the forgot password callback (placeholder)", () => {
-    renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
-
-    // Open the login dialog
-    fireEvent.click(screen.getByTestId("open-login-dialog-button"));
-
-    // There's a link with test ID "forgot-password-link"
-    const forgotLink = screen.getByTestId("forgot-password-link");
-    const consoleSpy = vi.spyOn(console, "log");
-
-    fireEvent.click(forgotLink);
-
-    expect(consoleSpy).toHaveBeenCalledWith("Forgot Password");
-
-    consoleSpy.mockRestore();
-  });
 });

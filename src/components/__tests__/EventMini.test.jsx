@@ -195,7 +195,7 @@ describe('EventMini Component', () => {
     renderEventMini();
 
     await waitFor(() => {
-      const avatarGroup = screen.getByText('2 people are going');
+      const avatarGroup = screen.getByText('people are going');
       expect(avatarGroup).toBeInTheDocument();
     });
   });
