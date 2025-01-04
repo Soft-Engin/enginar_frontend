@@ -411,6 +411,7 @@ export default function UserMini({ user }) {
         {userLogged && isAdmin && !isOwnProfile && (
           <Box sx={{ position: "absolute", right: -10 }}>
             <IconButton
+              data-testid="more-button"
               aria-label="more"
               id="menuButton"
               aria-controls={open ? "menu" : undefined}
@@ -437,7 +438,7 @@ export default function UserMini({ user }) {
               open={open}
               onClose={handleClose}
             >
-              <MenuItem key="Ban" onClick={handleBanOpen}>
+              <MenuItem data-testid="ban-menu-item" key="Ban" onClick={handleBanOpen}>
                 Ban
               </MenuItem>
             </Menu>
@@ -455,12 +456,15 @@ export default function UserMini({ user }) {
                 },
               }}
             >
-              <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Ban</DialogTitle>
+              <DialogTitle sx={{ fontWeight: "bold" }}>
+                Confirm Ban
+              </DialogTitle>
               <DialogContent>
                 <Typography>Are you sure you want to ban this user?</Typography>
               </DialogContent>
               <DialogActions>
                 <Button
+                  data-testid="cancel-ban-button"
                   onClick={handleBanClose}
                   sx={{
                     backgroundColor: "#C8EFA5",
@@ -477,6 +481,7 @@ export default function UserMini({ user }) {
                   Cancel
                 </Button>
                 <Button
+                  data-testid="confirm-ban-button"
                   onClick={handleBanConfirm}
                   variant="contained"
                   sx={{
