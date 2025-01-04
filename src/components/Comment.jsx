@@ -153,6 +153,7 @@ export default function Comment({ comment, type, onDelete }) {
   };
   return (
     <Box
+      data-testid={`comment-${comment.id}`}
       sx={{
         width: "100%",
         backgroundColor: "#EAEAEA",
@@ -170,12 +171,14 @@ export default function Comment({ comment, type, onDelete }) {
         <Box sx={{ display: "flex", pb: 1.2 }}>
           {profilePictureUrl ? (
             <Avatar
+              data-testid={`comment-avatar-${comment.id}`}
               src={profilePictureUrl}
               sx={{ width: 50, height: 50, mr: 1.3 }}
               onError={() => setProfilePictureUrl(null)}
             />
           ) : (
             <Box
+              data-testid={`comment-initials-${comment.id}`}
               sx={{
                 width: 50,
                 height: 50,
@@ -205,30 +208,56 @@ export default function Comment({ comment, type, onDelete }) {
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body1" fontWeight="bold" noWrap>
+                <Typography
+                  data-testid={`comment-username-${comment.id}`}
+                  variant="body1"
+                  fontWeight="bold"
+                  noWrap
+                >
                   {comment.userName}
                 </Typography>
               </Link>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                data-testid={`comment-timestamp-${comment.id}`}
+                variant="body2"
+                color="text.secondary"
+              >
                 {comment.timestamp &&
                   formatDistanceToNow(parseISO(comment.timestamp), {
                     addSuffix: true,
                   })}
               </Typography>
             </Box>
-            <Typography variant="body2">{comment.text}</Typography>
+            <Typography data-testid={`comment-text-${comment.id}`} variant="body2">
+              {comment.text}
+            </Typography>
             {errorProfile && (
-              <Box display="flex" justifyContent="center" my={2}>
+              <Box
+                data-testid={`comment-error-profile-${comment.id}`}
+                display="flex"
+                justifyContent="center"
+                my={2}
+              >
                 <Typography color="error">Error: {errorProfile}</Typography>
               </Box>
             )}
 
             {loadingImages ? (
-              <Box display="flex" justifyContent="center" my={2}>
+              <Box
+                data-testid={`comment-loading-images-${comment.id}`}
+                display="flex"
+                justifyContent="center"
+                my={2}
+              >
                 <CircularProgress size={20} />
               </Box>
             ) : commentImages && commentImages.length > 0 ? (
-              <ImageList cols={3} gap={8} sx={{ mt: 1, width: "400px" }}>
+              <ImageList
+                data-testid={`comment-images-${comment.id}`}
+                cols={3}
+                gap={8}
+                sx={{ mt: 1, width: "400px" }}
+              >
                 {commentImages.map((image, index) => (
                   <ImageListItem key={index}>
                     <img
@@ -242,6 +271,7 @@ export default function Comment({ comment, type, onDelete }) {
                         borderRadius: 10,
                         border: "1px solid #C0C0C0",
                       }}
+                      data-testid={`comment-image-${comment.id}-${index}`}
                     />
                   </ImageListItem>
                 ))}
@@ -259,22 +289,37 @@ export default function Comment({ comment, type, onDelete }) {
               alignItems: "flex-start",
             }}
           >
-            <IconButton onClick={handleMenuOpen} sx={{ padding: 0 }}>
+            <IconButton
+              data-testid={`comment-menu-button-${comment.id}`}
+              onClick={handleMenuOpen}
+              sx={{ padding: 0 }}
+            >
               <MoreHorizIcon sx={{ fontSize: "30px" }} />
             </IconButton>
-            <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
-              <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
+            <Menu
+              anchorEl={anchorEl}
+              open={openMenu}
+              onClose={handleMenuClose}
+              data-testid={`comment-menu-${comment.id}`}
+            >
+              <MenuItem data-testid={`comment-delete-menuitem-${comment.id}`} onClick={handleDeleteClick}>
+                Delete
+              </MenuItem>
             </Menu>
           </Box>
         )}
 
-        <Dialog open={openDialog} onClose={handleCancelDelete}>
-          <DialogTitle>
-            {"Are you sure you want to delete this comment?"}
-          </DialogTitle>
+        <Dialog
+          open={openDialog}
+          onClose={handleCancelDelete}
+          data-testid={`comment-delete-dialog-${comment.id}`}
+        >
+          <DialogTitle>{"Are you sure you want to delete this comment?"}</DialogTitle>
           <DialogActions>
-            <Button onClick={handleCancelDelete}>Cancel</Button>
-            <Button onClick={handleConfirmDelete} autoFocus>
+            <Button data-testid={`comment-delete-cancel-${comment.id}`} onClick={handleCancelDelete}>
+              Cancel
+            </Button>
+            <Button data-testid={`comment-delete-confirm-${comment.id}`} onClick={handleConfirmDelete} autoFocus>
               Delete
             </Button>
           </DialogActions>
