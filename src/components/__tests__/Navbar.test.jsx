@@ -197,48 +197,76 @@ describe("Navbar Component", () => {
   });
 
   it("opens/closes speed dial", () => {
+    // Set user as logged in to see SpeedDial
+    localStorage.setItem("userLogged", "true");
+    localStorage.setItem("userData", JSON.stringify({
+      userId: "123",
+      roleName: "User"
+    }));
+
     renderNavbar();
 
-    // SpeedDial is present
+    // SpeedDial should be present
     const speedDial = screen.getByTestId("navbar-speed-dial");
     expect(speedDial).toBeInTheDocument();
 
-    // MUI SpeedDial uses the main button to open
-    const fabButton = screen.getByRole("button", { name: /speeddial actions/i });
     // Click to open
-    fireEvent.click(fabButton);
+    const mainButton = screen.getByRole("button", { name: "SpeedDial tooltip example" });
+    fireEvent.click(mainButton);
 
-    // The speed-dial actions are now "open"
-    // e.g. we might see the 3 SpeedDialAction icons
-    // If you're mocking them, just check for the presence of something in the DOM
+    // Verify actions are visible
+    expect(screen.getByTestId("speed-dial-blog")).toBeInTheDocument();
+    expect(screen.getByTestId("speed-dial-event")).toBeInTheDocument();
+    expect(screen.getByTestId("speed-dial-recipe")).toBeInTheDocument();
   });
 
   it("opens PostPopup when speed dial Post is clicked", () => {
+    // Set user as logged in to see SpeedDial
+    localStorage.setItem("userLogged", "true");
+    localStorage.setItem("userData", JSON.stringify({
+      userId: "123",
+      roleName: "User"
+    }));
+
     renderNavbar();
 
+    // Wait for SpeedDial to appear and click it
     const speedDial = screen.getByTestId("navbar-speed-dial");
-    // open
-    const fabButton = screen.getByRole("button", { name: /speeddial actions/i });
-    fireEvent.click(fabButton);
+    
+    // Click the main SpeedDial button to open it
+    const mainButton = screen.getByRole("button", { name: "SpeedDial tooltip example" });
+    fireEvent.click(mainButton);
 
-    // The Post action typically has a tooltip: "Post"
-    const postAction = screen.getByText("Post");
+    // Find and click the Blog action
+    const postAction = screen.getByTestId("speed-dial-blog");
     fireEvent.click(postAction);
 
-    // Now the PostPopup should appear
+    // Check if PostPopup opened
     expect(screen.getByTestId("mock-post-popup")).toBeInTheDocument();
   });
 
-  it("opens EventPopup when speed dial Etkinlik is clicked", () => {
+  it("opens EventPopup when speed dial Event is clicked", async () => {
+    // Set user as logged in to see SpeedDial
+    localStorage.setItem("userLogged", "true");
+    localStorage.setItem("userData", JSON.stringify({
+      userId: "123",
+      roleName: "User"
+    }));
+
     renderNavbar();
 
-    const fabButton = screen.getByRole("button", { name: /speeddial actions/i });
-    fireEvent.click(fabButton);
+    // Wait for SpeedDial to appear
+    const speedDial = screen.getByTestId("navbar-speed-dial");
+    
+    // Click the main SpeedDial button to open it
+    const mainButton = screen.getByRole("button", { name: "SpeedDial tooltip example" });
+    fireEvent.click(mainButton);
 
-    const eventAction = screen.getByText("Etkinlik");
+    // Now find the Event action by its data-testid and click it
+    const eventAction = screen.getByTestId("speed-dial-event");
     fireEvent.click(eventAction);
 
-    // Now the EventPopup should appear
+    // Check if EventPopup opened
     expect(screen.getByTestId("mock-event-popup")).toBeInTheDocument();
   });
 

@@ -604,6 +604,7 @@ export default function Navbar(props) {
             icon={<PostAddIcon />}
             tooltipTitle={"Blog"}
             tooltipOpen
+            data-testid="speed-dial-blog"
             onClick={handlePostPopupOpen}
             tooltipPlacement={isSmUp ? "right" : "left"}
           />
@@ -612,6 +613,7 @@ export default function Navbar(props) {
             icon={<GroupAddIcon />}
             tooltipTitle={"Event"}
             tooltipOpen
+            data-testid="speed-dial-event"
             onClick={handleEventPopupOpen}
             tooltipPlacement={isSmUp ? "right" : "left"}
           />
@@ -620,6 +622,7 @@ export default function Navbar(props) {
             icon={<RestaurantMenuIcon />}
             tooltipTitle={"Recipe"}
             tooltipOpen
+            data-testid="speed-dial-recipe"
             onClick={() => navigate("/createRecipe")}
             tooltipPlacement={isSmUp ? "right" : "left"}
           />
