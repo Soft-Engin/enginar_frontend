@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import axios from "axios";
+import { MemoryRouter } from "react-router-dom";
 import CreateRecipe from "../CreateRecipe"; // Adjust path if needed
 
 vi.mock("axios");
@@ -20,19 +21,22 @@ describe("CreateRecipe Component", () => {
     { id: "2", name: "Banana" },
   ];
 
+  const renderCreateRecipe = () => {
+    return render(
+      <MemoryRouter>
+        <CreateRecipe />
+      </MemoryRouter>
+    );
+  };
+
   it("shows loading spinner initially", () => {
-    // By default, we haven't resolved the GET call
-    render(<CreateRecipe />);
-    // We see the loading spinner
+    renderCreateRecipe();
     expect(screen.getByTestId("create-recipe-loading")).toBeInTheDocument();
   });
 
   it("renders error if fetching ingredients fails", async () => {
     axios.get.mockRejectedValueOnce(new Error("Network Error"));
-
-    render(<CreateRecipe />);
-
-    // Wait for the error state
+    renderCreateRecipe();
     await waitFor(() =>
       expect(screen.getByTestId("create-recipe-error")).toBeInTheDocument()
     );
@@ -48,7 +52,7 @@ describe("CreateRecipe Component", () => {
     // Then the second call for images
     axios.get.mockResolvedValueOnce({ data: [] }); // no images
 
-    render(<CreateRecipe />);
+    renderCreateRecipe();
 
     // Wait for form
     await waitFor(() =>
@@ -70,7 +74,7 @@ describe("CreateRecipe Component", () => {
     // 3) the POST for creating recipe
     axios.post.mockResolvedValueOnce({ status: 201, data: { message: "Created" } });
 
-    render(<CreateRecipe />);
+    renderCreateRecipe();
 
     // Wait for the main form
     await waitFor(() =>
@@ -85,8 +89,8 @@ describe("CreateRecipe Component", () => {
     const createBtn = screen.getByTestId("create-recipe-button");
     fireEvent.click(createBtn);
 
-    // Expect the "Creating..." state
-    expect(createBtn).toHaveTextContent("Creating...");
+    // Expect the "Saving..." state
+    expect(createBtn).toHaveTextContent("Saving...");
 
     // Once the POST resolves
     await waitFor(() => expect(createBtn).toHaveTextContent("Create Recipe"));
@@ -107,7 +111,7 @@ describe("CreateRecipe Component", () => {
       }
     });
 
-    render(<CreateRecipe />);
+    renderCreateRecipe();
 
     // Wait for the form
     await waitFor(() =>
@@ -132,7 +136,7 @@ describe("CreateRecipe Component", () => {
     // 2) fetch images
     axios.get.mockResolvedValueOnce({ data: [] });
 
-    render(<CreateRecipe />);
+    renderCreateRecipe();
 
     await waitFor(() =>
       expect(screen.getByTestId("create-recipe-form")).toBeInTheDocument()
