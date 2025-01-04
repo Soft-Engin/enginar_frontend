@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Typography,
   Box,
@@ -11,6 +11,7 @@ import {
   MenuItem,
   Dialog,
   DialogTitle,
+  DialogContent,
   DialogActions,
   Button,
   Modal,
@@ -296,18 +297,63 @@ export default function Comment({ comment, type, onDelete }) {
               <MoreHorizIcon sx={{ fontSize: "30px" }} />
             </IconButton>
             <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
-              <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
+              <MenuItem onClick={handleDeleteClick} sx={{ color: "red" }}>
+                Delete Comment
+              </MenuItem>
             </Menu>
           </Box>
         )}
-
-        <Dialog open={openDialog} onClose={handleCancelDelete}>
-          <DialogTitle>
-            {"Are you sure you want to delete this comment?"}
-          </DialogTitle>
+        <Dialog
+          open={openDialog}
+          onClose={handleCancelDelete}
+          PaperProps={{
+            sx: {
+              width: { xs: 250, sm: 400 },
+              borderRadius: 4,
+              backgroundColor: "#C8EFA5",
+              padding: 0.5,
+            },
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete this comment?
+            </Typography>
+          </DialogContent>
           <DialogActions>
-            <Button onClick={handleCancelDelete}>Cancel</Button>
-            <Button onClick={handleConfirmDelete} autoFocus>
+            <Button
+              onClick={handleCancelDelete}
+              sx={{
+                backgroundColor: "#C8EFA5",
+                color: "black",
+                ":hover": {
+                  backgroundColor: "#C8EFA5",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              variant="contained"
+              sx={{
+                backgroundColor: "#cc0000",
+                color: "error",
+                ":hover": {
+                  backgroundColor: "#cc0000",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+                fontWeight: "bold",
+              }}
+            >
               Delete
             </Button>
           </DialogActions>
