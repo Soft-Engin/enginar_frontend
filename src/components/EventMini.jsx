@@ -12,6 +12,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { Link, useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 export default function EventMini({ event }) {
   const eventDate = event?.date ? parseISO(event.date) : null;
@@ -456,7 +457,7 @@ export default function EventMini({ event }) {
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Button
             variant="contained"
-            style={{
+            sx={{
               backgroundColor: "#4B9023",
               borderRadius: 30,
               width: "80px",
@@ -464,6 +465,7 @@ export default function EventMini({ event }) {
               textTransform: "none",
             }}
             onClick={handleJoinLeaveToggle}
+            disabled={eventDate < dayjs()}
           >
             <Typography variant="h6">
               {userLogged ? (

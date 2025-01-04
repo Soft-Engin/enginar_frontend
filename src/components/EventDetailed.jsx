@@ -24,6 +24,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EventPopup from "./EventPopup";
+import dayjs from "dayjs";
 
 export default function EventDetailed({ eventId }) {
   const [participantsPopupOpen, setParticipantsPopupOpen] =
@@ -882,7 +883,7 @@ export default function EventDetailed({ eventId }) {
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Button
                 variant="contained"
-                style={{
+                sx={{
                   backgroundColor: "#4B9023",
                   borderRadius: 30,
                   width: "110px",
@@ -890,6 +891,7 @@ export default function EventDetailed({ eventId }) {
                   textTransform: "none",
                 }}
                 onClick={handleJoinLeaveToggle}
+                disabled={parseISO(eventData.date) < dayjs()}
               >
                 <Typography variant="h5">
                   {userLogged ? (
