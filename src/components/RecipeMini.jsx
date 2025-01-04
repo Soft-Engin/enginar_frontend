@@ -159,20 +159,6 @@ export default function RecipeMini({ recipe, disableActions = false }) {
     }
   }, [recipe]);
 
-  const generateInitials = (userName) => {
-    const nameParts = userName.split(" ");
-    return (
-      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
-      userName.charAt(0).toUpperCase()
-    );
-  };
-
-  useEffect(() => {
-    if (recipe && recipe.userName) {
-      setUserInitials(generateInitials(recipe.userName));
-    }
-  }, [recipe]);
-
   useEffect(() => {
     if (recipeId) {
       const fetchLikesAndComments = async () => {
