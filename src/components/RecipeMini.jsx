@@ -395,7 +395,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
           </Link>
           <Typography variant="body2" color="text.secondary" noWrap>
             {recipe.createdAt &&
-              formatDistanceToNow(parseISO(recipe.createdAt), {
+              formatDistanceToNow(parseISO(recipe.createdAt).getTime() + 3 * 60 * 60 * 1000, {
                 addSuffix: true,
               })}
           </Typography>

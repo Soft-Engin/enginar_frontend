@@ -396,7 +396,7 @@ export default function BlogMini({ blog }) {
           </Link>
           <Typography variant="body2" color="text.secondary" noWrap>
             {blog.createdAt &&
-              formatDistanceToNow(parseISO(blog.createdAt), {
+              formatDistanceToNow(parseISO(blog.createdAt).getTime() + 3 * 60 * 60 * 1000, {
                 addSuffix: true,
               })}
           </Typography>

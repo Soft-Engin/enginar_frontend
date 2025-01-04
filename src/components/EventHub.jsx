@@ -119,11 +119,14 @@ export default function EventHub() {
     // Use the most recent fromDate, defaulting to today if null
     const currentFromDate = fromDate || dayjs();
 
+    // Calculate fromDate as one day earlier
+    const adjustedFromDate = currentFromDate.subtract(1, "day");
+
     searchParamsRef.current = {
       selectedCountry,
       selectedCities,
       selectedDistricts,
-      fromDate: currentFromDate,
+      fromDate: adjustedFromDate, // Use the adjusted date
     };
     fetchEvents(true);
   }, [selectedCountry, selectedCities, selectedDistricts, fromDate]);
