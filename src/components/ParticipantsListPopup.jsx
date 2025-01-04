@@ -4,10 +4,10 @@ import DialogContent from "@mui/material/DialogContent";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-
 import CloseIcon from "@mui/icons-material/Close";
 import UserListItem from "./UserListItem";
 import axios from "axios";
+import Pagination from "@mui/material/Pagination";
 
 export default function ParticipantsListPopup(props) {
   const { open, handleClose, eventId, totalCount } = props;
@@ -15,32 +15,42 @@ export default function ParticipantsListPopup(props) {
   const [followingParticipants, setFollowingParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pageNum, setPageNum] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageSize = 10;
+
+  const fetchParticipants = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(
+        `/api/v1/events/${eventId}/participants`,
+        {
+          params: { pageSize: pageSize, pageNumber: pageNum },
+        }
+      );
+      if (response.data && response.data.participations) {
+        setParticipants(response.data.participations.items || []);
+        setFollowingParticipants(
+          response.data.followedParticipations.items || []
+        );
+        setTotalPages(Math.ceil(totalCount / pageSize));
+      }
+    } catch (error) {
+      console.error("Error fetching participants: ", error);
+      setError(error.message || "Failed to load participants.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = (event, value) => {
+    setPageNum(value);
+  };
 
   useEffect(() => {
-    const fetchParticipants = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await axios.get(
-          `/api/v1/events/${eventId}/participants?pageSize=100`
-        );
-        if (response.data && response.data.participations) {
-          setParticipants(response.data.participations.items || []);
-          setFollowingParticipants(
-            response.data.followedParticipations.items || []
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching participants: ", error);
-        setError(error.message || "Failed to load participants.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (open) {
-      fetchParticipants();
-    }
-  }, [open, eventId]);
+    fetchParticipants();
+  }, [open, eventId, pageNum]);
 
   if (!open || totalCount === 0) {
     return null; // Do not render the dialog if not open or there are no participants
@@ -48,7 +58,7 @@ export default function ParticipantsListPopup(props) {
 
   return (
     <Dialog
-      open={props.open}
+      open={open}
       onClose={handleClose}
       maxWidth={"md"}
       PaperProps={{
@@ -106,6 +116,23 @@ export default function ParticipantsListPopup(props) {
               ))}
           </>
         )}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mt: 1,
+            mb: 1,
+          }}
+        >
+          {totalPages > 1 && (
+            <Pagination
+              count={totalPages}
+              page={pageNum}
+              onChange={handlePageChange}
+              variant="outlined"
+            />
+          )}
+        </Box>
       </DialogContent>
     </Dialog>
   );
