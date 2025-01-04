@@ -194,10 +194,29 @@ export default function RecommendedUsers() {
                 }}
               >
                 <ListItemAvatar>
-                  <Avatar src={user.profilePictureUrl}>
-                    {!user.profilePictureUrl &&
-                      user.userName?.charAt(0).toUpperCase()}
-                  </Avatar>
+                  {user.profilePictureUrl ? (
+                    <Avatar
+                      src={user.profilePictureUrl}
+                      sx={{ width: 40, height: 40 }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        backgroundColor: "#A5E072",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#fff",
+                        fontSize: "1.1rem",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {user.userName?.charAt(0).toUpperCase()}
+                    </Box>
+                  )}
                 </ListItemAvatar>
                 <ListItemText>
                   <Typography variant="h6" color="black" noWrap>

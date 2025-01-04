@@ -10,7 +10,7 @@ export default function BlogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (
-    <Box sx={{ m: 4, width: 800 }}>
+    <Box sx={{ m: 4, width: 800, pb: 5 }}>
       <Box
         data-testid="blog-page-container"
         sx={{

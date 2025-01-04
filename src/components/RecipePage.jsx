@@ -10,7 +10,7 @@ export default function RecipePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   console.log(searchParams.get("id"));
   return (
-    <Box data-testid="recipe-page" sx={{ m: 4, width: 800 }}>
+    <Box data-testid="recipe-page" sx={{ m: 4, width: 800, pb: 5 }}>
       <Box
         data-testid="recipe-page-inner"
         sx={{

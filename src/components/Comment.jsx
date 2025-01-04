@@ -11,6 +11,7 @@ import {
   MenuItem,
   Dialog,
   DialogTitle,
+  DialogContent,
   DialogActions,
   Button,
   Modal,
@@ -18,7 +19,7 @@ import {
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import axios from "axios";
-import { format, parseISO, formatDistanceToNow } from "date-fns";
+import { parseISO, formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
 
 export default function Comment({ comment, type, onDelete }) {
@@ -36,7 +37,7 @@ export default function Comment({ comment, type, onDelete }) {
   const isCommentOwner = userId === comment.userId;
   const [imageEnlarged, setImageEnlarged] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (comment && comment.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
@@ -86,7 +87,8 @@ export default function Comment({ comment, type, onDelete }) {
       }
     };
   }, [comment]);
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (comment && comment.id && type) {
       const fetchCommentImages = async () => {
         setLoadingImages(true);
@@ -133,6 +135,7 @@ export default function Comment({ comment, type, onDelete }) {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
   const handleDeleteClick = () => {
     setOpenDialog(true);
     handleMenuClose();
@@ -154,6 +157,7 @@ export default function Comment({ comment, type, onDelete }) {
       console.log("Error deleting comment", error);
     }
   };
+
   return (
     <Box
       data-testid={`comment-${comment.id}`}
@@ -176,7 +180,7 @@ export default function Comment({ comment, type, onDelete }) {
             <Avatar
               data-testid={`comment-avatar-${comment.id}`}
               src={profilePictureUrl}
-              sx={{ width: 50, height: 50, mr: 1.3 }}
+              sx={{ width: 50, height: 50, mr: 2 }}
               onError={() => setProfilePictureUrl(null)}
             />
           ) : (
@@ -329,30 +333,73 @@ export default function Comment({ comment, type, onDelete }) {
             >
               <MoreHorizIcon sx={{ fontSize: "30px" }} />
             </IconButton>
+
             <Menu
               anchorEl={anchorEl}
               open={openMenu}
               onClose={handleMenuClose}
               data-testid={`comment-menu-${comment.id}`}
             >
-              <MenuItem data-testid={`comment-delete-menuitem-${comment.id}`} onClick={handleDeleteClick}>
-                Delete
+              <MenuItem data-testid={`comment-delete-menuitem-${comment.id}`} onClick={handleDeleteClick} sx={{ color: "red" }}>
+                Delete Comment
               </MenuItem>
             </Menu>
           </Box>
         )}
-
         <Dialog
           open={openDialog}
           onClose={handleCancelDelete}
+          PaperProps={{
+            sx: {
+              width: { xs: 250, sm: 400 },
+              borderRadius: 4,
+              backgroundColor: "#C8EFA5",
+              padding: 0.5,
+            },
+          }}
           data-testid={`comment-delete-dialog-${comment.id}`}
         >
-          <DialogTitle>{"Are you sure you want to delete this comment?"}</DialogTitle>
+          <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete this comment?
+            </Typography>
+          </DialogContent>
           <DialogActions>
-            <Button data-testid={`comment-delete-cancel-${comment.id}`} onClick={handleCancelDelete}>
+            <Button
+              onClick={handleCancelDelete}
+              sx={{
+                backgroundColor: "#C8EFA5",
+                color: "black",
+                ":hover": {
+                  backgroundColor: "#C8EFA5",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+              }}
+              data-testid={`comment-delete-cancel-${comment.id}`}
+            >
               Cancel
             </Button>
-            <Button data-testid={`comment-delete-confirm-${comment.id}`} onClick={handleConfirmDelete} autoFocus>
+            <Button
+              onClick={handleConfirmDelete}
+              variant="contained"
+              sx={{
+                backgroundColor: "#cc0000",
+                color: "error",
+                ":hover": {
+                  backgroundColor: "#cc0000",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+                fontWeight: "bold",
+              }}
+              data-testid={`comment-delete-confirm-${comment.id}`}
+            >
               Delete
             </Button>
           </DialogActions>

@@ -45,6 +45,7 @@ export default function RecipeDetailed({ recipeId }) {
   const navigate = useNavigate();
   const [recipeData, setRecipeData] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = useState("");
   const [bannerUrl, setBannerUrl] = React.useState(null);
   const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
@@ -233,6 +234,20 @@ export default function RecipeDetailed({ recipeId }) {
         URL.revokeObjectURL(profilePictureUrl);
       }
     };
+  }, [recipeData]);
+
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (recipeData && recipeData.userName) {
+      setUserInitials(generateInitials(recipeData.userName));
+    }
   }, [recipeData]);
 
   React.useEffect(() => {
@@ -565,11 +580,31 @@ export default function RecipeDetailed({ recipeId }) {
               alignItems: "center",
             }}
           >
-            <Avatar
-              src={profilePictureUrl}
-              sx={{ width: 50, height: 50, marginRight: 1.5 }}
-              onError={() => setProfilePictureUrl(null)}
-            />
+            {profilePictureUrl ? (
+              <Avatar
+                src={profilePictureUrl}
+                sx={{ width: 50, height: 50, mr: 1.5 }}
+                onError={() => setProfilePictureUrl(null)}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: "50%",
+                  marginRight: 1.5,
+                  backgroundColor: "#A5E072",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {userInitials}
+              </Box>
+            )}
             <Box>
               <Typography
                 variant="h6"
@@ -581,9 +616,13 @@ export default function RecipeDetailed({ recipeId }) {
               </Typography>
               <Typography variant="body2" color="text.secondary" noWrap>
                 {recipeData.createdAt &&
-                  formatDistanceToNow(parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000, {
-                    addSuffix: true,
-                  })}
+                  formatDistanceToNow(
+                    parseISO(recipeData.createdAt).getTime() +
+                      3 * 60 * 60 * 1000,
+                    {
+                      addSuffix: true,
+                    }
+                  )}
               </Typography>
             </Box>
           </Link>
@@ -958,11 +997,18 @@ export default function RecipeDetailed({ recipeId }) {
           noWrap
         >
           {recipeData.createdAt &&
-            format(parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000, "h:mm a")}
+            format(
+              parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+              "h:mm a"
+            )}
         </Typography>
         <Typography variant="body1" color="text.secondary" noWrap>
-          · {recipeData.createdAt &&
-            format(parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000, "MMM d, yyyy")}
+          ·{" "}
+          {recipeData.createdAt &&
+            format(
+              parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+              "MMM d, yyyy"
+            )}
         </Typography>
       </Box>
       <Box

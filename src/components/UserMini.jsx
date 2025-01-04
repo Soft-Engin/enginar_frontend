@@ -44,6 +44,7 @@ export default function UserMini({ user }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [banDialogOpen, setBanDialogOpen] = useState(false);
+  const [userInitials, setUserInitials] = useState("");
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -105,9 +106,6 @@ export default function UserMini({ user }) {
   const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
   let isAdmin = loggedInUserData?.roleName === "Admin";
 
-  const profilePlaceholder = user?.firstName
-    ? user.firstName.charAt(0).toUpperCase()
-    : "?";
   const bannerPlaceholder = "#ffffff";
 
   useEffect(() => {
@@ -172,6 +170,20 @@ export default function UserMini({ user }) {
     fetchImages();
     fetchFollowCounts();
   }, [user.userId]);
+
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (user && user.userName) {
+      setUserInitials(generateInitials(user.userName));
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchLoggedInUserFollowing = async () => {
@@ -336,24 +348,44 @@ export default function UserMini({ user }) {
           position: "relative",
         }}
       >
-        <Avatar
-          sx={{
-            width: 130,
-            height: 130,
-            border: "4px solid white",
-            position: "absolute",
-            top: -65,
-            left: 5,
-            bgcolor: profilePic ? "transparent" : "#A5E072",
-            boxShadow: 2,
-            fontSize: "3rem",
-          }}
-        >
-          {!profilePic && profilePlaceholder}
-          {profilePic && (
-            <Avatar src={profilePic} sx={{ width: "100%", height: "100%" }} />
-          )}
-        </Avatar>
+        {profilePic ? (
+          <Avatar
+            src={profilePic}
+            sx={{
+              width: 130,
+              height: 130,
+              border: "4px solid white",
+              position: "absolute",
+              top: -65,
+              left: 5,
+              bgcolor: "transparent",
+              boxShadow: 2,
+            }}
+            onError={() => setProfilePic(null)}
+          />
+        ) : (
+          <Box
+            sx={{
+              width: 130,
+              height: 130,
+              borderRadius: "50%",
+              backgroundColor: "#A5E072",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#fff",
+              fontSize: "3rem",
+              fontWeight: "bold",
+              border: "4px solid white",
+              position: "absolute",
+              top: -65,
+              left: 5,
+              boxShadow: 2,
+            }}
+          >
+            {userInitials}
+          </Box>
+        )}
         <Box sx={{ ml: 18 }}>
           <Box sx={{ display: "flex", gap: 2, mt: 0.6, alignItems: "center" }}>
             <Link

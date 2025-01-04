@@ -50,6 +50,7 @@ export default function BlogDetailed({ blogId }) {
   const [errorBanner, setErrorBanner] = useState(null);
   const [errorIsBookmarked, setErrorIsBookmarked] = useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+  const [userInitials, setUserInitials] = useState("");
   const [bannerUrl, setBannerUrl] = useState(null);
   const [bannerImage, setBannerImage] = useState(null); // New state for base64 banner
   const [isLiked, setIsLiked] = useState(false);
@@ -183,6 +184,7 @@ export default function BlogDetailed({ blogId }) {
       setIsEditing(false);
     }
   };
+
   const handleDeleteBlog = async () => {
     setLoading(true);
     try {
@@ -200,6 +202,7 @@ export default function BlogDetailed({ blogId }) {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     const fetchBlog = async () => {
       setLoading(true);
@@ -248,6 +251,20 @@ export default function BlogDetailed({ blogId }) {
     };
   }, [blogData]);
 
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (blogData && blogData.userName) {
+      setUserInitials(generateInitials(blogData.userName));
+    }
+  }, [blogData]);
+
   useEffect(() => {
     if (blogData && blogData.id) {
       const fetchBanner = async () => {
@@ -284,6 +301,7 @@ export default function BlogDetailed({ blogId }) {
       }
     };
   }, [blogData]);
+
   useEffect(() => {
     if (blogData && blogData.recipeId) {
       const fetchRecipe = async () => {
@@ -306,6 +324,7 @@ export default function BlogDetailed({ blogId }) {
       setLoadingRecipe(false);
     }
   }, [blogData?.recipeId]);
+
   const convertBlobToBase64 = (blob) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -410,10 +429,12 @@ export default function BlogDetailed({ blogId }) {
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     }
   };
+
   const handleEditClick = () => {
     setIsEditing(true);
     handleClose();
   };
+
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
     handleClose();
@@ -460,9 +481,17 @@ export default function BlogDetailed({ blogId }) {
   }
 
   const formattedTime =
-    blogData.createdAt && format(parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000, "h:mm a");
+    blogData.createdAt &&
+    format(
+      parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+      "h:mm a"
+    );
   const formattedDate =
-    blogData.createdAt && format(parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000, "MMM d, yyyy");
+    blogData.createdAt &&
+    format(
+      parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+      "MMM d, yyyy"
+    );
 
   return (
     <Box
@@ -500,12 +529,32 @@ export default function BlogDetailed({ blogId }) {
             }}
             data-testid="blog-author-link"
           >
-            <Avatar
-              data-testid="blog-author-avatar"
-              src={profilePictureUrl || undefined}
-              sx={{ width: 50, height: 50, marginRight: 1.5 }}
-              onError={() => setProfilePictureUrl(null)}
-            />
+            {profilePictureUrl ? (
+              <Avatar
+                data-testid="blog-author-avatar"
+                src={profilePictureUrl}
+                sx={{ width: 50, height: 50, mr: 1.5 }}
+                onError={() => setProfilePictureUrl(null)}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: "50%",
+                  marginRight: 1.5,
+                  backgroundColor: "#A5E072",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {userInitials}
+              </Box>
+            )}
             <Box>
               <Typography
                 data-testid="blog-author-username"
@@ -523,9 +572,12 @@ export default function BlogDetailed({ blogId }) {
                 noWrap
               >
                 {blogData.createdAt &&
-                  formatDistanceToNow(parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000, {
-                    addSuffix: true,
-                  })}
+                  formatDistanceToNow(
+                    parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+                    {
+                      addSuffix: true,
+                    }
+                  )}
               </Typography>
             </Box>
           </Link>

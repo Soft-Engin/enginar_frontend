@@ -32,25 +32,25 @@ const StyledCardMedia = styled("img")({
 });
 
 export default function RecipeMini({ recipe, disableActions = false }) {
-  // Added disableActions prop
   const navigate = useNavigate();
-  const [bannerUrl, setBannerUrl] = useState(null);
-  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
-  const [likeCount, setLikeCount] = useState(0);
-  const [commentCount, setCommentCount] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [loadingProfile, setLoadingProfile] = useState(true);
-  const [loadingLikesComments, setLoadingLikesComments] = useState(true);
-  const [loadingIsLiked, setLoadingIsLiked] = useState(true);
-  const [loadingIsBookmarked, setLoadingIsBookmarked] = useState(true);
-  const [error, setError] = useState(null);
-  const [errorProfile, setErrorProfile] = useState(null);
-  const [errorLikesComments, setErrorLikesComments] = useState(null);
-  const [errorIsLiked, setErrorIsLiked] = useState(null);
-  const [errorIsBookmarked, setErrorIsBookmarked] = useState(null);
-  const [showBanner, setShowBanner] = useState(false);
+  const [bannerUrl, setBannerUrl] = React.useState(null);
+  const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = React.useState("");
+  const [likeCount, setLikeCount] = React.useState(0);
+  const [commentCount, setCommentCount] = React.useState(0);
+  const [isLiked, setIsLiked] = React.useState(false);
+  const [isBookmarked, setIsBookmarked] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [loadingProfile, setLoadingProfile] = React.useState(true);
+  const [loadingLikesComments, setLoadingLikesComments] = React.useState(true);
+  const [loadingIsLiked, setLoadingIsLiked] = React.useState(true);
+  const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
+  const [error, setError] = React.useState(null);
+  const [errorProfile, setErrorProfile] = React.useState(null);
+  const [errorLikesComments, setErrorLikesComments] = React.useState(null);
+  const [errorIsLiked, setErrorIsLiked] = React.useState(null);
+  const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
+  const [showBanner, setShowBanner] = React.useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
   const [loggedInUserData, setLoggedInUserData] = useState(
@@ -143,6 +143,20 @@ export default function RecipeMini({ recipe, disableActions = false }) {
         URL.revokeObjectURL(profilePictureUrl);
       }
     };
+  }, [recipe]);
+
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (recipe && recipe.userName) {
+      setUserInitials(generateInitials(recipe.userName));
+    }
   }, [recipe]);
 
   useEffect(() => {
@@ -416,12 +430,32 @@ export default function RecipeMini({ recipe, disableActions = false }) {
               pointerEvents: disableActions ? "none" : "auto",
             }}
           >
-            <Avatar
-              data-testid="recipe-avatar"
-              src={profilePictureUrl}
-              sx={{ width: 30, height: 30, marginRight: 1 }}
-              onError={() => setProfilePictureUrl(null)}
-            />
+            {profilePictureUrl ? (
+              <Avatar
+                data-testid="recipe-avatar"
+                src={profilePictureUrl}
+                sx={{ width: 30, height: 30, mr: 1 }}
+                onError={() => setProfilePictureUrl(null)}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  marginRight: 1,
+                  backgroundColor: "#A5E072",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {userInitials}
+              </Box>
+            )}
             <Typography
               data-testid="recipe-username"
               variant="body2"
@@ -434,8 +468,10 @@ export default function RecipeMini({ recipe, disableActions = false }) {
           </Link>
           <Typography data-testid="recipe-created-ago" variant="body2" color="text.secondary" noWrap>
             {recipe.createdAt &&
-              formatDistanceToNow(parseISO(recipe.createdAt).getTime() + 3 * 60 * 60 * 1000, {
-                addSuffix: true,
+              formatDistanceToNow(
+                parseISO(recipe.createdAt).getTime() + 3 * 60 * 60 * 1000,
+                {
+                  addSuffix: true,
                 }
               )}
           </Typography>
