@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Box, Avatar, IconButton, Chip } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Avatar,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -23,22 +34,22 @@ const StyledCardMedia = styled("img")({
 
 export default function BlogMini({ blog }) {
   const navigate = useNavigate();
-  const [bannerUrl, setBannerUrl] = React.useState(null);
-  const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
-  const [likeCount, setLikeCount] = React.useState(0);
-  const [commentCount, setCommentCount] = React.useState(0);
-  const [isLiked, setIsLiked] = React.useState(false);
-  const [isBookmarked, setIsBookmarked] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
-  const [loadingProfile, setLoadingProfile] = React.useState(true);
-  const [loadingLikesComments, setLoadingLikesComments] = React.useState(true);
-  const [loadingIsLiked, setLoadingIsLiked] = React.useState(true);
-  const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
-  const [error, setError] = React.useState(null);
-  const [errorProfile, setErrorProfile] = React.useState(null);
-  const [errorLikesComments, setErrorLikesComments] = React.useState(null);
-  const [errorIsLiked, setErrorIsLiked] = React.useState(null);
-  const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
+  const [bannerUrl, setBannerUrl] = useState(null);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+  const [likeCount, setLikeCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [loadingLikesComments, setLoadingLikesComments] = useState(true);
+  const [loadingIsLiked, setLoadingIsLiked] = useState(true);
+  const [loadingIsBookmarked, setLoadingIsBookmarked] = useState(true);
+  const [error, setError] = useState(null);
+  const [errorProfile, setErrorProfile] = useState(null);
+  const [errorLikesComments, setErrorLikesComments] = useState(null);
+  const [errorIsLiked, setErrorIsLiked] = useState(null);
+  const [errorIsBookmarked, setErrorIsBookmarked] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loggedInUserFollowing, setLoggedInUserFollowing] = useState([]);
   const [loggedInUserData, setLoggedInUserData] = useState(
@@ -46,6 +57,7 @@ export default function BlogMini({ blog }) {
       ? JSON.parse(localStorage.getItem("userData"))
       : null
   );
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const [recipeName, setRecipeName] = useState(null);
   const [loadingRecipe, setLoadingRecipe] = useState(true);
@@ -68,7 +80,7 @@ export default function BlogMini({ blog }) {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (blogId) {
       const fetchBanner = async () => {
         setLoading(true);
@@ -120,7 +132,7 @@ export default function BlogMini({ blog }) {
     }
   }, [blog?.recipeId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (blog && blog.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
@@ -151,7 +163,7 @@ export default function BlogMini({ blog }) {
       }
     };
   }, [blog]);
-  React.useEffect(() => {
+  useEffect(() => {
     if (blogId) {
       const fetchLikesAndComments = async () => {
         setLoadingLikesComments(true);
@@ -174,7 +186,7 @@ export default function BlogMini({ blog }) {
       fetchLikesAndComments();
     }
   }, [blogId]);
-  React.useEffect(() => {
+  useEffect(() => {
     if (blogId && userLogged) {
       const fetchIsLiked = async () => {
         setLoadingIsLiked(true);
@@ -192,7 +204,7 @@ export default function BlogMini({ blog }) {
       fetchIsLiked();
     }
   }, [blogId, userLogged]);
-  React.useEffect(() => {
+  useEffect(() => {
     if (blogId && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
@@ -331,8 +343,27 @@ export default function BlogMini({ blog }) {
       );
     }
   };
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleDeleteBlog = async () => {
+    setLoading(true);
+    try {
+      await axios.delete(`/api/v1/blogs/${blogId}`);
+      setDeleteDialogOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete the blog."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+  };
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -341,6 +372,10 @@ export default function BlogMini({ blog }) {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+    handleClose();
   };
 
   return (
@@ -398,7 +433,8 @@ export default function BlogMini({ blog }) {
             {blog.createdAt &&
               formatDistanceToNow(parseISO(blog.createdAt).getTime() + 3 * 60 * 60 * 1000, {
                 addSuffix: true,
-              })}
+                }
+              )}
           </Typography>
         </Box>
         {userLogged && (
@@ -433,18 +469,13 @@ export default function BlogMini({ blog }) {
               {isAdmin || !isOwnBlog ? (
                 <>
                   {isAdmin && (
-                    <>
-                      <MenuItem key="Edit" onClick={handleClose}>
-                        Edit Blog
-                      </MenuItem>
-                      <MenuItem
-                        key="Delete"
-                        onClick={handleClose}
-                        sx={{ color: "red" }}
-                      >
-                        Delete Blog
-                      </MenuItem>
-                    </>
+                    <MenuItem
+                      key="Delete"
+                      onClick={handleDeleteClick}
+                      sx={{ color: "red" }}
+                    >
+                      Delete Blog
+                    </MenuItem>
                   )}
 
                   {!isOwnBlog && (
@@ -462,18 +493,13 @@ export default function BlogMini({ blog }) {
                   )}
                 </>
               ) : (
-                <>
-                  <MenuItem key="Edit" onClick={handleClose}>
-                    Edit Blog
-                  </MenuItem>
-                  <MenuItem
-                    key="Delete"
-                    onClick={handleClose}
-                    sx={{ color: "red" }}
-                  >
-                    Delete Blog
-                  </MenuItem>
-                </>
+                <MenuItem
+                  key="Delete"
+                  onClick={handleDeleteClick}
+                  sx={{ color: "red" }}
+                >
+                  Delete Blog
+                </MenuItem>
               )}
             </Menu>
           </Box>
@@ -589,6 +615,61 @@ export default function BlogMini({ blog }) {
           </IconButton>
         </Box>
       </Box>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this blog post?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCancelDelete}
+            sx={{
+              backgroundColor: "#C8EFA5",
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteBlog}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
+                backgroundColor: "#cc0000",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
