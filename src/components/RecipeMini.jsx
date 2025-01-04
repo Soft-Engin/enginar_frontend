@@ -488,6 +488,7 @@ export default function RecipeMini({ recipe }) {
           <Typography
             variant="h5"
             fontWeight="bold"
+            data-testid={`recipe-header-${recipe.id}`}
             sx={{
               whiteSpace: "nowrap",
               overflow: "hidden",

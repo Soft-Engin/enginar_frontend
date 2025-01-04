@@ -60,7 +60,7 @@ describe("RecipeMini Component", () => {
     renderRecipeMini(sampleRecipe);
 
     // The main container
-    expect(screen.getByTestId("recipe-mini-recipe-123")).toBeInTheDocument();
+    expect(screen.getByTestId(`recipe-mini-${sampleRecipe.id}`)).toBeInTheDocument();
 
     // Basic text
     expect(screen.getByTestId("recipe-username")).toHaveTextContent("TestChef");
