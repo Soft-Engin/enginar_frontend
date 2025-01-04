@@ -509,7 +509,7 @@ export default function BlogMini({ blog }) {
               onClick={() => navigate(`/recipe?id=${blog.recipeId}`)}
               clickable
               size="small"
-              sx={{ backgroundColor: "#4B9023", color: "white" }}
+              sx={{ backgroundColor: "#4B9023", color: "white", maxWidth: "70%" }}
             />
           </Box>
         )}

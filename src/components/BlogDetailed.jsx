@@ -635,7 +635,7 @@ export default function BlogDetailed({ blogId }) {
             }}
             clickable
             size="small"
-            sx={{ backgroundColor: "#4B9023", color: "white" }}
+            sx={{ backgroundColor: "#4B9023", color: "white", maxWidth: "80%" }}
           />
         </Box>
       )}

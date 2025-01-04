@@ -426,14 +426,6 @@ export default function Navbar(props) {
           <SearchBar />
 
           <RightSection sx={{ mr: 3 }}>
-            <IconButton
-              onClick={toggleInvertMode}
-              sx={{
-                opacity: 0,
-              }}
-            >
-              {isInverted ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
             {userLogged ? (
               <>
                 <Tooltip title="Profile Menu">
