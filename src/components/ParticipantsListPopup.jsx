@@ -12,6 +12,7 @@ import axios from "axios";
 export default function ParticipantsListPopup(props) {
   const { open, handleClose, eventId, totalCount } = props;
   const [participants, setParticipants] = useState([]);
+  const [followingParticipants, setFollowingParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -25,6 +26,9 @@ export default function ParticipantsListPopup(props) {
         );
         if (response.data && response.data.participations) {
           setParticipants(response.data.participations.items || []);
+          setFollowingParticipants(
+            response.data.followedParticipations.items || []
+          );
         }
       } catch (error) {
         console.error("Error fetching participants: ", error);
@@ -76,18 +80,32 @@ export default function ParticipantsListPopup(props) {
       <DialogContent sx={{ px: 1.5, py: 0 }}>
         {loading && <Typography>Loading participants...</Typography>}
         {error && <Typography color="error">{error}</Typography>}
-        {!loading &&
-          !error &&
-          participants.map((user) => (
-            <Box
-              key={user.userId}
-              justifyContent="center"
-              alignItems="center"
-              sx={{ mt: 0.5, mb: 1.5 }}
-            >
-              <UserListItem user={user} />
-            </Box>
-          ))}
+        {!loading && !error && (
+          <>
+            {followingParticipants &&
+              followingParticipants.map((user) => (
+                <Box
+                  key={user.userId}
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{ mt: 0.5, mb: 1.5 }}
+                >
+                  <UserListItem user={user} />
+                </Box>
+              ))}
+            {participants &&
+              participants.map((user) => (
+                <Box
+                  key={user.userId}
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{ mt: 0.5, mb: 1.5 }}
+                >
+                  <UserListItem user={user} />
+                </Box>
+              ))}
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
