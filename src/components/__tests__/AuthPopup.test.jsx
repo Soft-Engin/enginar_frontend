@@ -5,12 +5,22 @@ import React from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { MemoryRouter } from "react-router-dom";
 import AuthPopup from "../AuthPopup"; // Adjust the path as needed
 import axios from "axios";
 
 describe("AuthPopup Component", () => {
   let mockSetUserLogged;
   let mockSetAnchorElUser;
+
+  // Add renderWithRouter helper
+  const renderWithRouter = (component) => {
+    return render(
+      <MemoryRouter>
+        {component}
+      </MemoryRouter>
+    );
+  };
 
   beforeEach(() => {
     // Mock the props
@@ -27,7 +37,7 @@ describe("AuthPopup Component", () => {
   };
 
   it("renders Login and Sign up buttons on initial load", () => {
-    render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+    renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
 
     const loginButton = screen.getByTestId("open-login-dialog-button");
     const signupButton = screen.getByTestId("open-signup-dialog-button");
@@ -37,7 +47,7 @@ describe("AuthPopup Component", () => {
   });
 
   it("opens the login dialog when 'Log in' is clicked", () => {
-    render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+    renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
 
     const loginButton = screen.getByTestId("open-login-dialog-button");
     fireEvent.click(loginButton);
@@ -47,7 +57,7 @@ describe("AuthPopup Component", () => {
   });
 
   it("opens the signup dialog when 'Sign up' is clicked", () => {
-    render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+    renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
 
     const signupButton = screen.getByTestId("open-signup-dialog-button");
     fireEvent.click(signupButton);
@@ -57,7 +67,7 @@ describe("AuthPopup Component", () => {
   });
 
   it("switches from signup to login when the user clicks the 'Already have an account?' link", () => {
-    render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+    renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
 
     // Open the Signup dialog
     fireEvent.click(screen.getByTestId("open-signup-dialog-button"));
@@ -72,7 +82,7 @@ describe("AuthPopup Component", () => {
   });
 
   it("switches from login to signup when the user clicks the 'Don't have an account?' link", () => {
-    render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+    renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
 
     // Open the Login dialog
     fireEvent.click(screen.getByTestId("open-login-dialog-button"));
@@ -95,7 +105,7 @@ describe("AuthPopup Component", () => {
     });
 
     it("submits signup form successfully and shows success message", async () => {
-        render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+        renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
   
         fireEvent.click(screen.getByTestId("open-signup-dialog-button"));
   
@@ -120,7 +130,7 @@ describe("AuthPopup Component", () => {
       });
 
       it("handles signup error response", async () => {
-        render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+        renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
   
         fireEvent.click(screen.getByTestId("open-signup-dialog-button"));
   
@@ -145,7 +155,7 @@ describe("AuthPopup Component", () => {
       });
       
       it("submits login form successfully and sets localStorage + calls props", async () => {
-        render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+        renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
   
         fireEvent.click(screen.getByTestId("open-login-dialog-button"));
   
@@ -171,7 +181,7 @@ describe("AuthPopup Component", () => {
       });
 
     it("handles login error response", async () => {
-      render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+      renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
 
       fireEvent.click(screen.getByTestId("open-login-dialog-button"));
 
@@ -192,7 +202,7 @@ describe("AuthPopup Component", () => {
   });
 
   it("clicking 'Forgot password?' calls the forgot password callback (placeholder)", () => {
-    render(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
+    renderWithRouter(<AuthPopup setUserLogged={mockSetUserLogged} setAnchorElUser={mockSetAnchorElUser} />);
 
     // Open the login dialog
     fireEvent.click(screen.getByTestId("open-login-dialog-button"));

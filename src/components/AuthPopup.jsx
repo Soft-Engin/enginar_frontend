@@ -296,7 +296,7 @@ export default function AuthPopup(props) {
                   ),
                 }}
               />
-            </React.Fragment>
+            </>
           ) : (
             <TextField
               data-testid="identifier-input"
