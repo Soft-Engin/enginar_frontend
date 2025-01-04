@@ -73,7 +73,7 @@ export default function EventMini({ event }) {
         setErrorParticipants(null);
         try {
           const response = await axios.get(
-            `/api/v1/events/${event.eventId}/participants`
+            `/api/v1/events/${event.eventId}/participants?pageSize=200`
           );
           if (response.data && response.data.participations) {
             setParticipants(response.data.participations.items || []);
@@ -403,7 +403,7 @@ export default function EventMini({ event }) {
               component="div"
               color="text.secondary"
             >
-              {participants.length + followedParticipants.length} people are
+              {event.totalParticipantsCount} people are
               going
               {followedParticipants && followedParticipants.length > 0 && (
                 <span> ({followedParticipants.length} whom you follow)</span>

@@ -386,6 +386,7 @@ export default function PostPopup(props) {
                       label={selectedRecipe.header}
                       onDelete={handleDeleteSelectedRecipe}
                       color="success"
+                      sx={{ maxWidth: "90%" }}
                     />
                   </Box>
                 )}

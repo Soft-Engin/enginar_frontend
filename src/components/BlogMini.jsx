@@ -367,6 +367,7 @@ export default function BlogMini({ blog }) {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          height: 35,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -479,10 +480,7 @@ export default function BlogMini({ blog }) {
         )}
       </Box>
 
-      <Box
-        
-      >
-        
+      <Box>
         <Typography
           variant="body2"
           sx={{
@@ -496,7 +494,7 @@ export default function BlogMini({ blog }) {
             wordWrap: "break-word",
             overflowWrap: "break-word",
             flexGrow: 1,
-            cursor: "pointer"
+            cursor: "pointer",
           }}
           onClick={() => navigate(`/blog?id=${blogId}`)}
         >
@@ -505,20 +503,21 @@ export default function BlogMini({ blog }) {
 
         {recipeName && (
           <Box sx={{ mb: 0.5, display: "flex", flexDirection: "row", gap: 1 }}>
-            <Typography variant="subtitle2">
-            {"Linked Recipe: "} 
-          </Typography>
+            <Typography variant="subtitle2">{"Linked Recipe: "}</Typography>
             <Chip
               label={recipeName}
               onClick={() => navigate(`/recipe?id=${blog.recipeId}`)}
               clickable
               size="small"
-              sx={{backgroundColor: "#4B9023", color: "white"}}
+              sx={{ backgroundColor: "#4B9023", color: "white", maxWidth: "70%" }}
             />
           </Box>
         )}
 
-        <Box sx={{ mb: 0.5 }}>
+        <Box
+          sx={{ mb: 0.5, cursor: "pointer" }}
+          onClick={() => navigate(`/blog?id=${blogId}`)}
+        >
           {bannerUrl && !loading && (
             <StyledCardMedia
               src={bannerUrl}

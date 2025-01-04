@@ -529,19 +529,34 @@ export default function BlogDetailed({ blogId }) {
               <MoreHorizIcon sx={{ fontSize: "30px" }} />
             </IconButton>
             <Menu
-              id="menu"
-              MenuListProps={{
-                "aria-labelledby": "menuButton",
-              }}
               anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "left",
+              PaperProps={{
+                elevation: 0,
+                sx: {
+                  overflow: "visible",
+                  filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                  "& .MuiAvatar-root": {
+                    width: 32,
+                    height: 32,
+                    ml: -0.5,
+                    mr: 1,
+                  },
+                  "&:before": {
+                    content: '""',
+                    display: "block",
+                    position: "absolute",
+                    top: 0,
+                    right: 14,
+                    width: 10,
+                    height: 10,
+                    bgcolor: "background.paper",
+                    transform: "translateY(-50%) rotate(45deg)",
+                    zIndex: 0,
+                  },
+                },
               }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               open={open}
               onClose={handleClose}
             >
@@ -613,14 +628,14 @@ export default function BlogDetailed({ blogId }) {
             label={recipeName}
             onClick={() => {
               try {
-                  navigate(`/recipe?id=${blogData.recipeId}`)
-              } catch(e){
-                  console.error("error on navigation", e)
+                navigate(`/recipe?id=${blogData.recipeId}`);
+              } catch (e) {
+                console.error("error on navigation", e);
               }
-          }}
+            }}
             clickable
             size="small"
-            sx={{ backgroundColor: "#4B9023", color: "white" }}
+            sx={{ backgroundColor: "#4B9023", color: "white", maxWidth: "80%" }}
           />
         </Box>
       )}

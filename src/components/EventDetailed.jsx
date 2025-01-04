@@ -74,7 +74,7 @@ export default function EventDetailed({ eventId }) {
       if (loggedInUserData?.userId) {
         try {
           const response = await axios.get(
-            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=200`
           );
           if (response.status === 200) {
             setLoggedInUserFollowing(response.data.items);
@@ -213,7 +213,7 @@ export default function EventDetailed({ eventId }) {
         setErrorParticipants(null);
         try {
           const response = await axios.get(
-            `/api/v1/events/${eventData.eventId}/participants`
+            `/api/v1/events/${eventData.eventId}/participants?pageSize=100`
           );
           if (response.data && response.data.participations) {
             setParticipants(response.data.participations.items || []);
@@ -391,51 +391,57 @@ export default function EventDetailed({ eventId }) {
       handleCloseDeleteDialog();
     };
     return (
-      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog} 
-      PaperProps={{
-        sx: {
-          width: { xs: 250, sm: 400 },
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          padding: 0.5,
-        },
-      }}>
-        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete this event?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteDialog}
-          sx={{
-            backgroundColor: "#C8EFA5",
-            color: "black",
-            ":hover": {
+          <Button
+            onClick={handleCloseDeleteDialog}
+            sx={{
               backgroundColor: "#C8EFA5",
-            },
-            borderRadius: 20,
-            marginTop: 2,
-            display: "block",
-            marginLeft: "auto",
-          }}>
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={confirmDelete} 
-              variant="contained"
-              sx={{
+          <Button
+            onClick={confirmDelete}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
                 backgroundColor: "#cc0000",
-                color: "error",
-                ":hover": {
-                  backgroundColor: "#cc0000",
-                },
-                borderRadius: 20,
-                marginTop: 2,
-                display: "block",
-                marginLeft: "auto",
-                fontWeight: "bold",
-              }}
-            >
-              Delete
-            </Button>
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     );
@@ -505,7 +511,7 @@ export default function EventDetailed({ eventId }) {
               </Typography>
             </Box>
             {userLogged && (
-              <Box>
+              <Box sx={{ position: "relative", right: -3, top: -5}}>
                 <IconButton
                   aria-label="more"
                   id="menuButton"
@@ -517,19 +523,34 @@ export default function EventDetailed({ eventId }) {
                   <MoreHorizIcon sx={{ fontSize: "30px" }} />
                 </IconButton>
                 <Menu
-                  id="menu"
-                  MenuListProps={{
-                    "aria-labelledby": "menuButton",
-                  }}
                   anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
+                  PaperProps={{
+                    elevation: 0,
+                    sx: {
+                      overflow: "visible",
+                      filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                      "& .MuiAvatar-root": {
+                        width: 32,
+                        height: 32,
+                        ml: -0.5,
+                        mr: 1,
+                      },
+                      "&:before": {
+                        content: '""',
+                        display: "block",
+                        position: "absolute",
+                        top: 0,
+                        right: 14,
+                        width: 10,
+                        height: 10,
+                        bgcolor: "background.paper",
+                        transform: "translateY(-50%) rotate(45deg)",
+                        zIndex: 0,
+                      },
+                    },
                   }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                   open={open}
                   onClose={handleClose}
                 >
@@ -760,6 +781,7 @@ export default function EventDetailed({ eventId }) {
                   marginRight: 1,
                   cursor: "pointer",
                 }}
+                onClick={handleParticipantsPopupOpen}
               >
                 {participants &&
                   participants.map((participant) => (
@@ -798,7 +820,7 @@ export default function EventDetailed({ eventId }) {
                   component="div"
                   color="text.secondary"
                 >
-                  {participants.length + followedParticipants.length} people are
+                  {eventData.totalParticipantsCount} people are
                   going
                   {followedParticipants && followedParticipants.length > 0 && (
                     <span>
@@ -846,6 +868,8 @@ export default function EventDetailed({ eventId }) {
           <ParticipantsListPopup
             open={participantsPopupOpen}
             handleClose={handleParticipantsPopupClose}
+            eventId={eventId}
+            totalCount={eventData.totalParticipantsCount}
           />
           <EventPopup
             open={editPopupOpen}
