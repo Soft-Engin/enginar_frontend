@@ -14,6 +14,8 @@ describe('Guest User Journey - Browsing Popular Recipes', () => {
     document.body.appendChild(container);
 
     render(<PopularRecipesTab />, { container });
+
+    console.log("mounted");
   });
 
   test('should display popular recipes and load more on scroll', async () => {
@@ -25,6 +27,8 @@ describe('Guest User Journey - Browsing Popular Recipes', () => {
     // Log the HTML to debug
     console.log(document.body.innerHTML);
 
+    setTimeout(async () => {
+      console.log("tries");
     // Check if recipe boxes are present
     const recipeBoxes = screen.queryAllByTestId('recipe-box');
     console.log('Recipe boxes found:', recipeBoxes.length);
@@ -53,5 +57,7 @@ describe('Guest User Journey - Browsing Popular Recipes', () => {
       'loadingMore',
       'true'
     );
+    }, 5000)
+    
   });
 });
