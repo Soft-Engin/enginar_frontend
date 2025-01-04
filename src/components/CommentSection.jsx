@@ -336,7 +336,7 @@ export default function CommentSection({ type, contentId }) {
               noWrap
               sx={{ mb: 0, ml: 1.8 }}
             >
-              {userName || "User Name"}
+              {userName || "Guest"}
             </Typography>
             <TextField
               fullWidth
