@@ -3,7 +3,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import PopularRecipesTab from '../PopularRecipesTab';
 import axios from 'axios'; // Import axios
 
-describe('Guest User Journey - Browsing Popular Recipes', () => {
+describe('Browsing feed - bookmark/like', () => {
   beforeEach(async () => {
     // Set the base URL for axios
     axios.defaults.baseURL = "http://localhost:8090";
