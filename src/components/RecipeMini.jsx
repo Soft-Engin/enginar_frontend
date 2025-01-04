@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Box, Avatar, IconButton } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Avatar,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -48,6 +58,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
       ? JSON.parse(localStorage.getItem("userData"))
       : null
   );
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
@@ -65,7 +76,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (recipeId) {
       const fetchBanner = async () => {
         setLoading(true);
@@ -102,7 +113,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
     };
   }, [recipeId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (recipe && recipe.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
@@ -148,7 +159,21 @@ export default function RecipeMini({ recipe, disableActions = false }) {
     }
   }, [recipe]);
 
-  React.useEffect(() => {
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (recipe && recipe.userName) {
+      setUserInitials(generateInitials(recipe.userName));
+    }
+  }, [recipe]);
+
+  useEffect(() => {
     if (recipeId) {
       const fetchLikesAndComments = async () => {
         setLoadingLikesComments(true);
@@ -172,7 +197,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
     }
   }, [recipeId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (recipeId && userLogged) {
       const fetchIsLiked = async () => {
         setLoadingIsLiked(true);
@@ -193,7 +218,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
     }
   }, [recipeId, userLogged]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (recipeId && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
@@ -342,8 +367,32 @@ export default function RecipeMini({ recipe, disableActions = false }) {
       );
     }
   };
+  const handleDeleteRecipe = async () => {
+    setLoading(true);
+    try {
+      await axios.delete(`/api/v1/recipes/${recipeId}`);
+      setDeleteDialogOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting recipe:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete the recipe."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+  };
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+    handleClose();
+  };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -470,18 +519,13 @@ export default function RecipeMini({ recipe, disableActions = false }) {
               {isAdmin || !isOwnRecipe ? (
                 <>
                   {isAdmin && (
-                    <>
-                      <MenuItem key="Edit" onClick={handleClose}>
-                        Edit Recipe
-                      </MenuItem>
-                      <MenuItem
-                        key="Delete"
-                        onClick={handleClose}
-                        sx={{ color: "red" }}
-                      >
-                        Delete Recipe
-                      </MenuItem>
-                    </>
+                    <MenuItem
+                      key="Delete"
+                      onClick={handleDeleteClick}
+                      sx={{ color: "red" }}
+                    >
+                      Delete Recipe
+                    </MenuItem>
                   )}
 
                   {!isOwnRecipe && (
@@ -507,18 +551,13 @@ export default function RecipeMini({ recipe, disableActions = false }) {
                   )}
                 </>
               ) : (
-                <>
-                  <MenuItem key="Edit" onClick={handleClose}>
-                    Edit Recipe
-                  </MenuItem>
-                  <MenuItem
-                    key="Delete"
-                    onClick={handleClose}
-                    sx={{ color: "red" }}
-                  >
-                    Delete Recipe
-                  </MenuItem>
-                </>
+                <MenuItem
+                  key="Delete"
+                  onClick={handleDeleteClick}
+                  sx={{ color: "red" }}
+                >
+                  Delete Recipe
+                </MenuItem>
               )}
             </Menu>
           </Box>
@@ -655,6 +694,61 @@ export default function RecipeMini({ recipe, disableActions = false }) {
           </IconButton>
         </Box>
       </Box>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this recipe post?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCancelDelete}
+            sx={{
+              backgroundColor: "#C8EFA5",
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteRecipe}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
+                backgroundColor: "#cc0000",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

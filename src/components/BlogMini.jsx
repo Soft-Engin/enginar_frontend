@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Box, Avatar, IconButton, Chip } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Avatar,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -47,6 +58,7 @@ export default function BlogMini({ blog }) {
       ? JSON.parse(localStorage.getItem("userData"))
       : null
   );
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const [recipeName, setRecipeName] = useState(null);
   const [loadingRecipe, setLoadingRecipe] = useState(true);
@@ -350,8 +362,27 @@ export default function BlogMini({ blog }) {
       );
     }
   };
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleDeleteBlog = async () => {
+    setLoading(true);
+    try {
+      await axios.delete(`/api/v1/blogs/${blogId}`);
+      setDeleteDialogOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete the blog."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+  };
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -360,6 +391,10 @@ export default function BlogMini({ blog }) {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+    handleClose();
   };
 
   return (
@@ -475,18 +510,13 @@ export default function BlogMini({ blog }) {
               {isAdmin || !isOwnBlog ? (
                 <>
                   {isAdmin && (
-                    <>
-                      <MenuItem key="Edit" onClick={handleClose}>
-                        Edit Blog
-                      </MenuItem>
-                      <MenuItem
-                        key="Delete"
-                        onClick={handleClose}
-                        sx={{ color: "red" }}
-                      >
-                        Delete Blog
-                      </MenuItem>
-                    </>
+                    <MenuItem
+                      key="Delete"
+                      onClick={handleDeleteClick}
+                      sx={{ color: "red" }}
+                    >
+                      Delete Blog
+                    </MenuItem>
                   )}
 
                   {!isOwnBlog && (
@@ -504,18 +534,13 @@ export default function BlogMini({ blog }) {
                   )}
                 </>
               ) : (
-                <>
-                  <MenuItem key="Edit" onClick={handleClose}>
-                    Edit Blog
-                  </MenuItem>
-                  <MenuItem
-                    key="Delete"
-                    onClick={handleClose}
-                    sx={{ color: "red" }}
-                  >
-                    Delete Blog
-                  </MenuItem>
-                </>
+                <MenuItem
+                  key="Delete"
+                  onClick={handleDeleteClick}
+                  sx={{ color: "red" }}
+                >
+                  Delete Blog
+                </MenuItem>
               )}
             </Menu>
           </Box>
@@ -635,6 +660,61 @@ export default function BlogMini({ blog }) {
           </IconButton>
         </Box>
       </Box>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this blog post?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCancelDelete}
+            sx={{
+              backgroundColor: "#C8EFA5",
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteBlog}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
+                backgroundColor: "#cc0000",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -79,7 +79,6 @@ export default function AuthPopup(props) {
 
   const handleSwitchToLogin = () => {
     setIsSignup(false);
-    setShowSuccess(true);
     setFormError(null);
     setTimeout(() => {
       setShowSuccess(false);
