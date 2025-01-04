@@ -74,7 +74,7 @@ export default function EventDetailed({ eventId }) {
       if (loggedInUserData?.userId) {
         try {
           const response = await axios.get(
-            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=200`
           );
           if (response.status === 200) {
             setLoggedInUserFollowing(response.data.items);
@@ -213,7 +213,7 @@ export default function EventDetailed({ eventId }) {
         setErrorParticipants(null);
         try {
           const response = await axios.get(
-            `/api/v1/events/${eventData.eventId}/participants`
+            `/api/v1/events/${eventData.eventId}/participants?pageSize=100`
           );
           if (response.data && response.data.participations) {
             setParticipants(response.data.participations.items || []);
@@ -781,6 +781,7 @@ export default function EventDetailed({ eventId }) {
                   marginRight: 1,
                   cursor: "pointer",
                 }}
+                onClick={handleParticipantsPopupOpen}
               >
                 {participants &&
                   participants.map((participant) => (
@@ -819,7 +820,7 @@ export default function EventDetailed({ eventId }) {
                   component="div"
                   color="text.secondary"
                 >
-                  {participants.length + followedParticipants.length} people are
+                  {eventData.totalParticipantsCount} people are
                   going
                   {followedParticipants && followedParticipants.length > 0 && (
                     <span>
@@ -867,6 +868,8 @@ export default function EventDetailed({ eventId }) {
           <ParticipantsListPopup
             open={participantsPopupOpen}
             handleClose={handleParticipantsPopupClose}
+            eventId={eventId}
+            totalCount={eventData.totalParticipantsCount}
           />
           <EventPopup
             open={editPopupOpen}
