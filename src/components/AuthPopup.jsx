@@ -96,6 +96,15 @@ export default function AuthPopup(props) {
     const formJson = Object.fromEntries(formData.entries());
     const apiURL = isSignup ? "/api/v1/auth/register" : "/api/v1/auth/login";
 
+    if (isSignup) {
+      const email = formJson.email;
+      const emailRegex = /^[a-zA-Z0-9._-]+@(gmail|hotmail)\.[a-zA-Z]{2,4}$/;
+      if (!emailRegex.test(email)) {
+        setFormError("Invalid email. Please use a Gmail or Hotmail address.");
+        return;
+      }
+    }
+
     try {
       const response = await axios.post(apiURL, formJson);
 

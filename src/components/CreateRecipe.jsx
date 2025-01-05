@@ -143,8 +143,8 @@ const CreateRecipe = () => {
           setRecipeName(recipeData.header || "");
           setServingSize(String(recipeData.servingSize || "1"));
           setPrepTime(
-            prepTimeOptions[Math.floor(recipeData.preparationTime / 10)] ||
-              "0-10 minutes"
+            prepTimeOptions[Math.floor(recipeData.preparationTime / 15) - 1] ||
+              "More than 120 minutes"
           );
           setDescription(recipeData.bodyText || "");
           setIngredients(
@@ -484,13 +484,11 @@ const CreateRecipe = () => {
   };
   // Remove step image
   const removeStepImage = (index) => {
-    console.log(steps);
     setSteps((prevSteps) => {
       const newSteps = [...prevSteps];
       newSteps[index] = { ...newSteps[index], imageUrl: null };
       return newSteps;
     });
-    console.log(steps);
 
     setStepImageUrls((prevImageUrls) => {
       const imageUrl = prevImageUrls[index];
@@ -513,10 +511,10 @@ const CreateRecipe = () => {
 
   const quantityOptions = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5];
 
-  const numberOptions = Array.from({ length: 10 }, (_, i) => i + 1);
+  const numberOptions = Array.from({ length: 9 }, (_, i) => i + 1);
   const servingSizeOptions = [...numberOptions.map(String), "10+"];
-  const prepTimeOptions = numberOptions.map((num) => `${num * 10} minutes`);
-  prepTimeOptions.push("More than 100 minutes");
+  const prepTimeOptions = Array.from({ length: 8 }, (_, i) => i + 1).map((num) => `${num * 15} minutes`);
+  prepTimeOptions.push("More than 120 minutes");
 
   const handleCreateRecipe = async () => {
     setCreating(true);
@@ -546,7 +544,7 @@ const CreateRecipe = () => {
         stepImages: stepImagesData.length > 0 ? stepImagesData : null,
         servingSize: parseInt(servingSize),
         preparationTime:
-          prepTimeOptions.findIndex((option) => option === prepTime) * 10,
+          prepTimeOptions.findIndex((option) => option === prepTime) * 15 + 15,
         steps: stepsWithTextOnly,
         ingredients: transformedIngredients,
       };

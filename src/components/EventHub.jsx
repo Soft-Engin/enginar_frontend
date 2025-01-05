@@ -63,32 +63,54 @@ export default function EventHub() {
       setErrorMore(null);
 
       try {
-        // Use the ref values for constructing parameters
         const params = {
           pageNumber: currentPage,
           pageSize: pageSize,
-          SortBy: sortBy, // Added sorting
+          SortBy: sortBy,
         };
 
-        if (searchParamsRef.current.selectedCountry) {
-          params.CountryIds = [searchParamsRef.current.selectedCountry];
+        const searchParams = searchParamsRef.current; // For better readability
+
+        if (searchParams.selectedCountry) {
+          params.CountryIds = [searchParams.selectedCountry];
         }
 
-        if (searchParamsRef.current.selectedCities?.length > 0) {
-          params.CityIds = searchParamsRef.current.selectedCities;
+        if (searchParams.selectedCities?.length > 0) {
+          searchParams.selectedCities.forEach((cityId) => {
+            //Important: Append each individual city id like ?CityIds=1&CityIds=2
+            params.CityIds = params.CityIds
+              ? [...params.CityIds, cityId]
+              : [cityId];
+          });
         }
 
-        if (searchParamsRef.current.selectedDistricts?.length > 0) {
-          params.DistrictIds = searchParamsRef.current.selectedDistricts;
+        if (searchParams.selectedDistricts?.length > 0) {
+          searchParams.selectedDistricts.forEach((districtId) => {
+            //Important: Append each individual district id like ?DistrictIds=1&DistrictIds=2
+            params.DistrictIds = params.DistrictIds
+              ? [...params.DistrictIds, districtId]
+              : [districtId];
+          });
         }
-        //if no toDate is specified send the fromDate to only receive current and future events
-        if (searchParamsRef.current.fromDate) {
-          params.FromDate =
-            searchParamsRef.current.fromDate.format("YYYY-MM-DD");
+
+        if (searchParams.fromDate) {
+          params.FromDate = searchParams.fromDate.format("YYYY-MM-DD");
+        }
+
+        // Construct the URL
+        const urlParams = new URLSearchParams();
+        for (const key in params) {
+          if (Array.isArray(params[key])) {
+            params[key].forEach((value) => {
+              urlParams.append(key, value);
+            });
+          } else {
+            urlParams.append(key, params[key]);
+          }
         }
 
         const eventsResponse = await axios.get(
-          `/api/v1/events/search?${new URLSearchParams(params).toString()}`
+          `/api/v1/events/search?${urlParams.toString()}`
         );
 
         if (eventsResponse.data && eventsResponse.data.items) {

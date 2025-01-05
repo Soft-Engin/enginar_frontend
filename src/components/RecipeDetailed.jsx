@@ -795,7 +795,7 @@ export default function RecipeDetailed({ recipeId }) {
                 }}
               >
                 <AccessTimeFilledIcon />
-                <b>Total Time:</b> {recipeData.preparationTime} mins
+                <p><b>Total Time:</b> {recipeData?.preparationTime > 120 ? "More than 120 mins" : recipeData?.preparationTime ? `${recipeData?.preparationTime} mins` : null}</p>
               </Typography>
             </Box>
           </Box>

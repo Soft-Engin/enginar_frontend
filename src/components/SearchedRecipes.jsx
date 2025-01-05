@@ -73,7 +73,6 @@ export default function SearchedRecipes({ query }) {
         ]);
       }
       pageNumber += 1;
-      console.log(pageNumber);
     } catch (err) {
       console.error("Error fetching more data:", err);
       setErrorMore(err.message || "An unexpected error occurred.");

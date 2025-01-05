@@ -96,6 +96,7 @@ export default function EventPopup(props) {
   }, [requirementPage]);
 
   useEffect(() => {
+    if (props.open) {
     const fetchAllLocationData = async () => {
       try {
         const countriesResponse = await axios.get("/api/v1/events/countries");
@@ -138,7 +139,8 @@ export default function EventPopup(props) {
       }
     };
     fetchAllLocationData();
-  }, []);
+    }
+  }, [props.open]);
 
   const handleClose = () => {
     setEventName("");

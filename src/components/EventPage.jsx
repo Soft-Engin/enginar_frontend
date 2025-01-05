@@ -8,7 +8,6 @@ import { useSearchParams } from "react-router-dom";
 
 export default function EventPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  console.log(searchParams.get("id"));
   return (
     <Box sx={{ m: 4, width: 800, pb: 5 }}>
       <Box
