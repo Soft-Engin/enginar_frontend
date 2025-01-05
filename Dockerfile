@@ -12,7 +12,7 @@ COPY src ./src
 COPY public ./public
 COPY index.html ./
 COPY vite.config.js ./
-COPY .env ./.env
+COPY .env.example ./.env
 
 RUN sed -i "s|VITE_API_BASE_URL=.*|VITE_API_BASE_URL=${VITE_API_BASE_URL}|" .env
 
