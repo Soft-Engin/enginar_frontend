@@ -8,12 +8,12 @@ on:
         description: 'Type a tag version to be deployed to Docker Hub : (vX.X.X)'
         required: true
   push:
-    # tags:
-    #  - v*
+    tags:
+     - v*
 
 jobs:
   docker-build-push:
-    # if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.tag_version != '' }}
+    if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.tag_version != '' }}
     name: Docker Build and Push
     runs-on: self-hosted
     steps:
