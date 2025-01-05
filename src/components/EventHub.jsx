@@ -309,6 +309,13 @@ export default function EventHub() {
             value={selectedCountry}
             label="Country"
             onChange={handleCountryChange}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  maxHeight: 300,
+                },
+              },
+            }}
           >
             {locationData.countries.map((country) => (
               <MenuItem key={country.id} value={country.id}>
@@ -326,6 +333,13 @@ export default function EventHub() {
             multiple
             value={selectedCities}
             label="City"
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  maxHeight: 300,
+                },
+              },
+            }}
             renderValue={(selected) => (
               <Stack direction="row" spacing={1}>
                 {selected.map((id) => {
@@ -355,6 +369,13 @@ export default function EventHub() {
             multiple
             value={selectedDistricts}
             label="District"
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  maxHeight: 300,
+                },
+              },
+            }}
             renderValue={(selected) => (
               <Stack direction="row" spacing={1}>
                 {selected.map((id) => {
