@@ -7,7 +7,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -80,7 +79,6 @@ export default function AuthPopup(props) {
 
   const handleSwitchToLogin = () => {
     setIsSignup(false);
-    setShowSuccess(true);
     setFormError(null);
     setTimeout(() => {
       setShowSuccess(false);
@@ -349,21 +347,6 @@ export default function AuthPopup(props) {
                 ),
               }}
             />
-          )}
-
-          {!isSignup && (
-            <Box sx={{ display: "flex", justifyContent: "right" }}>
-              <Typography noWrap component="div" color="#535353">
-                <Link
-                  onClick={() => console.log("Forgot Password")}
-                  color="#4B9023"
-                  underline="hover"
-                  sx={{ cursor: "pointer" }}
-                >
-                  Forgot password?
-                </Link>
-              </Typography>
-            </Box>
           )}
         </DialogContent>
         <DialogActions

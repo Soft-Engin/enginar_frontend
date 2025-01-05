@@ -3,13 +3,7 @@ import EventMini from "./EventMini";
 import Grid from "@mui/material/Grid2";
 import axios from "axios";
 import { LoadingErrorDisplay } from "./LoadingErrorDisplay";
-import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-} from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, Chip } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -125,11 +119,14 @@ export default function EventHub() {
     // Use the most recent fromDate, defaulting to today if null
     const currentFromDate = fromDate || dayjs();
 
+    // Calculate fromDate as one day earlier
+    const adjustedFromDate = currentFromDate.subtract(1, "day");
+
     searchParamsRef.current = {
       selectedCountry,
       selectedCities,
       selectedDistricts,
-      fromDate: currentFromDate,
+      fromDate: adjustedFromDate, // Use the adjusted date
     };
     fetchEvents(true);
   }, [selectedCountry, selectedCities, selectedDistricts, fromDate]);
@@ -214,13 +211,7 @@ export default function EventHub() {
   };
 
   const handleDateChange = (date) => {
-    if (date != null) {
-      const today = dayjs();
-      if (date.isBefore(today, "day") || date === fromDate) return;
-      setFromDate(date);
-    } else {
-      setFromDate(dayjs());
-    }
+    setFromDate(date);
   };
 
   const handleScroll = React.useCallback(() => {
@@ -371,7 +362,7 @@ export default function EventHub() {
               label="From Date"
               value={fromDate}
               onChange={handleDateChange}
-              minDate={dayjs()}
+              format="DD/MM/YYYY"
             />
           </Stack>
         </LocalizationProvider>

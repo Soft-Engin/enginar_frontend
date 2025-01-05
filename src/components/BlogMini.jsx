@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Box, Avatar, IconButton } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Avatar,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -25,6 +36,7 @@ export default function BlogMini({ blog }) {
   const navigate = useNavigate();
   const [bannerUrl, setBannerUrl] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = React.useState("");
   const [likeCount, setLikeCount] = React.useState(0);
   const [commentCount, setCommentCount] = React.useState(0);
   const [isLiked, setIsLiked] = React.useState(false);
@@ -46,6 +58,11 @@ export default function BlogMini({ blog }) {
       ? JSON.parse(localStorage.getItem("userData"))
       : null
   );
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const [recipeName, setRecipeName] = useState(null);
+  const [loadingRecipe, setLoadingRecipe] = useState(true);
+  const [errorRecipe, setErrorRecipe] = useState(null);
 
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
@@ -64,7 +81,7 @@ export default function BlogMini({ blog }) {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (blogId) {
       const fetchBanner = async () => {
         setLoading(true);
@@ -94,7 +111,29 @@ export default function BlogMini({ blog }) {
       }
     };
   }, [blogId]);
-  React.useEffect(() => {
+
+  useEffect(() => {
+    if (blog && blog.recipeId) {
+      const fetchRecipe = async () => {
+        setLoadingRecipe(true);
+        setErrorRecipe(null);
+        try {
+          const response = await axios.get(`/api/v1/recipes/${blog.recipeId}`);
+          setRecipeName(response.data.header);
+        } catch (err) {
+          console.error("Error fetching recipe:", err);
+          setErrorRecipe(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingRecipe(false);
+        }
+      };
+      fetchRecipe();
+    } else {
+      setLoadingRecipe(false);
+    }
+  }, [blog?.recipeId]);
+
+  useEffect(() => {
     if (blog && blog.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
@@ -125,7 +164,22 @@ export default function BlogMini({ blog }) {
       }
     };
   }, [blog]);
-  React.useEffect(() => {
+
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (blog && blog.userName) {
+      setUserInitials(generateInitials(blog.userName));
+    }
+  }, [blog]);
+
+  useEffect(() => {
     if (blogId) {
       const fetchLikesAndComments = async () => {
         setLoadingLikesComments(true);
@@ -148,7 +202,8 @@ export default function BlogMini({ blog }) {
       fetchLikesAndComments();
     }
   }, [blogId]);
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (blogId && userLogged) {
       const fetchIsLiked = async () => {
         setLoadingIsLiked(true);
@@ -166,7 +221,8 @@ export default function BlogMini({ blog }) {
       fetchIsLiked();
     }
   }, [blogId, userLogged]);
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (blogId && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
@@ -213,6 +269,7 @@ export default function BlogMini({ blog }) {
       }
     }
   };
+
   const handleBookmarkToggle = async () => {
     if (!userLogged) {
       const authButton = document.getElementById(authButtonId);
@@ -305,8 +362,27 @@ export default function BlogMini({ blog }) {
       );
     }
   };
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleDeleteBlog = async () => {
+    setLoading(true);
+    try {
+      await axios.delete(`/api/v1/blogs/${blogId}`);
+      setDeleteDialogOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete the blog."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+  };
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -315,6 +391,10 @@ export default function BlogMini({ blog }) {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+    handleClose();
   };
 
   return (
@@ -341,6 +421,7 @@ export default function BlogMini({ blog }) {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          height: 35,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -353,11 +434,31 @@ export default function BlogMini({ blog }) {
               alignItems: "center",
             }}
           >
-            <Avatar
-              src={profilePictureUrl}
-              sx={{ width: 30, height: 30, marginRight: 1 }}
-              onError={() => setProfilePictureUrl(null)}
-            />
+            {profilePictureUrl ? (
+              <Avatar
+                src={profilePictureUrl}
+                sx={{ width: 30, height: 30, mr: 1 }}
+                onError={() => setProfilePictureUrl(null)}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  marginRight: 1,
+                  backgroundColor: "#A5E072",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {userInitials}
+              </Box>
+            )}
             <Typography
               variant="body2"
               fontWeight="bold"
@@ -369,9 +470,12 @@ export default function BlogMini({ blog }) {
           </Link>
           <Typography variant="body2" color="text.secondary" noWrap>
             {blog.createdAt &&
-              formatDistanceToNow(parseISO(blog.createdAt), {
-                addSuffix: true,
-              })}
+              formatDistanceToNow(
+                parseISO(blog.createdAt).getTime() + 3 * 60 * 60 * 1000,
+                {
+                  addSuffix: true,
+                }
+              )}
           </Typography>
         </Box>
         {userLogged && (
@@ -406,18 +510,13 @@ export default function BlogMini({ blog }) {
               {isAdmin || !isOwnBlog ? (
                 <>
                   {isAdmin && (
-                    <>
-                      <MenuItem key="Edit" onClick={handleClose}>
-                        Edit Blog
-                      </MenuItem>
-                      <MenuItem
-                        key="Delete"
-                        onClick={handleClose}
-                        sx={{ color: "red" }}
-                      >
-                        Delete Blog
-                      </MenuItem>
-                    </>
+                    <MenuItem
+                      key="Delete"
+                      onClick={handleDeleteClick}
+                      sx={{ color: "red" }}
+                    >
+                      Delete Blog
+                    </MenuItem>
                   )}
 
                   {!isOwnBlog && (
@@ -435,28 +534,20 @@ export default function BlogMini({ blog }) {
                   )}
                 </>
               ) : (
-                <>
-                  <MenuItem key="Edit" onClick={handleClose}>
-                    Edit Blog
-                  </MenuItem>
-                  <MenuItem
-                    key="Delete"
-                    onClick={handleClose}
-                    sx={{ color: "red" }}
-                  >
-                    Delete Blog
-                  </MenuItem>
-                </>
+                <MenuItem
+                  key="Delete"
+                  onClick={handleDeleteClick}
+                  sx={{ color: "red" }}
+                >
+                  Delete Blog
+                </MenuItem>
               )}
             </Menu>
           </Box>
         )}
       </Box>
 
-      <Box
-        onClick={() => navigate(`/blog?id=${blogId}`)}
-        sx={{ cursor: "pointer" }}
-      >
+      <Box>
         <Typography
           variant="body2"
           sx={{
@@ -470,12 +561,34 @@ export default function BlogMini({ blog }) {
             wordWrap: "break-word",
             overflowWrap: "break-word",
             flexGrow: 1,
+            cursor: "pointer",
           }}
+          onClick={() => navigate(`/blog?id=${blogId}`)}
         >
           {blog.bodyText}
         </Typography>
 
-        <Box sx={{ mb: 0.5 }}>
+        {recipeName && (
+          <Box sx={{ mb: 0.5, display: "flex", flexDirection: "row", gap: 1 }}>
+            <Typography variant="subtitle2">{"Linked Recipe: "}</Typography>
+            <Chip
+              label={recipeName}
+              onClick={() => navigate(`/recipe?id=${blog.recipeId}`)}
+              clickable
+              size="small"
+              sx={{
+                backgroundColor: "#4B9023",
+                color: "white",
+                maxWidth: "70%",
+              }}
+            />
+          </Box>
+        )}
+
+        <Box
+          sx={{ mb: 0.5, cursor: "pointer" }}
+          onClick={() => navigate(`/blog?id=${blogId}`)}
+        >
           {bannerUrl && !loading && (
             <StyledCardMedia
               src={bannerUrl}
@@ -547,6 +660,61 @@ export default function BlogMini({ blog }) {
           </IconButton>
         </Box>
       </Box>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this blog post?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCancelDelete}
+            sx={{
+              backgroundColor: "#C8EFA5",
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteBlog}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
+                backgroundColor: "#cc0000",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -30,8 +30,6 @@ import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlin
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import LogoutIcon from "@mui/icons-material/Logout";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import LightModeIcon from "@mui/icons-material/LightMode";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
@@ -177,6 +175,7 @@ const navbarTitlesIconsBase = [
     link: "/eventhub",
   },
 ];
+
 const navbarTitlesIconsAuth = [
   {
     text: (
@@ -232,6 +231,21 @@ export default function Navbar(props) {
   const setStoredInvertMode = (value) => {
     localStorage.setItem("isInverted", value.toString());
   };
+  const [userInitials, setUserInitials] = React.useState("");
+
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (user && user.userName) {
+      setUserInitials(generateInitials(user.userName));
+    }
+  }, [user]);
 
   useEffect(() => {
     const storedMode = getStoredInvertMode();
@@ -274,9 +288,11 @@ export default function Navbar(props) {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
   const handleLogout = () => {
     localStorage.setItem("userLogged", false);
     setUserLogged(false);
@@ -286,6 +302,7 @@ export default function Navbar(props) {
     navigate("/");
     window.location.reload();
   };
+
   useEffect(() => {
     setNavbarTitlesIcons(
       userLogged
@@ -293,6 +310,7 @@ export default function Navbar(props) {
         : navbarTitlesIconsBase
     );
   }, [userLogged]);
+
   const fetchUserData = async () => {
     if (userLogged) {
       try {
@@ -326,12 +344,15 @@ export default function Navbar(props) {
       setProfilePic(null);
     }
   };
+
   useEffect(() => {
     fetchUserData();
   }, []);
+
   useEffect(() => {
     fetchUserData();
   }, [userLogged]);
+
   const [postPopupOpen, setPostPopupOpen] = React.useState(false);
   const [eventPopupOpen, setEventPopupOpen] = React.useState(false);
   const handleEventPopupOpen = () => {
@@ -350,6 +371,7 @@ export default function Navbar(props) {
     setPostPopupOpen(false);
     setSpeedDialOpen(false);
   };
+
   const handleFeelinHungry = async () => {
     const randomSeed = Math.floor(Math.random() * 1000);
     try {
@@ -364,6 +386,7 @@ export default function Navbar(props) {
       console.error("Error fetching random recipe", error);
     }
   };
+
   const userActions = [
     {
       text: "Profile",
@@ -389,6 +412,7 @@ export default function Navbar(props) {
       action: handleLogout,
     },
   ];
+  
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -425,27 +449,31 @@ export default function Navbar(props) {
 
           <SearchBar />
 
-          <RightSection>
-            <IconButton
-              onClick={toggleInvertMode}
-              sx={{
-                opacity: 0,
-              }}
-            >
-              {isInverted ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
+          <RightSection sx={{ mr: 3 }}>
             {userLogged ? (
               <>
                 <Tooltip title="Profile Menu">
                   <IconButton onClick={handleOpenUserMenu}>
-                    <Avatar
-                      alt={
-                        user?.firstName
-                          ? `${user.firstName} ${user.lastName}`
-                          : "User"
-                      }
-                      src={profilePic || "/static/images/avatar/2.jpg"}
-                    />
+                    {profilePic ? (
+                      <Avatar src={profilePic} sx={{ width: 45, height: 45 }} />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: 45,
+                          height: 45,
+                          borderRadius: "50%",
+                          backgroundColor: "#A5E072",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#fff",
+                          fontSize: "0.9rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {userInitials}
+                      </Box>
+                    )}
                   </IconButton>
                 </Tooltip>
                 <Menu

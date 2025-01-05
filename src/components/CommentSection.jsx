@@ -29,6 +29,7 @@ const ImagePreview = styled(Box)(({ theme }) => ({
   marginRight: theme.spacing(1),
   marginBottom: theme.spacing(1),
 }));
+
 const StyledCloseButton = styled(IconButton)(({ theme }) => ({
   position: "absolute",
   top: theme.spacing(-1),
@@ -76,6 +77,7 @@ export default function CommentSection({ type, contentId }) {
     };
     fetchComments();
   }, [type, contentId]);
+
   React.useEffect(() => {
     if (userLogged && userId) {
       const fetchUserData = async () => {
@@ -263,6 +265,7 @@ export default function CommentSection({ type, contentId }) {
         console.log("Error parsing images:", error);
       });
   };
+  
   const removeImage = (index) => {
     setNewImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
@@ -336,7 +339,7 @@ export default function CommentSection({ type, contentId }) {
               noWrap
               sx={{ mb: 0, ml: 1.8 }}
             >
-              {userName || "User Name"}
+              {userName || "Guest"}
             </Typography>
             <TextField
               fullWidth
@@ -439,7 +442,7 @@ export default function CommentSection({ type, contentId }) {
               marginLeft: "auto",
               textTransform: "none",
               height: "36px",
-              width: "80px",
+              width: "115px",
             }}
             onClick={handleAddComment}
             disabled={loadingComment || !newComment.trim()}
@@ -448,10 +451,10 @@ export default function CommentSection({ type, contentId }) {
               loadingComment ? (
                 <CircularProgress size={20} color="white" />
               ) : (
-                <Typography variant="h6">Post</Typography>
+                <Typography variant="h6">Comment</Typography>
               )
             ) : (
-              <Typography variant="h6">Post</Typography>
+              <Typography variant="h6">Comment</Typography>
             )}
           </Button>
         </Box>

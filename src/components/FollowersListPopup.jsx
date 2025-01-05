@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import UserListItem from "./UserListItem";
 import axios from "axios";
+import Pagination from "@mui/material/Pagination";
 
 export default function FollowersListPopup(props) {
   const { open, handleClose, userId } = props;
@@ -14,30 +15,37 @@ export default function FollowersListPopup(props) {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pageNum, setPageNum] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageSize = 10;
+
+  const fetchFollowers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`/api/v1/users/${userId}/followers`, {
+        params: { pageSize: pageSize, page: pageNum },
+      });
+      if (response.status === 200) {
+        setFollowers(response.data.items);
+        setTotalCount(response.data.totalCount);
+        setTotalPages(Math.ceil(response.data.totalCount / pageSize));
+      }
+    } catch (error) {
+      console.error("Error fetching followers:", error);
+      setError(error.message || "Failed to load followers.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = (event, value) => {
+    setPageNum(value);
+  };
 
   useEffect(() => {
-    const fetchFollowers = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await axios.get(
-          `/api/v1/users/${userId}/followers?pageSize=100`
-        );
-        if (response.status === 200) {
-          setFollowers(response.data.items);
-          setTotalCount(response.data.totalCount);
-        }
-      } catch (error) {
-        console.error("Error fetching followers:", error);
-        setError(error.message || "Failed to load followers.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (open) {
-      fetchFollowers();
-    }
-  }, [open, userId]);
+    fetchFollowers();
+  }, [open, userId, pageNum]);
 
   if (!open || totalCount === 0) {
     return null; // Do not render the dialog if not open or there are no followers
@@ -89,6 +97,23 @@ export default function FollowersListPopup(props) {
               <UserListItem user={user} />
             </Box>
           ))}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mt: 1,
+            mb: 1,
+          }}
+        >
+          {totalPages > 1 && (
+            <Pagination
+              count={totalPages}
+              page={pageNum}
+              onChange={handlePageChange}
+              variant="outlined"
+            />
+          )}
+        </Box>
       </DialogContent>
     </Dialog>
   );

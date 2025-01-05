@@ -235,14 +235,17 @@ export default function EventPopup(props) {
   const handleEventNameChange = (event) => {
     setEventName(event.target.value);
   };
+
   const handleEventDescriptionChange = (event) => {
     setEventDescription(event.target.value);
   };
+
   const handleLoadMoreRequirements = () => {
     if (requirementOptions.length < totalRequirements) {
       setRequirementPage(requirementPage + 1);
     }
   };
+  
   return (
     <Dialog
       open={props.open}

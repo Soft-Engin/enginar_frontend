@@ -279,6 +279,7 @@ const UserProfile = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  
   const handleBanOpen = () => {
     setBanDialogOpen(true);
   };
@@ -448,7 +449,8 @@ const UserProfile = () => {
                     left: 0,
                     bgcolor: profilePic ? "transparent" : "#A5E072",
                     boxShadow: 2,
-                    fontSize: "3rem",
+                    fontSize: "4rem",
+                    fontWeight: "bold",
                   }}
                 >
                   {!profilePic && profilePlaceholder}
