@@ -187,6 +187,8 @@ export default function RecommendedUsers() {
                   color: "inherit",
                   display: "flex",
                   alignItems: "center",
+                  flexGrow: 1,
+                  overflow: "hidden",
                 }}
               >
                 <ListItemAvatar>
