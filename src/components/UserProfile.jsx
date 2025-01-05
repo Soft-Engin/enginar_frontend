@@ -554,7 +554,7 @@ const UserProfile = () => {
                       onClose={handleClose}
                     >
                       {isOwnProfile ? (
-                        <MenuItem key="Edit" onClick={handleEditProfile}>
+                        <MenuItem key="Edit" onClick={handleEditProfile} data-testid="edit-bio-button">
                           Edit Profile
                         </MenuItem>
                       ) : isAdmin ? (
