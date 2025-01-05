@@ -5,6 +5,7 @@ import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 
 import { useSearchParams } from "react-router-dom";
+import RecomEventsBox from "./RecomEventsBox";
 
 export default function RecipePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,8 +23,7 @@ export default function RecipePage() {
         <RecipeDetailed data-testid="recipe-detailed" recipeId={searchParams.get("id")} />
         <CommentSection data-testid="comment-section" type="recipe" contentId={searchParams.get("id")} />
       </Box>
-      <RecommendedUsers data-testid="recommended-users" />
-      <UpcomingEvents data-testid="upcoming-events" />
+      <RecomEventsBox/>
     </Box>
   );
 }

@@ -8,6 +8,7 @@ import Box from "@mui/material/Box";
 import PopularRecipesTab from "./PopularRecipesTab";
 import PopularBlogsTab from "./PopularBlogsTab";
 import FollowingTab from "./FollowingTab";
+import RecomEventsBox from "./RecomEventsBox";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -119,8 +120,7 @@ export default function ContentFeed() {
           </div>
         </CustomTabPanel>
       )}
-      <RecommendedUsers data-testid="recommended-users" />
-      <UpcomingEvents data-testid="upcoming-events" />
+      <RecomEventsBox/>
     </Box>
   );
 }

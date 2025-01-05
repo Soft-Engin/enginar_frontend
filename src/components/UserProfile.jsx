@@ -30,6 +30,7 @@ import FollowingListPopup from "./FollowingListPopup";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
 import { useSearchParams } from "react-router-dom";
+import RecomEventsBox from "./RecomEventsBox";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
@@ -685,8 +686,7 @@ const UserProfile = () => {
         handleClose={handleFollowingPopupClose}
         userId={userId}
       />
-      <RecommendedUsers />
-      <UpcomingEvents />
+      <RecomEventsBox/>
     </Box>
   );
 };
