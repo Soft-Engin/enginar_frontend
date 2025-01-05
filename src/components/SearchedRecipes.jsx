@@ -63,7 +63,8 @@ export default function SearchedRecipes({ query }) {
           pageSize: pageSize,
           pageNumber: pageNumber,
           HeaderContains: query,
-          SortBy: "createdAt",
+          SortBy: "CreationDate",
+          SortOrder: "desc",
         },
       });
       if (recipesResponse.data && recipesResponse.data.items) {
@@ -111,7 +112,8 @@ export default function SearchedRecipes({ query }) {
             pageSize: pageSize,
             pageNumber: 1,
             HeaderContains: query,
-            SortBy: "createdAt",
+            SortBy: "CreationDate",
+            SortOrder: "desc",
           },
         });
         setRecipes(response.data.items);

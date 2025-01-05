@@ -63,7 +63,8 @@ export default function SearchedBlogs({ query }) {
           pageSize: pageSize,
           pageNumber: pageNumber,
           BodyContains: query,
-          SortBy: "createdAt",
+          SortBy: "CreationDate",
+          SortOrder: "desc",
         },
       });
       if (blogsResponse.data && blogsResponse.data.items) {
@@ -108,7 +109,8 @@ export default function SearchedBlogs({ query }) {
             pageSize: pageSize,
             pageNumber: 1,
             BodyContains: query,
-            SortBy: "createdAt",
+            SortBy: "CreationDate",
+            SortOrder: "desc",
           },
         });
         setBlogs(response.data.items);
