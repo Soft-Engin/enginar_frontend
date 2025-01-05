@@ -465,6 +465,7 @@ export default function EventDetailed({ eventId }) {
 
   return (
     <Box
+      data-testid={`event-detailed-${eventId}`}
       sx={{
         maxWidth: 1500,
         outline: "1.5px solid #C0C0C0",
@@ -514,6 +515,7 @@ export default function EventDetailed({ eventId }) {
               <Typography
                 variant="h4"
                 fontWeight="bold"
+                data-testid="event-title"
                 sx={{
                   overflowWrap: "break-word",
                   wordWrap: "break-word",
@@ -656,6 +658,7 @@ export default function EventDetailed({ eventId }) {
             />
             <Typography
               variant="body1"
+              data-testid="event-datetime"
               component="div"
               color="text.secondary"
               noWrap
@@ -679,6 +682,7 @@ export default function EventDetailed({ eventId }) {
             />
             <Typography
               variant="body1"
+              data-testid="event-location"
               component="div"
               color="text.secondary"
               noWrap
@@ -750,6 +754,7 @@ export default function EventDetailed({ eventId }) {
           </Typography>
           <Typography
             variant="body1"
+            data-testid="event-description"
             component="div"
             sx={{
               lineHeight: "25px",
@@ -883,6 +888,7 @@ export default function EventDetailed({ eventId }) {
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Button
                 variant="contained"
+                data-testid="join-button"
                 sx={{
                   backgroundColor: "#4B9023",
                   borderRadius: 30,

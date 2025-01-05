@@ -338,9 +338,7 @@ export default function BlogDetailed({ blogId }) {
     if (blogData && blogData.id && userLogged) {
       const fetchIsLiked = async () => {
         try {
-          const response = await axios.get(
-            `/api/v1/blogs/${blogData.id}/is-liked`
-          );
+          const response = await axios.get(`/api/v1/blogs/${blogData.id}/is-liked`);
           setIsLiked(response.data.isLiked || false);
           setLikeCount(response.data.likeCount || 0);
         } catch (err) {
@@ -449,6 +447,7 @@ export default function BlogDetailed({ blogId }) {
   if (loading) {
     return (
       <Box
+        data-testid="blog-detailed-loading"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -462,6 +461,7 @@ export default function BlogDetailed({ blogId }) {
   if (error) {
     return (
       <Box
+        data-testid="blog-detailed-error"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -473,8 +473,13 @@ export default function BlogDetailed({ blogId }) {
   }
 
   if (!blogData) {
-    return <Typography>No blog data available.</Typography>;
+    return (
+      <Typography data-testid="blog-detailed-no-data">
+        No blog data available.
+      </Typography>
+    );
   }
+
   const formattedTime =
     blogData.createdAt &&
     format(
@@ -490,6 +495,7 @@ export default function BlogDetailed({ blogId }) {
 
   return (
     <Box
+      data-testid="blog-detailed-container"
       sx={{
         width: "100%",
         outline: "1.5px solid #C0C0C0",
@@ -502,6 +508,7 @@ export default function BlogDetailed({ blogId }) {
       }}
     >
       <Box
+        data-testid="blog-detailed-header"
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -512,7 +519,6 @@ export default function BlogDetailed({ blogId }) {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* Placeholder avatar */}
           <Link
             to={`/profile?id=${blogData.userId}`}
             style={{
@@ -521,9 +527,11 @@ export default function BlogDetailed({ blogId }) {
               display: "flex",
               alignItems: "center",
             }}
+            data-testid="blog-author-link"
           >
             {profilePictureUrl ? (
               <Avatar
+                data-testid="blog-author-avatar"
                 src={profilePictureUrl}
                 sx={{ width: 50, height: 50, mr: 1.5 }}
                 onError={() => setProfilePictureUrl(null)}
@@ -549,6 +557,7 @@ export default function BlogDetailed({ blogId }) {
             )}
             <Box>
               <Typography
+                data-testid="blog-author-username"
                 variant="h6"
                 fontWeight="bold"
                 sx={{ marginRight: 0.5 }}
@@ -556,7 +565,12 @@ export default function BlogDetailed({ blogId }) {
               >
                 {blogData.userName}
               </Typography>
-              <Typography variant="body2" color="text.secondary" noWrap>
+              <Typography
+                data-testid="blog-created-ago"
+                variant="body2"
+                color="text.secondary"
+                noWrap
+              >
                 {blogData.createdAt &&
                   formatDistanceToNow(
                     parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000,
@@ -662,6 +676,7 @@ export default function BlogDetailed({ blogId }) {
         )}
       </Box>
       <Typography
+        data-testid="blog-body-text"
         variant="body1"
         component="div"
         sx={{
@@ -692,8 +707,9 @@ export default function BlogDetailed({ blogId }) {
         </Box>
       )}
       {bannerUrl && !loadingBanner && (
-        <Box sx={{ mb: 2 }}>
+        <Box data-testid="blog-banner-container" sx={{ mb: 2 }}>
           <StyledCardMedia
+            data-testid="blog-banner-image"
             src={bannerUrl}
             alt={blogData.header}
             onError={() => setBannerUrl(null)}
@@ -731,14 +747,12 @@ export default function BlogDetailed({ blogId }) {
         </Box>
       )}
       {errorBanner && (
-        <Box display="flex" justifyContent="center" my={2}>
-          {errorBanner !== null && (
-            <Typography color="error">Error: {errorBanner}</Typography>
-          )}
+        <Box data-testid="blog-banner-error" display="flex" justifyContent="center" my={2}>
+          <Typography color="error">Error: {errorBanner}</Typography>
         </Box>
       )}
-
       <Box
+        data-testid="blog-date-time"
         sx={{
           display: "flex",
           alignItems: "center",
@@ -749,6 +763,7 @@ export default function BlogDetailed({ blogId }) {
         }}
       >
         <Typography
+          data-testid="blog-created-time"
           variant="body1"
           color="text.secondary"
           sx={{ marginRight: 0.5 }}
@@ -756,12 +771,18 @@ export default function BlogDetailed({ blogId }) {
         >
           {formattedTime}
         </Typography>
-        <Typography variant="body1" color="text.secondary" noWrap>
+        <Typography
+          data-testid="blog-created-date"
+          variant="body1"
+          color="text.secondary"
+          noWrap
+        >
           · {formattedDate}
         </Typography>
       </Box>
 
       <Box
+        data-testid="blog-actions-row"
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -769,38 +790,63 @@ export default function BlogDetailed({ blogId }) {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton onClick={handleLikeToggle} style={{ padding: 0 }}>
+          <Box
+            data-testid="like-section"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
+            <IconButton
+              data-testid="like-button"
+              onClick={handleLikeToggle}
+              style={{ padding: 0 }}
+            >
               {isLiked ? (
                 <FavoriteIcon
+                  data-testid="like-icon-filled"
                   style={{ fontSize: "45px", marginRight: 4, color: "red" }}
                 />
               ) : (
                 <FavoriteBorderIcon
+                  data-testid="like-icon-border"
                   style={{ fontSize: "45px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
-            <Typography variant="body1" color="text.secondary">
+            <Typography
+              data-testid="like-count"
+              variant="body1"
+              color="text.secondary"
+            >
               {likeCount}
             </Typography>
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            data-testid="comment-section"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
             <ChatBubbleOutlineIcon
               style={{ fontSize: "42px", marginRight: 4, color: "#757575" }}
+              data-testid="comment-icon"
             />
-            <Typography variant="body1" color="text.secondary">
+            <Typography
+              data-testid="comment-count"
+              variant="body1"
+              color="text.secondary"
+            >
               {commentCount}
             </Typography>
           </Box>
         </Box>
-
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+        
+        <Box data-testid="right-actions" sx={{ display: "flex", alignItems: "center" }}>
+          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
-              <BookmarkIcon style={{ fontSize: "48px" }} />
+              <BookmarkIcon
+                data-testid="bookmark-icon-filled"
+                style={{ fontSize: "48px" }}
+              />
             ) : (
               <BookmarkBorderOutlinedIcon
+                data-testid="bookmark-icon-border"
                 style={{ fontSize: "48px", color: "#757575" }}
               />
             )}

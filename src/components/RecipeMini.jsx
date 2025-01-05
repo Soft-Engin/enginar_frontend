@@ -392,6 +392,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
 
   return (
     <Box
+      data-testid={`recipe-mini-${recipe.id}`}
       sx={{
         maxWidth: 700,
         width: "100%",
@@ -409,6 +410,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
       }}
     >
       <Box
+        data-testid="recipe-mini-header"
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -430,6 +432,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
           >
             {profilePictureUrl ? (
               <Avatar
+                data-testid="recipe-avatar"
                 src={profilePictureUrl}
                 sx={{ width: 30, height: 30, mr: 1 }}
                 onError={() => setProfilePictureUrl(null)}
@@ -454,6 +457,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
               </Box>
             )}
             <Typography
+              data-testid="recipe-username"
               variant="body2"
               fontWeight="bold"
               sx={{ marginRight: 0.5 }}
@@ -462,7 +466,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
               {recipe.userName}
             </Typography>
           </Link>
-          <Typography variant="body2" color="text.secondary" noWrap>
+          <Typography data-testid="recipe-created-ago" variant="body2" color="text.secondary" noWrap>
             {recipe.createdAt &&
               formatDistanceToNow(
                 parseISO(recipe.createdAt).getTime() + 3 * 60 * 60 * 1000,
@@ -483,7 +487,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
               onClick={handleClick}
               disabled={disableActions} // Disable the more button as well
             >
-              <MoreHorizIcon sx={{ fontSize: "30px" }} />
+              <MoreHorizIcon data-testid="menu-button" sx={{ fontSize: "30px" }} />
             </IconButton>
             <Menu
               id="menu"
@@ -551,6 +555,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
       </Box>
 
       <Box
+        data-testid="recipe-mini-clickable"
         onClick={
           disableActions ? undefined : () => navigate(`/recipe?id=${recipeId}`)
         }
@@ -566,6 +571,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
           <Typography
             variant="h5"
             fontWeight="bold"
+            data-testid={`recipe-header-${recipe.id}`}
             sx={{
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -577,6 +583,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
           </Typography>
 
           <Typography
+            data-testid="recipe-bodyText"
             variant="body2"
             sx={{
               display: "-webkit-box",
@@ -604,6 +611,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
             }}
           >
             <StyledCardMedia
+              data-testid="recipe-banner"
               src={bannerUrl}
               alt="Recipe Banner"
               onError={() => setBannerUrl(null)}
@@ -612,7 +620,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
         )}
 
         {error && (
-          <Box display="flex" justifyContent="center" my={2}>
+          <Box data-testid="recipe-error" display="flex" justifyContent="center" my={2}>
             {error !== null && (
               <Typography color="error">Error: {error}</Typography>
             )}
@@ -621,6 +629,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
       </Box>
 
       <Box
+        data-testid="recipe-mini-actions"
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -631,21 +640,23 @@ export default function RecipeMini({ recipe, disableActions = false }) {
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
+              data-testid="like-button"
               onClick={handleLikeToggle}
               style={{ padding: 0 }}
               disabled={disableActions}
             >
               {isLiked ? (
-                <FavoriteIcon
+                <FavoriteIcon data-testid="like-icon-filled"
                   style={{ fontSize: "30px", marginRight: 4, color: "red" }}
                 />
               ) : (
                 <FavoriteBorderIcon
+                  data-testid="like-icon-border"
                   style={{ fontSize: "30px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
-            <Typography variant="body2" color="text.secondary">
+            <Typography data-testid="like-count" variant="body2" color="text.secondary">
               {likeCount}
             </Typography>
           </Box>
@@ -658,7 +669,7 @@ export default function RecipeMini({ recipe, disableActions = false }) {
                   : () => navigate(`/recipe?id=${recipeId}`)
               }
             />
-            <Typography variant="body2" color="text.secondary">
+            <Typography data-testid="comment-count" variant="body2" color="text.secondary">
               {commentCount}
             </Typography>
           </Box>
@@ -666,14 +677,16 @@ export default function RecipeMini({ recipe, disableActions = false }) {
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <IconButton
+            data-testid="bookmark-button"
             onClick={handleBookmarkToggle}
             style={{ padding: 0 }}
             disabled={disableActions}
           >
             {isBookmarked ? (
-              <BookmarkIcon style={{ fontSize: "32px" }} />
+              <BookmarkIcon data-testid="bookmark-icon-filled" style={{ fontSize: "32px" }} />
             ) : (
               <BookmarkBorderOutlinedIcon
+                data-testid="bookmark-icon-border"
                 style={{ fontSize: "32px", color: "#757575" }}
               />
             )}

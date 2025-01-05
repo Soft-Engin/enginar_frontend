@@ -398,7 +398,8 @@ export default function BlogMini({ blog }) {
   };
 
   return (
-    <Box
+    <Box 
+      data-testid={`blog-mini-${blog.id}`}
       sx={{
         maxWidth: 700,
         width: "100%",
@@ -616,14 +617,20 @@ export default function BlogMini({ blog }) {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton onClick={handleLikeToggle} style={{ padding: 0 }}>
+            <IconButton 
+              onClick={handleLikeToggle} 
+              style={{ padding: 0 }}
+              data-testid="like-button"
+            >
               {isLiked ? (
                 <FavoriteIcon
                   style={{ fontSize: "30px", marginRight: 4, color: "red" }}
+                  data-testid="liked-icon"
                 />
               ) : (
                 <FavoriteBorderIcon
                   style={{ fontSize: "30px", marginRight: 4, color: "#757575" }}
+                  data-testid="not-liked-icon"
                 />
               )}
             </IconButton>
@@ -649,11 +656,15 @@ export default function BlogMini({ blog }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
-              <BookmarkIcon style={{ fontSize: "32px" }} />
+              <BookmarkIcon 
+                style={{ fontSize: "32px" }}
+                data-testid="bookmarked-icon"
+              />
             ) : (
               <BookmarkBorderOutlinedIcon
+                data-testid="not-bookmarked-icon"
                 style={{ fontSize: "32px", color: "#757575" }}
               />
             )}

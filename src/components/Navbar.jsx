@@ -1,3 +1,4 @@
+// Navbar.jsx
 import React, { useState, useEffect } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -414,12 +415,13 @@ export default function Navbar(props) {
   ];
   
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex" }} data-testid="navbar-container">
       <CssBaseline />
-      <AppBar position="fixed" open={drawerOpen}>
-        <StyledToolbar>
+      <AppBar position="fixed" open={drawerOpen} data-testid="navbar-appbar">
+        <StyledToolbar data-testid="navbar-toolbar">
           <LeftSection>
             <IconButton
+              data-testid="navbar-drawer-button"
               color="inherit"
               aria-label="open drawer"
               onClick={drawerToggle}
@@ -447,13 +449,13 @@ export default function Navbar(props) {
             )}
           </LeftSection>
 
-          <SearchBar />
+          <SearchBar data-testid="navbar-search" />
 
-          <RightSection sx={{ mr: 3 }}>
+          <RightSection data-testid="navbar-right-section" sx={{ mr: 3 }}>
             {userLogged ? (
               <>
                 <Tooltip title="Profile Menu">
-                  <IconButton onClick={handleOpenUserMenu}>
+                  <IconButton data-testid="user-avatar-button" onClick={handleOpenUserMenu}>
                     {profilePic ? (
                       <Avatar src={profilePic} sx={{ width: 45, height: 45 }} />
                     ) : (
@@ -477,6 +479,7 @@ export default function Navbar(props) {
                   </IconButton>
                 </Tooltip>
                 <Menu
+                  data-testid="user-menu"
                   sx={{ mt: "45px" }}
                   id="menu-appbar"
                   anchorEl={anchorElUser}
@@ -512,6 +515,7 @@ export default function Navbar(props) {
               </>
             ) : (
               <AuthPopup
+                data-testid="auth-popup"
                 setUserLogged={setUserLogged}
                 setAnchorElUser={setAnchorElUser}
               />
@@ -520,6 +524,7 @@ export default function Navbar(props) {
         </StyledToolbar>
       </AppBar>
       <Drawer
+        data-testid="navbar-drawer"
         variant="permanent"
         open={drawerOpen}
         PaperProps={{
@@ -531,11 +536,7 @@ export default function Navbar(props) {
         <DrawerHeader />
         <List sx={{ marginTop: "6px" }}>
           {navbarTitlesIcons.map((item) => (
-            <ListItem
-              key={item.text}
-              disablePadding
-              sx={{ display: "block", position: "relative" }}
-            >
+            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 to={item.link}
                 onClick={
@@ -602,12 +603,14 @@ export default function Navbar(props) {
           flexDirection: "column",
           alignItems: "center",
         }}
+        data-testid="navbar-main"
       >
         <DrawerHeader />
         {props.body}
       </Box>
       {showSpeedDial && (
         <ActionSpeedDial
+          data-testid="navbar-speed-dial"
           ariaLabel="SpeedDial tooltip example"
           icon={<SpeedDialIcon />}
           onClose={handleSpeedDialClose}
@@ -629,6 +632,7 @@ export default function Navbar(props) {
             icon={<PostAddIcon />}
             tooltipTitle={"Blog"}
             tooltipOpen
+            data-testid="speed-dial-blog"
             onClick={handlePostPopupOpen}
             tooltipPlacement={isSmUp ? "right" : "left"}
           />
@@ -637,6 +641,7 @@ export default function Navbar(props) {
             icon={<GroupAddIcon />}
             tooltipTitle={"Event"}
             tooltipOpen
+            data-testid="speed-dial-event"
             onClick={handleEventPopupOpen}
             tooltipPlacement={isSmUp ? "right" : "left"}
           />
@@ -645,6 +650,7 @@ export default function Navbar(props) {
             icon={<RestaurantMenuIcon />}
             tooltipTitle={"Recipe"}
             tooltipOpen
+            data-testid="speed-dial-recipe"
             onClick={() => navigate("/createRecipe")}
             tooltipPlacement={isSmUp ? "right" : "left"}
           />

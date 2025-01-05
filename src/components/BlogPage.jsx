@@ -12,6 +12,7 @@ export default function BlogPage() {
   return (
     <Box sx={{ m: 4, width: 800, pb: 5 }}>
       <Box
+        data-testid="blog-page-container"
         sx={{
           scale: { xs: "70%", sm: "70%", md: "90%", lg: "84%", xl: "100%" },
           transformOrigin: "top",
@@ -19,11 +20,11 @@ export default function BlogPage() {
           margin: "0 auto",
         }}
       >
-        <BlogDetailed blogId={searchParams.get("id")} />
-        <CommentSection type="blog" contentId={searchParams.get("id")} />
+        <BlogDetailed data-testid="blog-detailed" blogId={searchParams.get("id")} />
+        <CommentSection data-testid="comment-section" type="blog" contentId={searchParams.get("id")} />
       </Box>
-      <RecommendedUsers />
-      <UpcomingEvents />
+      <RecommendedUsers data-testid="recommended-users" />
+      <UpcomingEvents data-testid="upcoming-events" />
     </Box>
   );
 }

@@ -84,18 +84,21 @@ function UserBlogsTab() {
   }, [userId]);
 
   return (
-    <div>
+    <div data-testid="user-blogs-tab-container">
       <LoadingErrorDisplay
+        data-testid="loading-error-display"
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      {blogs.map((post, index) => (
-        <Box key={index} sx={{ width: 600, mb: 2 }}>
-          <BlogMini key={post.id} blog={post} />
-        </Box>
-      ))}
+      <div data-testid="blogs-stack">
+        {blogs.map((post, index) => (
+          <Box key={index} sx={{ width: 600, mb: 2 }}>
+            <BlogMini key={post.id} blog={post} />
+          </Box>
+        ))}
+      </div>
     </div>
   );
 }

@@ -397,7 +397,7 @@ export default function UserMini({ user }) {
                 alignItems: "center",
               }}
             >
-              <Typography variant="h5" fontWeight="bold">
+              <Typography data-testid="user-name" variant="h5" fontWeight="bold">
                 {user.firstName} {user.lastName}
               </Typography>
             </Link>
@@ -405,6 +405,7 @@ export default function UserMini({ user }) {
               (userLogged ? (
                 isFollowing ? (
                   <FollowButton
+                    data-testid="follow-button"
                     variant="contained"
                     onClick={handleUnfollowUser}
                   >
@@ -422,6 +423,7 @@ export default function UserMini({ user }) {
           </Typography>
           <Box sx={{ display: "flex", gap: 2, mt: 0.5 }}>
             <Typography
+              data-testid="following-count"
               variant="body2"
               onClick={handleFollowingPopupOpen}
               sx={{ cursor: "pointer" }}
@@ -429,6 +431,7 @@ export default function UserMini({ user }) {
               <strong>{followingCount}</strong> Following
             </Typography>
             <Typography
+              data-testid="followers-count"
               variant="body2"
               onClick={handleFollowersPopupOpen}
               sx={{ cursor: "pointer" }}
@@ -440,6 +443,7 @@ export default function UserMini({ user }) {
         {userLogged && isAdmin && !isOwnProfile && (
           <Box sx={{ position: "absolute", right: -10 }}>
             <IconButton
+              data-testid="more-button"
               aria-label="more"
               id="menuButton"
               aria-controls={open ? "menu" : undefined}
@@ -466,7 +470,7 @@ export default function UserMini({ user }) {
               open={open}
               onClose={handleClose}
             >
-              <MenuItem key="Ban" onClick={handleBanOpen}>
+              <MenuItem data-testid="ban-menu-item" key="Ban" onClick={handleBanOpen}>
                 Ban
               </MenuItem>
             </Menu>
@@ -484,12 +488,15 @@ export default function UserMini({ user }) {
                 },
               }}
             >
-              <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Ban</DialogTitle>
+              <DialogTitle sx={{ fontWeight: "bold" }}>
+                Confirm Ban
+              </DialogTitle>
               <DialogContent>
                 <Typography>Are you sure you want to ban this user?</Typography>
               </DialogContent>
               <DialogActions>
                 <Button
+                  data-testid="cancel-ban-button"
                   onClick={handleBanClose}
                   sx={{
                     backgroundColor: "#C8EFA5",
@@ -506,6 +513,7 @@ export default function UserMini({ user }) {
                   Cancel
                 </Button>
                 <Button
+                  data-testid="confirm-ban-button"
                   onClick={handleBanConfirm}
                   variant="contained"
                   sx={{
