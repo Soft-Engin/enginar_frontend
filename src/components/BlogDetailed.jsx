@@ -10,6 +10,9 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Modal,
+  Fade,
+  Chip,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -47,14 +50,20 @@ export default function BlogDetailed({ blogId }) {
   const [errorBanner, setErrorBanner] = useState(null);
   const [errorIsBookmarked, setErrorIsBookmarked] = useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+  const [userInitials, setUserInitials] = useState("");
   const [bannerUrl, setBannerUrl] = useState(null);
   const [bannerImage, setBannerImage] = useState(null); // New state for base64 banner
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  const [commentCount, setCommentCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0); // Initialize commentCount state
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [imageEnlarged, setImageEnlarged] = useState(false);
   let authButtonId = "loginButton";
+
+  const [recipeName, setRecipeName] = useState(null);
+  const [loadingRecipe, setLoadingRecipe] = useState(true);
+  const [errorRecipe, setErrorRecipe] = useState(null);
 
   let userLogged = localStorage.getItem("userLogged") === "true";
   const [isFollowing, setIsFollowing] = useState(false);
@@ -175,6 +184,7 @@ export default function BlogDetailed({ blogId }) {
       setIsEditing(false);
     }
   };
+
   const handleDeleteBlog = async () => {
     setLoading(true);
     try {
@@ -192,6 +202,7 @@ export default function BlogDetailed({ blogId }) {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     const fetchBlog = async () => {
       setLoading(true);
@@ -240,6 +251,20 @@ export default function BlogDetailed({ blogId }) {
     };
   }, [blogData]);
 
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (blogData && blogData.userName) {
+      setUserInitials(generateInitials(blogData.userName));
+    }
+  }, [blogData]);
+
   useEffect(() => {
     if (blogData && blogData.id) {
       const fetchBanner = async () => {
@@ -277,6 +302,29 @@ export default function BlogDetailed({ blogId }) {
     };
   }, [blogData]);
 
+  useEffect(() => {
+    if (blogData && blogData.recipeId) {
+      const fetchRecipe = async () => {
+        setLoadingRecipe(true);
+        setErrorRecipe(null);
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${blogData.recipeId}`
+          );
+          setRecipeName(response.data.header);
+        } catch (err) {
+          console.error("Error fetching recipe:", err);
+          setErrorRecipe(err.message || "An unexpected error occurred.");
+        } finally {
+          setLoadingRecipe(false);
+        }
+      };
+      fetchRecipe();
+    } else {
+      setLoadingRecipe(false);
+    }
+  }, [blogData?.recipeId]);
+
   const convertBlobToBase64 = (blob) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -290,9 +338,7 @@ export default function BlogDetailed({ blogId }) {
     if (blogData && blogData.id && userLogged) {
       const fetchIsLiked = async () => {
         try {
-          const response = await axios.get(
-            `/api/v1/blogs/${blogData.id}/is-liked`
-          );
+          const response = await axios.get(`/api/v1/blogs/${blogData.id}/is-liked`);
           setIsLiked(response.data.isLiked || false);
           setLikeCount(response.data.likeCount || 0);
         } catch (err) {
@@ -300,6 +346,22 @@ export default function BlogDetailed({ blogId }) {
         }
       };
       fetchIsLiked();
+    }
+  }, [blogData, userLogged]);
+
+  useEffect(() => {
+    if (blogData && blogData.id && userLogged) {
+      const fetchCommentCount = async () => {
+        try {
+          const response = await axios.get(
+            `/api/v1/blogs/${blogData.id}/comments`
+          );
+          setCommentCount(response.data.totalCount || 0);
+        } catch (err) {
+          console.error("Error fetching comment count:", err);
+        }
+      };
+      fetchCommentCount();
     }
   }, [blogData, userLogged]);
 
@@ -367,10 +429,12 @@ export default function BlogDetailed({ blogId }) {
       setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
     }
   };
+
   const handleEditClick = () => {
     setIsEditing(true);
     handleClose();
   };
+
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
     handleClose();
@@ -383,6 +447,7 @@ export default function BlogDetailed({ blogId }) {
   if (loading) {
     return (
       <Box
+        data-testid="blog-detailed-loading"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -396,6 +461,7 @@ export default function BlogDetailed({ blogId }) {
   if (error) {
     return (
       <Box
+        data-testid="blog-detailed-error"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -407,15 +473,29 @@ export default function BlogDetailed({ blogId }) {
   }
 
   if (!blogData) {
-    return <Typography>No blog data available.</Typography>;
+    return (
+      <Typography data-testid="blog-detailed-no-data">
+        No blog data available.
+      </Typography>
+    );
   }
+
   const formattedTime =
-    blogData.createdAt && format(parseISO(blogData.createdAt), "h:mm a");
+    blogData.createdAt &&
+    format(
+      parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+      "h:mm a"
+    );
   const formattedDate =
-    blogData.createdAt && format(parseISO(blogData.createdAt), "MMM d, yyyy");
+    blogData.createdAt &&
+    format(
+      parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+      "MMM d, yyyy"
+    );
 
   return (
     <Box
+      data-testid="blog-detailed-container"
       sx={{
         width: "100%",
         outline: "1.5px solid #C0C0C0",
@@ -428,6 +508,7 @@ export default function BlogDetailed({ blogId }) {
       }}
     >
       <Box
+        data-testid="blog-detailed-header"
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -438,7 +519,6 @@ export default function BlogDetailed({ blogId }) {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* Placeholder avatar */}
           <Link
             to={`/profile?id=${blogData.userId}`}
             style={{
@@ -447,14 +527,37 @@ export default function BlogDetailed({ blogId }) {
               display: "flex",
               alignItems: "center",
             }}
+            data-testid="blog-author-link"
           >
-            <Avatar
-              src={profilePictureUrl}
-              sx={{ width: 50, height: 50, marginRight: 1.5 }}
-              onError={() => setProfilePictureUrl(null)}
-            />
+            {profilePictureUrl ? (
+              <Avatar
+                data-testid="blog-author-avatar"
+                src={profilePictureUrl}
+                sx={{ width: 50, height: 50, mr: 1.5 }}
+                onError={() => setProfilePictureUrl(null)}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: "50%",
+                  marginRight: 1.5,
+                  backgroundColor: "#A5E072",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {userInitials}
+              </Box>
+            )}
             <Box>
               <Typography
+                data-testid="blog-author-username"
                 variant="h6"
                 fontWeight="bold"
                 sx={{ marginRight: 0.5 }}
@@ -462,11 +565,19 @@ export default function BlogDetailed({ blogId }) {
               >
                 {blogData.userName}
               </Typography>
-              <Typography variant="body2" color="text.secondary" noWrap>
+              <Typography
+                data-testid="blog-created-ago"
+                variant="body2"
+                color="text.secondary"
+                noWrap
+              >
                 {blogData.createdAt &&
-                  formatDistanceToNow(parseISO(blogData.createdAt), {
-                    addSuffix: true,
-                  })}
+                  formatDistanceToNow(
+                    parseISO(blogData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+                    {
+                      addSuffix: true,
+                    }
+                  )}
               </Typography>
             </Box>
           </Link>
@@ -484,19 +595,34 @@ export default function BlogDetailed({ blogId }) {
               <MoreHorizIcon sx={{ fontSize: "30px" }} />
             </IconButton>
             <Menu
-              id="menu"
-              MenuListProps={{
-                "aria-labelledby": "menuButton",
-              }}
               anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "left",
+              PaperProps={{
+                elevation: 0,
+                sx: {
+                  overflow: "visible",
+                  filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                  "& .MuiAvatar-root": {
+                    width: 32,
+                    height: 32,
+                    ml: -0.5,
+                    mr: 1,
+                  },
+                  "&:before": {
+                    content: '""',
+                    display: "block",
+                    position: "absolute",
+                    top: 0,
+                    right: 14,
+                    width: 10,
+                    height: 10,
+                    bgcolor: "background.paper",
+                    transform: "translateY(-50%) rotate(45deg)",
+                    zIndex: 0,
+                  },
+                },
               }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               open={open}
               onClose={handleClose}
             >
@@ -550,6 +676,7 @@ export default function BlogDetailed({ blogId }) {
         )}
       </Box>
       <Typography
+        data-testid="blog-body-text"
         variant="body1"
         component="div"
         sx={{
@@ -561,41 +688,71 @@ export default function BlogDetailed({ blogId }) {
       >
         {blogData.bodyText}
       </Typography>
-      {bannerUrl && !loadingBanner && (
-        <Box sx={{ mb: 2 }}>
-          <StyledCardMedia
-            src={bannerUrl}
-            alt={blogData.header}
-            onError={() => setBannerUrl(null)}
+      {recipeName && (
+        <Box sx={{ mb: 0.5, display: "flex", flexDirection: "row", gap: 1 }}>
+          <Typography variant="subtitle2">{"Linked Recipe: "}</Typography>
+          <Chip
+            label={recipeName}
+            onClick={() => {
+              try {
+                navigate(`/recipe?id=${blogData.recipeId}`);
+              } catch (e) {
+                console.error("error on navigation", e);
+              }
+            }}
+            clickable
+            size="small"
+            sx={{ backgroundColor: "#4B9023", color: "white", maxWidth: "80%" }}
           />
         </Box>
       )}
-      {errorBanner && (
-        <Box display="flex" justifyContent="center" my={2}>
-          {errorBanner !== null && (
-            <Typography color="error">Error: {errorBanner}</Typography>
-          )}
+      {bannerUrl && !loadingBanner && (
+        <Box data-testid="blog-banner-container" sx={{ mb: 2 }}>
+          <StyledCardMedia
+            data-testid="blog-banner-image"
+            src={bannerUrl}
+            alt={blogData.header}
+            onError={() => setBannerUrl(null)}
+            onClick={() => setImageEnlarged(true)}
+            sx={{ cursor: "pointer" }}
+          />
+          <Fade in={imageEnlarged}>
+            <Box>
+              <Modal
+                open={imageEnlarged}
+                onClose={() => setImageEnlarged(false)}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: "rgba(0, 0, 0, 0.5)",
+                }}
+              >
+                <Fade in={imageEnlarged} timeout={300}>
+                  <img
+                    src={bannerUrl}
+                    alt={blogData.header}
+                    style={{
+                      maxWidth: "70vw",
+                      maxHeight: "70vh",
+                      aspectRatio: "auto",
+                      objectFit: "contain",
+                      borderRadius: "10px",
+                    }}
+                  />
+                </Fade>
+              </Modal>
+            </Box>
+          </Fade>
         </Box>
       )}
-
-      {blogData.recipeId && (
-        <Link
-          to={`/recipe?id=${blogData.recipeId}`}
-          style={{
-            textDecoration: "none",
-            color: "inherit",
-            display: "block",
-            textAlign: "center",
-            marginBottom: 2,
-          }}
-        >
-          <Typography variant="body1" fontWeight={"bold"}>
-            Click here to see the related recipe!
-          </Typography>
-        </Link>
+      {errorBanner && (
+        <Box data-testid="blog-banner-error" display="flex" justifyContent="center" my={2}>
+          <Typography color="error">Error: {errorBanner}</Typography>
+        </Box>
       )}
-
       <Box
+        data-testid="blog-date-time"
         sx={{
           display: "flex",
           alignItems: "center",
@@ -606,6 +763,7 @@ export default function BlogDetailed({ blogId }) {
         }}
       >
         <Typography
+          data-testid="blog-created-time"
           variant="body1"
           color="text.secondary"
           sx={{ marginRight: 0.5 }}
@@ -613,12 +771,18 @@ export default function BlogDetailed({ blogId }) {
         >
           {formattedTime}
         </Typography>
-        <Typography variant="body1" color="text.secondary" noWrap>
+        <Typography
+          data-testid="blog-created-date"
+          variant="body1"
+          color="text.secondary"
+          noWrap
+        >
           · {formattedDate}
         </Typography>
       </Box>
 
       <Box
+        data-testid="blog-actions-row"
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -626,38 +790,63 @@ export default function BlogDetailed({ blogId }) {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton onClick={handleLikeToggle} style={{ padding: 0 }}>
+          <Box
+            data-testid="like-section"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
+            <IconButton
+              data-testid="like-button"
+              onClick={handleLikeToggle}
+              style={{ padding: 0 }}
+            >
               {isLiked ? (
                 <FavoriteIcon
+                  data-testid="like-icon-filled"
                   style={{ fontSize: "45px", marginRight: 4, color: "red" }}
                 />
               ) : (
                 <FavoriteBorderIcon
+                  data-testid="like-icon-border"
                   style={{ fontSize: "45px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
-            <Typography variant="body1" color="text.secondary">
+            <Typography
+              data-testid="like-count"
+              variant="body1"
+              color="text.secondary"
+            >
               {likeCount}
             </Typography>
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            data-testid="comment-section"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
             <ChatBubbleOutlineIcon
               style={{ fontSize: "42px", marginRight: 4, color: "#757575" }}
+              data-testid="comment-icon"
             />
-            <Typography variant="body1" color="text.secondary">
+            <Typography
+              data-testid="comment-count"
+              variant="body1"
+              color="text.secondary"
+            >
               {commentCount}
             </Typography>
           </Box>
         </Box>
-
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+        
+        <Box data-testid="right-actions" sx={{ display: "flex", alignItems: "center" }}>
+          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
-              <BookmarkIcon style={{ fontSize: "48px" }} />
+              <BookmarkIcon
+                data-testid="bookmark-icon-filled"
+                style={{ fontSize: "48px" }}
+              />
             ) : (
               <BookmarkBorderOutlinedIcon
+                data-testid="bookmark-icon-border"
                 style={{ fontSize: "48px", color: "#757575" }}
               />
             )}
@@ -675,51 +864,59 @@ export default function BlogDetailed({ blogId }) {
           bannerImage={bannerImage} // Pass bannerImage as a prop
         />
       )}
-      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete} 
-      PaperProps={{
-        sx: {
-          width: { xs: 250, sm: 400 },
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          padding: 0.5,
-        },
-      }}>
-        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete this blog post?</Typography>
+          <Typography>
+            Are you sure you want to delete this blog post?
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelDelete}
-          sx={{
-            backgroundColor: "#C8EFA5",
-            color: "black",
-            ":hover": {
+          <Button
+            onClick={handleCancelDelete}
+            sx={{
               backgroundColor: "#C8EFA5",
-            },
-            borderRadius: 20,
-            marginTop: 2,
-            display: "block",
-            marginLeft: "auto",
-          }}>
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={handleDeleteBlog} 
-              variant="contained"
-              sx={{
+          <Button
+            onClick={handleDeleteBlog}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
                 backgroundColor: "#cc0000",
-                color: "error",
-                ":hover": {
-                  backgroundColor: "#cc0000",
-                },
-                borderRadius: 20,
-                marginTop: 2,
-                display: "block",
-                marginLeft: "auto",
-                fontWeight: "bold",
-              }}
-            >
-              Delete
-            </Button>
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

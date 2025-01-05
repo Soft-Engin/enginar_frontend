@@ -24,6 +24,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EventPopup from "./EventPopup";
+import dayjs from "dayjs";
 
 export default function EventDetailed({ eventId }) {
   const [participantsPopupOpen, setParticipantsPopupOpen] =
@@ -32,6 +33,7 @@ export default function EventDetailed({ eventId }) {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = React.useState("");
   const [participants, setParticipants] = React.useState([]);
   const [followedParticipants, setFollowedParticipants] = React.useState([]);
   const [isParticipant, setIsParticipant] = React.useState(false);
@@ -74,7 +76,7 @@ export default function EventDetailed({ eventId }) {
       if (loggedInUserData?.userId) {
         try {
           const response = await axios.get(
-            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=100`
+            `/api/v1/users/${loggedInUserData?.userId}/following?pageSize=200`
           );
           if (response.status === 200) {
             setLoggedInUserFollowing(response.data.items);
@@ -206,6 +208,20 @@ export default function EventDetailed({ eventId }) {
     };
   }, [eventData]);
 
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  React.useEffect(() => {
+    if (eventData && eventData.creatorUserName) {
+      setUserInitials(generateInitials(eventData.creatorUserName));
+    }
+  }, [eventData]);
+
   React.useEffect(() => {
     const fetchParticipants = async () => {
       if (eventData && eventData.eventId) {
@@ -213,7 +229,7 @@ export default function EventDetailed({ eventId }) {
         setErrorParticipants(null);
         try {
           const response = await axios.get(
-            `/api/v1/events/${eventData.eventId}/participants`
+            `/api/v1/events/${eventData.eventId}/participants?pageSize=200`
           );
           if (response.data && response.data.participations) {
             setParticipants(response.data.participations.items || []);
@@ -353,7 +369,7 @@ export default function EventDetailed({ eventId }) {
   };
 
   const formattedDate = eventData?.date
-    ? format(parseISO(eventData.date), "dd.MM.yyyy, HH:mm")
+    ? format(parseISO(eventData.date), "dd.MM.yyyy")
     : "N/A";
 
   //EDIT FUNCTIONALITY
@@ -391,51 +407,57 @@ export default function EventDetailed({ eventId }) {
       handleCloseDeleteDialog();
     };
     return (
-      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog} 
-      PaperProps={{
-        sx: {
-          width: { xs: 250, sm: 400 },
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          padding: 0.5,
-        },
-      }}>
-        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete this event?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteDialog}
-          sx={{
-            backgroundColor: "#C8EFA5",
-            color: "black",
-            ":hover": {
+          <Button
+            onClick={handleCloseDeleteDialog}
+            sx={{
               backgroundColor: "#C8EFA5",
-            },
-            borderRadius: 20,
-            marginTop: 2,
-            display: "block",
-            marginLeft: "auto",
-          }}>
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={confirmDelete} 
-              variant="contained"
-              sx={{
+          <Button
+            onClick={confirmDelete}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
                 backgroundColor: "#cc0000",
-                color: "error",
-                ":hover": {
-                  backgroundColor: "#cc0000",
-                },
-                borderRadius: 20,
-                marginTop: 2,
-                display: "block",
-                marginLeft: "auto",
-                fontWeight: "bold",
-              }}
-            >
-              Delete
-            </Button>
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     );
@@ -443,6 +465,7 @@ export default function EventDetailed({ eventId }) {
 
   return (
     <Box
+      data-testid={`event-detailed-${eventId}`}
       sx={{
         maxWidth: 1500,
         outline: "1.5px solid #C0C0C0",
@@ -492,6 +515,7 @@ export default function EventDetailed({ eventId }) {
               <Typography
                 variant="h4"
                 fontWeight="bold"
+                data-testid="event-title"
                 sx={{
                   overflowWrap: "break-word",
                   wordWrap: "break-word",
@@ -505,7 +529,7 @@ export default function EventDetailed({ eventId }) {
               </Typography>
             </Box>
             {userLogged && (
-              <Box>
+              <Box sx={{ position: "relative", right: -3, top: -5 }}>
                 <IconButton
                   aria-label="more"
                   id="menuButton"
@@ -517,19 +541,34 @@ export default function EventDetailed({ eventId }) {
                   <MoreHorizIcon sx={{ fontSize: "30px" }} />
                 </IconButton>
                 <Menu
-                  id="menu"
-                  MenuListProps={{
-                    "aria-labelledby": "menuButton",
-                  }}
                   anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
+                  PaperProps={{
+                    elevation: 0,
+                    sx: {
+                      overflow: "visible",
+                      filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                      "& .MuiAvatar-root": {
+                        width: 32,
+                        height: 32,
+                        ml: -0.5,
+                        mr: 1,
+                      },
+                      "&:before": {
+                        content: '""',
+                        display: "block",
+                        position: "absolute",
+                        top: 0,
+                        right: 14,
+                        width: 10,
+                        height: 10,
+                        bgcolor: "background.paper",
+                        transform: "translateY(-50%) rotate(45deg)",
+                        zIndex: 0,
+                      },
+                    },
                   }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                   open={open}
                   onClose={handleClose}
                 >
@@ -612,13 +651,14 @@ export default function EventDetailed({ eventId }) {
               noWrap
               sx={{ mr: 1 }}
             >
-              Date and Time:
+              Date:
             </Typography>
             <CalendarMonthIcon
               style={{ fontSize: "28px", marginRight: "3px" }}
             />
             <Typography
               variant="body1"
+              data-testid="event-datetime"
               component="div"
               color="text.secondary"
               noWrap
@@ -642,6 +682,7 @@ export default function EventDetailed({ eventId }) {
             />
             <Typography
               variant="body1"
+              data-testid="event-location"
               component="div"
               color="text.secondary"
               noWrap
@@ -672,11 +713,31 @@ export default function EventDetailed({ eventId }) {
                 alignItems: "center",
               }}
             >
-              <Avatar
-                src={profilePictureUrl}
-                sx={{ width: 38, height: 38, marginRight: 0.7 }}
-                onError={() => setProfilePictureUrl(null)}
-              />
+              {profilePictureUrl ? (
+                <Avatar
+                  src={profilePictureUrl}
+                  sx={{ width: 38, height: 38, mr: 0.7 }}
+                  onError={() => setProfilePictureUrl(null)}
+                />
+              ) : (
+                <Box
+                  sx={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: "50%",
+                    marginRight: 0.7,
+                    backgroundColor: "#A5E072",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {userInitials}
+                </Box>
+              )}
               <Typography variant="body1" component="div" noWrap>
                 <b>{eventData?.creatorUserName}</b>
               </Typography>
@@ -693,6 +754,7 @@ export default function EventDetailed({ eventId }) {
           </Typography>
           <Typography
             variant="body1"
+            data-testid="event-description"
             component="div"
             sx={{
               lineHeight: "25px",
@@ -760,28 +822,15 @@ export default function EventDetailed({ eventId }) {
                   marginRight: 1,
                   cursor: "pointer",
                 }}
+                onClick={handleParticipantsPopupOpen}
               >
-                {participants &&
-                  participants.map((participant) => (
-                    <Avatar
-                      key={participant.userId}
-                      alt={participant.userName}
-                      src={participantProfiles[participant.userId]}
-                      onError={() =>
-                        setParticipantProfiles((prevProfiles) => {
-                          const newProfiles = { ...prevProfiles };
-                          delete newProfiles[participant.userId];
-                          return newProfiles;
-                        })
-                      }
-                    />
-                  ))}
                 {followedParticipants &&
                   followedParticipants.map((participant) => (
                     <Avatar
                       key={participant.userId}
                       alt={participant.userName}
                       src={followedParticipantProfiles[participant.userId]}
+                      sx={{ backgroundColor: "#A5E072", fontWeight: "bold" }}
                       onError={() =>
                         setFollowedParticipantProfiles((prevProfiles) => {
                           const newProfiles = { ...prevProfiles };
@@ -789,7 +838,29 @@ export default function EventDetailed({ eventId }) {
                           return newProfiles;
                         })
                       }
-                    />
+                    >
+                      {!followedParticipantProfiles[participant.userId] &&
+                        participant.userName?.charAt(0).toUpperCase()}
+                    </Avatar>
+                  ))}
+                {participants &&
+                  participants.map((participant) => (
+                    <Avatar
+                      key={participant.userId}
+                      alt={participant.userName}
+                      src={participantProfiles[participant.userId]}
+                      sx={{ backgroundColor: "#A5E072", fontWeight: "bold" }}
+                      onError={() =>
+                        setParticipantProfiles((prevProfiles) => {
+                          const newProfiles = { ...prevProfiles };
+                          delete newProfiles[participant.userId];
+                          return newProfiles;
+                        })
+                      }
+                    >
+                      {!participantProfiles[participant.userId] &&
+                        participant.userName?.charAt(0).toUpperCase()}
+                    </Avatar>
                   ))}
               </AvatarGroup>
               {!loadingParticipants && participants && (
@@ -798,8 +869,7 @@ export default function EventDetailed({ eventId }) {
                   component="div"
                   color="text.secondary"
                 >
-                  {participants.length + followedParticipants.length} people are
-                  going
+                  {eventData.totalParticipantsCount} people are going
                   {followedParticipants && followedParticipants.length > 0 && (
                     <span>
                       {" "}
@@ -818,7 +888,8 @@ export default function EventDetailed({ eventId }) {
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Button
                 variant="contained"
-                style={{
+                data-testid="join-button"
+                sx={{
                   backgroundColor: "#4B9023",
                   borderRadius: 30,
                   width: "110px",
@@ -826,6 +897,7 @@ export default function EventDetailed({ eventId }) {
                   textTransform: "none",
                 }}
                 onClick={handleJoinLeaveToggle}
+                disabled={parseISO(eventData.date) < dayjs()}
               >
                 <Typography variant="h5">
                   {userLogged ? (
@@ -846,6 +918,8 @@ export default function EventDetailed({ eventId }) {
           <ParticipantsListPopup
             open={participantsPopupOpen}
             handleClose={handleParticipantsPopupClose}
+            eventId={eventId}
+            totalCount={eventData.totalParticipantsCount}
           />
           <EventPopup
             open={editPopupOpen}

@@ -14,6 +14,8 @@ import {
   DialogActions,
   Button,
   DialogContent,
+  Fade,
+  Modal,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -43,6 +45,7 @@ export default function RecipeDetailed({ recipeId }) {
   const navigate = useNavigate();
   const [recipeData, setRecipeData] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = useState("");
   const [bannerUrl, setBannerUrl] = React.useState(null);
   const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
@@ -63,6 +66,8 @@ export default function RecipeDetailed({ recipeId }) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
   const [snackbarSeverity, setSnackbarSeverity] = React.useState("success");
+  const [imageEnlarged, setImageEnlarged] = useState(false);
+  const [enlargedImageIndex, setEnlargedImageIndex] = useState(null);
   const open = Boolean(anchorEl);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
@@ -231,6 +236,20 @@ export default function RecipeDetailed({ recipeId }) {
     };
   }, [recipeData]);
 
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (recipeData && recipeData.userName) {
+      setUserInitials(generateInitials(recipeData.userName));
+    }
+  }, [recipeData]);
+
   React.useEffect(() => {
     if (recipeData && recipeData.id) {
       const fetchBanner = async () => {
@@ -325,6 +344,22 @@ export default function RecipeDetailed({ recipeId }) {
 
   React.useEffect(() => {
     if (recipeData && recipeData.id && userLogged) {
+      const fetchCommentCount = async () => {
+        try {
+          const response = await axios.get(
+            `/api/v1/recipes/${recipeData.id}/comments`
+          );
+          setCommentCount(response.data.totalCount || 0);
+        } catch (err) {
+          console.error("Error fetching comment count:", err);
+        }
+      };
+      fetchCommentCount();
+    }
+  }, [recipeData, userLogged]);
+
+  React.useEffect(() => {
+    if (recipeData && recipeData.id && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
         setErrorIsBookmarked(null);
@@ -410,6 +445,7 @@ export default function RecipeDetailed({ recipeId }) {
   if (loading) {
     return (
       <Box
+        data-testid="recipe-detailed-loading"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -423,6 +459,7 @@ export default function RecipeDetailed({ recipeId }) {
   if (error) {
     return (
       <Box
+        data-testid="recipe-detailed-error"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -435,7 +472,7 @@ export default function RecipeDetailed({ recipeId }) {
 
   if (!recipeData) {
     return (
-      <Typography color="error" textAlign={"center"}>
+      <Typography data-testid="recipe-detailed-nodata" color="error" textAlign={"center"}>
         No recipe information available for this ID
       </Typography>
     );
@@ -443,6 +480,7 @@ export default function RecipeDetailed({ recipeId }) {
 
   return (
     <Box
+      data-testid="recipe-detailed-container"
       sx={{
         width: "100%",
         outline: "1.5px solid #C0C0C0",
@@ -467,51 +505,60 @@ export default function RecipeDetailed({ recipeId }) {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-      <Dialog open={openDialog} onClose={handleDialogClose} 
-      PaperProps={{
-        sx: {
-          width: { xs: 250, sm: 400 },
-          borderRadius: 4,
-          backgroundColor: "#C8EFA5",
-          padding: 0.5,
-        },
-      }}>
-        <DialogTitle sx={{ fontWeight: "bold" }} >Confirm Delete</DialogTitle>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        PaperProps={{
+          sx: {
+            width: { xs: 250, sm: 400 },
+            borderRadius: 4,
+            backgroundColor: "#C8EFA5",
+            padding: 0.5,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete this recipe?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}
-          sx={{
-            backgroundColor: "#C8EFA5",
-            color: "black",
-            ":hover": {
+          <Button
+            onClick={handleDialogClose}
+            sx={{
               backgroundColor: "#C8EFA5",
-            },
-            borderRadius: 20,
-            marginTop: 2,
-            display: "block",
-            marginLeft: "auto",
-          }}>
+              color: "black",
+              ":hover": {
+                backgroundColor: "#C8EFA5",
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={() => {handleDelete(); handleDialogClose();} }
-              variant="contained"
-              sx={{
+          <Button
+            onClick={() => {
+              handleDelete();
+              handleDialogClose();
+            }}
+            variant="contained"
+            sx={{
+              backgroundColor: "#cc0000",
+              color: "error",
+              ":hover": {
                 backgroundColor: "#cc0000",
-                color: "error",
-                ":hover": {
-                  backgroundColor: "#cc0000",
-                },
-                borderRadius: 20,
-                marginTop: 2,
-                display: "block",
-                marginLeft: "auto",
-                fontWeight: "bold",
-              }}
-            >
-              Delete
-            </Button>
+              },
+              borderRadius: 20,
+              marginTop: 2,
+              display: "block",
+              marginLeft: "auto",
+              fontWeight: "bold",
+            }}
+          >
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
       <Box
@@ -533,11 +580,31 @@ export default function RecipeDetailed({ recipeId }) {
               alignItems: "center",
             }}
           >
-            <Avatar
-              src={profilePictureUrl}
-              sx={{ width: 50, height: 50, marginRight: 1.5 }}
-              onError={() => setProfilePictureUrl(null)}
-            />
+            {profilePictureUrl ? (
+              <Avatar
+                src={profilePictureUrl}
+                sx={{ width: 50, height: 50, mr: 1.5 }}
+                onError={() => setProfilePictureUrl(null)}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: "50%",
+                  marginRight: 1.5,
+                  backgroundColor: "#A5E072",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {userInitials}
+              </Box>
+            )}
             <Box>
               <Typography
                 variant="h6"
@@ -549,9 +616,13 @@ export default function RecipeDetailed({ recipeId }) {
               </Typography>
               <Typography variant="body2" color="text.secondary" noWrap>
                 {recipeData.createdAt &&
-                  formatDistanceToNow(parseISO(recipeData.createdAt), {
-                    addSuffix: true,
-                  })}
+                  formatDistanceToNow(
+                    parseISO(recipeData.createdAt).getTime() +
+                      3 * 60 * 60 * 1000,
+                    {
+                      addSuffix: true,
+                    }
+                  )}
               </Typography>
             </Box>
           </Link>
@@ -578,7 +649,6 @@ export default function RecipeDetailed({ recipeId }) {
                   sx: {
                     overflow: "visible",
                     filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                    mt: 1.5,
                     "& .MuiAvatar-root": {
                       width: 32,
                       height: 32,
@@ -725,7 +795,7 @@ export default function RecipeDetailed({ recipeId }) {
                 }}
               >
                 <AccessTimeFilledIcon />
-                <b>Total Time:</b> {recipeData.preparationTime} mins
+                <p><b>Total Time:</b> {recipeData?.preparationTime > 120 ? "More than 120 mins" : recipeData?.preparationTime ? `${recipeData?.preparationTime} mins` : null}</p>
               </Typography>
             </Box>
           </Box>
@@ -784,9 +854,39 @@ export default function RecipeDetailed({ recipeId }) {
             objectFit: "cover",
             borderRadius: 10,
             border: "1px solid #C0C0C0",
+            cursor: "pointer",
           }}
+          onClick={() => setImageEnlarged(true)}
         />
       )}
+      <Fade in={imageEnlarged}>
+        <Box>
+          <Modal
+            open={imageEnlarged}
+            onClose={() => setImageEnlarged(false)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bgcolor: "rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <Fade in={imageEnlarged} timeout={300}>
+              <img
+                src={bannerUrl}
+                alt={recipeData.header}
+                style={{
+                  maxWidth: "70vw",
+                  maxHeight: "70vh",
+                  aspectRatio: "auto",
+                  objectFit: "contain",
+                  borderRadius: "10px",
+                }}
+              />
+            </Fade>
+          </Modal>
+        </Box>
+      </Fade>
 
       <Typography
         variant="h4"
@@ -839,8 +939,42 @@ export default function RecipeDetailed({ recipeId }) {
                     objectFit: "cover",
                     borderRadius: 10,
                     border: "1px solid #C0C0C0",
+                    cursor: "pointer",
                   }}
+                  onClick={() => setEnlargedImageIndex(index)}
                 />
+                <Fade in={imageEnlarged}>
+                  <Box>
+                    <Modal
+                      open={enlargedImageIndex === index}
+                      onClose={() => setEnlargedImageIndex(null)}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        bgcolor: "rgba(0, 0, 0, 0.5)",
+                      }}
+                    >
+                      <Fade in={enlargedImageIndex === index} timeout={300}>
+                        {enlargedImageIndex !== null ? (
+                          <img
+                            src={stepImages[enlargedImageIndex]}
+                            alt={`Step ${enlargedImageIndex + 1}`}
+                            style={{
+                              maxWidth: "70vw",
+                              maxHeight: "70vh",
+                              aspectRatio: "auto",
+                              objectFit: "contain",
+                              borderRadius: "10px",
+                            }}
+                          />
+                        ) : (
+                          <Box />
+                        )}
+                      </Fade>
+                    </Modal>
+                  </Box>
+                </Fade>
               </Box>
             )}
           </ListItem>
@@ -863,11 +997,18 @@ export default function RecipeDetailed({ recipeId }) {
           noWrap
         >
           {recipeData.createdAt &&
-            format(parseISO(recipeData.createdAt), "h:mm a")}
+            format(
+              parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+              "h:mm a"
+            )}
         </Typography>
         <Typography variant="body1" color="text.secondary" noWrap>
+          ·{" "}
           {recipeData.createdAt &&
-            format(parseISO(recipeData.createdAt), "MMM d, yyyy")}
+            format(
+              parseISO(recipeData.createdAt).getTime() + 3 * 60 * 60 * 1000,
+              "MMM d, yyyy"
+            )}
         </Typography>
       </Box>
       <Box
@@ -879,18 +1020,20 @@ export default function RecipeDetailed({ recipeId }) {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton onClick={handleLikeToggle} style={{ padding: 0 }}>
+            <IconButton data-testid="like-button" onClick={handleLikeToggle} style={{ padding: 0 }}>
               {isLiked ? (
                 <FavoriteIcon
+                  data-testid="like-icon-filled"
                   style={{ fontSize: "45px", marginRight: 4, color: "red" }}
                 />
               ) : (
                 <FavoriteBorderIcon
+                  data-testid="like-icon-border"
                   style={{ fontSize: "45px", marginRight: 4, color: "#757575" }}
                 />
               )}
             </IconButton>
-            <Typography variant="body1" color="text.secondary">
+            <Typography data-testid="like-count" variant="body1" color="text.secondary">
               {likeCount}
             </Typography>
           </Box>
@@ -905,11 +1048,12 @@ export default function RecipeDetailed({ recipeId }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
             {isBookmarked ? (
-              <BookmarkIcon style={{ fontSize: "48px" }} />
+              <BookmarkIcon data-testid="bookmark-icon-filled" style={{ fontSize: "48px" }} />
             ) : (
               <BookmarkBorderOutlinedIcon
+                data-testid="bookmark-icon-border"
                 style={{ fontSize: "48px", color: "#757575" }}
               />
             )}

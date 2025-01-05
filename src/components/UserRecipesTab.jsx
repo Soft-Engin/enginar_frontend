@@ -90,18 +90,21 @@ function UserRecipesTab() {
   }, [userId]);
 
   return (
-    <div>
+    <div data-testid="user-recipes-tab">
       <LoadingErrorDisplay
+        data-testid="loading-error-display"
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      {recipes.map((recipe, index) => (
-        <Box key={index} sx={{ width: 600, mb: 2 }}>
-          <RecipeMini key={recipe.id} recipe={recipe} />
-        </Box>
-      ))}
+      <div data-testid="recipes-stack">
+        {recipes.map((recipe, index) => (
+          <Box key={index} sx={{ width: 600, mb: 2 }}>
+            <RecipeMini key={recipe.id} recipe={recipe} />
+          </Box>
+        ))}
+      </div>
     </div>
   );
 }

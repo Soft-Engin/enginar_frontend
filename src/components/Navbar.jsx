@@ -1,3 +1,4 @@
+// Navbar.jsx
 import React, { useState, useEffect } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -30,8 +31,6 @@ import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlin
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import LogoutIcon from "@mui/icons-material/Logout";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import LightModeIcon from "@mui/icons-material/LightMode";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
@@ -177,6 +176,7 @@ const navbarTitlesIconsBase = [
     link: "/eventhub",
   },
 ];
+
 const navbarTitlesIconsAuth = [
   {
     text: (
@@ -198,7 +198,7 @@ const navbarTitlesIconsAuth = [
   },
 ];
 
-axios.defaults.baseURL = "http://localhost:8090";
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 axios.defaults.headers.common["Authorization"] = localStorage.getItem("token")
   ? `Bearer ${localStorage.getItem("token")}`
   : "";
@@ -232,6 +232,21 @@ export default function Navbar(props) {
   const setStoredInvertMode = (value) => {
     localStorage.setItem("isInverted", value.toString());
   };
+  const [userInitials, setUserInitials] = React.useState("");
+
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  useEffect(() => {
+    if (user && user.userName) {
+      setUserInitials(generateInitials(user.userName));
+    }
+  }, [user]);
 
   useEffect(() => {
     const storedMode = getStoredInvertMode();
@@ -274,9 +289,11 @@ export default function Navbar(props) {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
   const handleLogout = () => {
     localStorage.setItem("userLogged", false);
     setUserLogged(false);
@@ -286,6 +303,7 @@ export default function Navbar(props) {
     navigate("/");
     window.location.reload();
   };
+
   useEffect(() => {
     setNavbarTitlesIcons(
       userLogged
@@ -293,6 +311,7 @@ export default function Navbar(props) {
         : navbarTitlesIconsBase
     );
   }, [userLogged]);
+
   const fetchUserData = async () => {
     if (userLogged) {
       try {
@@ -326,12 +345,15 @@ export default function Navbar(props) {
       setProfilePic(null);
     }
   };
+
   useEffect(() => {
     fetchUserData();
   }, []);
+
   useEffect(() => {
     fetchUserData();
   }, [userLogged]);
+
   const [postPopupOpen, setPostPopupOpen] = React.useState(false);
   const [eventPopupOpen, setEventPopupOpen] = React.useState(false);
   const handleEventPopupOpen = () => {
@@ -350,6 +372,7 @@ export default function Navbar(props) {
     setPostPopupOpen(false);
     setSpeedDialOpen(false);
   };
+
   const handleFeelinHungry = async () => {
     const randomSeed = Math.floor(Math.random() * 1000);
     try {
@@ -364,6 +387,7 @@ export default function Navbar(props) {
       console.error("Error fetching random recipe", error);
     }
   };
+
   const userActions = [
     {
       text: "Profile",
@@ -389,13 +413,15 @@ export default function Navbar(props) {
       action: handleLogout,
     },
   ];
+  
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex" }} data-testid="navbar-container">
       <CssBaseline />
-      <AppBar position="fixed" open={drawerOpen}>
-        <StyledToolbar>
+      <AppBar position="fixed" open={drawerOpen} data-testid="navbar-appbar">
+        <StyledToolbar data-testid="navbar-toolbar">
           <LeftSection>
             <IconButton
+              data-testid="navbar-drawer-button"
               color="inherit"
               aria-label="open drawer"
               onClick={drawerToggle}
@@ -423,32 +449,37 @@ export default function Navbar(props) {
             )}
           </LeftSection>
 
-          <SearchBar />
+          <SearchBar data-testid="navbar-search" />
 
-          <RightSection>
-            <IconButton
-              onClick={toggleInvertMode}
-              sx={{
-                opacity: 0,
-              }}
-            >
-              {isInverted ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
+          <RightSection data-testid="navbar-right-section" sx={{ mr: 3 }}>
             {userLogged ? (
               <>
                 <Tooltip title="Profile Menu">
-                  <IconButton onClick={handleOpenUserMenu}>
-                    <Avatar
-                      alt={
-                        user?.firstName
-                          ? `${user.firstName} ${user.lastName}`
-                          : "User"
-                      }
-                      src={profilePic || "/static/images/avatar/2.jpg"}
-                    />
+                  <IconButton data-testid="user-avatar-button" onClick={handleOpenUserMenu}>
+                    {profilePic ? (
+                      <Avatar src={profilePic} sx={{ width: 45, height: 45 }} />
+                    ) : (
+                      <Box
+                        sx={{
+                          width: 45,
+                          height: 45,
+                          borderRadius: "50%",
+                          backgroundColor: "#A5E072",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#fff",
+                          fontSize: "0.9rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {userInitials}
+                      </Box>
+                    )}
                   </IconButton>
                 </Tooltip>
                 <Menu
+                  data-testid="user-menu"
                   sx={{ mt: "45px" }}
                   id="menu-appbar"
                   anchorEl={anchorElUser}
@@ -484,6 +515,7 @@ export default function Navbar(props) {
               </>
             ) : (
               <AuthPopup
+                data-testid="auth-popup"
                 setUserLogged={setUserLogged}
                 setAnchorElUser={setAnchorElUser}
               />
@@ -492,6 +524,7 @@ export default function Navbar(props) {
         </StyledToolbar>
       </AppBar>
       <Drawer
+        data-testid="navbar-drawer"
         variant="permanent"
         open={drawerOpen}
         PaperProps={{
@@ -503,11 +536,7 @@ export default function Navbar(props) {
         <DrawerHeader />
         <List sx={{ marginTop: "6px" }}>
           {navbarTitlesIcons.map((item) => (
-            <ListItem
-              key={item.text}
-              disablePadding
-              sx={{ display: "block", position: "relative" }}
-            >
+            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 to={item.link}
                 onClick={
@@ -574,12 +603,14 @@ export default function Navbar(props) {
           flexDirection: "column",
           alignItems: "center",
         }}
+        data-testid="navbar-main"
       >
         <DrawerHeader />
         {props.body}
       </Box>
       {showSpeedDial && (
         <ActionSpeedDial
+          data-testid="navbar-speed-dial"
           ariaLabel="SpeedDial tooltip example"
           icon={<SpeedDialIcon />}
           onClose={handleSpeedDialClose}
@@ -601,6 +632,7 @@ export default function Navbar(props) {
             icon={<PostAddIcon />}
             tooltipTitle={"Blog"}
             tooltipOpen
+            data-testid="speed-dial-blog"
             onClick={handlePostPopupOpen}
             tooltipPlacement={isSmUp ? "right" : "left"}
           />
@@ -609,6 +641,7 @@ export default function Navbar(props) {
             icon={<GroupAddIcon />}
             tooltipTitle={"Event"}
             tooltipOpen
+            data-testid="speed-dial-event"
             onClick={handleEventPopupOpen}
             tooltipPlacement={isSmUp ? "right" : "left"}
           />
@@ -617,6 +650,7 @@ export default function Navbar(props) {
             icon={<RestaurantMenuIcon />}
             tooltipTitle={"Recipe"}
             tooltipOpen
+            data-testid="speed-dial-recipe"
             onClick={() => navigate("/createRecipe")}
             tooltipPlacement={isSmUp ? "right" : "left"}
           />

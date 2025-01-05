@@ -12,6 +12,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { Link, useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 export default function EventMini({ event }) {
   const eventDate = event?.date ? parseISO(event.date) : null;
@@ -26,6 +27,7 @@ export default function EventMini({ event }) {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [userInitials, setUserInitials] = React.useState("");
   const [isParticipant, setIsParticipant] = React.useState(false);
   const [loadingIsParticipant, setLoadingIsParticipant] = React.useState(true);
   const [errorIsParticipant, setErrorIsParticipant] = React.useState(null);
@@ -66,6 +68,20 @@ export default function EventMini({ event }) {
     };
   }, [event]);
 
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  React.useEffect(() => {
+    if (event && event.creatorUserName) {
+      setUserInitials(generateInitials(event.creatorUserName));
+    }
+  }, [event]);
+
   React.useEffect(() => {
     const fetchParticipants = async () => {
       if (event && event.eventId) {
@@ -73,7 +89,7 @@ export default function EventMini({ event }) {
         setErrorParticipants(null);
         try {
           const response = await axios.get(
-            `/api/v1/events/${event.eventId}/participants`
+            `/api/v1/events/${event.eventId}/participants?pageSize=200`
           );
           if (response.data && response.data.participations) {
             setParticipants(response.data.participations.items || []);
@@ -214,6 +230,7 @@ export default function EventMini({ event }) {
 
   return (
     <Box
+      data-testid={`event-mini-${event.eventId}`}
       sx={{
         maxWidth: 630,
         width: "100%",
@@ -248,6 +265,7 @@ export default function EventMini({ event }) {
           <Typography
             variant="h5"
             fontWeight="bold"
+            data-testid="event-title"
             style={{ marginRight: "15px" }}
             noWrap
             onClick={() => navigate(`/event?id=${event.eventId}`)}
@@ -258,13 +276,23 @@ export default function EventMini({ event }) {
         </Box>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <PlaceOutlinedIcon style={{ fontSize: "30px", marginRight: "2px" }} />
-          <Typography variant="body2" component="div" noWrap>
+          <Typography 
+            variant="body2" 
+            component="div" 
+            data-testid="event-location"
+            noWrap
+          >
             {event?.address?.district?.city?.name || "City"}
           </Typography>
           <CalendarMonthIcon
             style={{ fontSize: "30px", marginRight: "2px", marginLeft: "5px" }}
           />
-          <Typography variant="body2" component="div" noWrap>
+          <Typography 
+            variant="body2" 
+            component="div"
+            data-testid="event-date" 
+            noWrap
+          >
             {formattedDate}
           </Typography>
         </Box>
@@ -296,11 +324,31 @@ export default function EventMini({ event }) {
               alignItems: "center",
             }}
           >
-            <Avatar
-              src={profilePictureUrl}
-              onError={() => setProfilePictureUrl(null)}
-              sx={{ width: 34, height: 34, marginRight: 0.7 }}
-            />
+            {profilePictureUrl ? (
+              <Avatar
+                src={profilePictureUrl}
+                sx={{ width: 34, height: 34, mr: 0.7 }}
+                onError={() => setProfilePictureUrl(null)}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: "50%",
+                  marginRight: 0.7,
+                  backgroundColor: "#A5E072",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {userInitials}
+              </Box>
+            )}
             <Typography
               variant="body2"
               component="div"
@@ -316,6 +364,7 @@ export default function EventMini({ event }) {
       <Typography
         variant="body2"
         component="div"
+        data-testid="event-description"
         sx={{
           overflow: "hidden",
           display: "-webkit-box",
@@ -360,27 +409,13 @@ export default function EventMini({ event }) {
                 marginRight: 0.5,
               }}
             >
-              {participants &&
-                participants.map((participant) => (
-                  <Avatar
-                    key={participant.userId}
-                    alt={participant.userName}
-                    src={participantProfiles[participant.userId]}
-                    onError={() =>
-                      setParticipantProfiles((prevProfiles) => {
-                        const newProfiles = { ...prevProfiles };
-                        delete newProfiles[participant.userId];
-                        return newProfiles;
-                      })
-                    }
-                  />
-                ))}
               {followedParticipants &&
                 followedParticipants.map((participant) => (
                   <Avatar
                     key={participant.userId}
                     alt={participant.userName}
                     src={followedParticipantProfiles[participant.userId]}
+                    sx={{ backgroundColor: "#A5E072", fontWeight: "bold" }}
                     onError={() =>
                       setFollowedParticipantProfiles((prevProfiles) => {
                         const newProfiles = { ...prevProfiles };
@@ -388,7 +423,29 @@ export default function EventMini({ event }) {
                         return newProfiles;
                       })
                     }
-                  />
+                  >
+                    {!followedParticipantProfiles[participant.userId] &&
+                      participant.userName?.charAt(0).toUpperCase()}
+                  </Avatar>
+                ))}
+              {participants &&
+                participants.map((participant) => (
+                  <Avatar
+                    key={participant.userId}
+                    alt={participant.userName}
+                    src={participantProfiles[participant.userId]}
+                    sx={{ backgroundColor: "#A5E072", fontWeight: "bold" }}
+                    onError={() =>
+                      setParticipantProfiles((prevProfiles) => {
+                        const newProfiles = { ...prevProfiles };
+                        delete newProfiles[participant.userId];
+                        return newProfiles;
+                      })
+                    }
+                  >
+                    {!participantProfiles[participant.userId] &&
+                      participant.userName?.charAt(0).toUpperCase()}
+                  </Avatar>
                 ))}
             </AvatarGroup>
           )}
@@ -403,8 +460,7 @@ export default function EventMini({ event }) {
               component="div"
               color="text.secondary"
             >
-              {participants.length + followedParticipants.length} people are
-              going
+              {event.totalParticipantsCount} people are going
               {followedParticipants && followedParticipants.length > 0 && (
                 <span> ({followedParticipants.length} whom you follow)</span>
               )}
@@ -414,7 +470,8 @@ export default function EventMini({ event }) {
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Button
             variant="contained"
-            style={{
+            data-testid="join-button"
+            sx={{
               backgroundColor: "#4B9023",
               borderRadius: 30,
               width: "80px",
@@ -422,6 +479,7 @@ export default function EventMini({ event }) {
               textTransform: "none",
             }}
             onClick={handleJoinLeaveToggle}
+            disabled={eventDate < dayjs()}
           >
             <Typography variant="h6">
               {userLogged ? (

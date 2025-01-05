@@ -63,7 +63,8 @@ export default function SearchedRecipes({ query }) {
           pageSize: pageSize,
           pageNumber: pageNumber,
           HeaderContains: query,
-          SortBy: "createdAt",
+          SortBy: "CreationDate",
+          SortOrder: "desc",
         },
       });
       if (recipesResponse.data && recipesResponse.data.items) {
@@ -73,7 +74,6 @@ export default function SearchedRecipes({ query }) {
         ]);
       }
       pageNumber += 1;
-      console.log(pageNumber);
     } catch (err) {
       console.error("Error fetching more data:", err);
       setErrorMore(err.message || "An unexpected error occurred.");
@@ -112,7 +112,8 @@ export default function SearchedRecipes({ query }) {
             pageSize: pageSize,
             pageNumber: 1,
             HeaderContains: query,
-            SortBy: "createdAt",
+            SortBy: "CreationDate",
+            SortOrder: "desc",
           },
         });
         setRecipes(response.data.items);

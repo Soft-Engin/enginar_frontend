@@ -18,10 +18,15 @@ function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      style={{ display: "flex", justifyContent: "center" }}
+      data-testid={`tabpanel-${index}`}
+      style={{ 
+        display: "flex", 
+        justifyContent: "center",
+        visibility: value === index ? 'visible' : 'hidden'
+      }}
       {...other}
     >
-      {value === index && <Box>{children}</Box>}
+      <Box>{children}</Box>
     </div>
   );
 }
@@ -49,10 +54,7 @@ export default function ContentFeed() {
   const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
 
   return (
-    <Box
-      sx={{
-        margin: "0 auto",
-      }}
+    <Box data-testid="content-feed" sx={{ margin: "0 auto" }}
     >
       <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
         <Tabs
@@ -83,33 +85,44 @@ export default function ContentFeed() {
             label="Popular Recipes"
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
             {...a11yProps(0)}
+            data-testid="tab-popular-recipes"
           />
           <Tab
             label="Popular Blogs"
             sx={{ "&.Mui-selected": { color: "#4B9023" } }}
             {...a11yProps(1)}
+            data-testid="tab-popular-blogs"
           />
           {userLogged && (
             <Tab
               label="Following"
               sx={{ "&.Mui-selected": { color: "#4B9023" } }}
               {...a11yProps(2)}
+              data-testid="tab-following"
             />
           )}
         </Tabs>
       </Box>
 
       <CustomTabPanel value={value} index={0}>
-        <PopularRecipesTab />
+        <div data-testid="tabpanel-content-popular-recipes">
+          <PopularRecipesTab />
+        </div>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        <PopularBlogsTab />
+        <div data-testid="tabpanel-content-popular-blogs">
+          <PopularBlogsTab />
+        </div>
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        <FollowingTab />
-      </CustomTabPanel>
-      <RecommendedUsers />
-      <UpcomingEvents />
+      {userLogged && (
+        <CustomTabPanel value={value} index={2}>
+          <div data-testid="tabpanel-content-following">
+            <FollowingTab />
+          </div>
+        </CustomTabPanel>
+      )}
+      <RecommendedUsers data-testid="recommended-users" />
+      <UpcomingEvents data-testid="upcoming-events" />
     </Box>
   );
 }

@@ -26,7 +26,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
-import CloseIcon from "@mui/icons-material/Close"; // Import the CloseIcon
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
@@ -143,8 +143,8 @@ const CreateRecipe = () => {
           setRecipeName(recipeData.header || "");
           setServingSize(String(recipeData.servingSize || "1"));
           setPrepTime(
-            prepTimeOptions[Math.floor(recipeData.preparationTime / 10)] ||
-              "0-10 minutes"
+            prepTimeOptions[Math.floor(recipeData.preparationTime / 15) - 1] ||
+              "More than 120 minutes"
           );
           setDescription(recipeData.bodyText || "");
           setIngredients(
@@ -484,13 +484,11 @@ const CreateRecipe = () => {
   };
   // Remove step image
   const removeStepImage = (index) => {
-    console.log(steps);
     setSteps((prevSteps) => {
       const newSteps = [...prevSteps];
       newSteps[index] = { ...newSteps[index], imageUrl: null };
       return newSteps;
     });
-    console.log(steps);
 
     setStepImageUrls((prevImageUrls) => {
       const imageUrl = prevImageUrls[index];
@@ -513,10 +511,10 @@ const CreateRecipe = () => {
 
   const quantityOptions = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5];
 
-  const numberOptions = Array.from({ length: 10 }, (_, i) => i + 1);
+  const numberOptions = Array.from({ length: 9 }, (_, i) => i + 1);
   const servingSizeOptions = [...numberOptions.map(String), "10+"];
-  const prepTimeOptions = numberOptions.map((num) => `${num * 10} minutes`);
-  prepTimeOptions.push("More than 100 minutes");
+  const prepTimeOptions = Array.from({ length: 8 }, (_, i) => i + 1).map((num) => `${num * 15} minutes`);
+  prepTimeOptions.push("More than 120 minutes");
 
   const handleCreateRecipe = async () => {
     setCreating(true);
@@ -546,7 +544,7 @@ const CreateRecipe = () => {
         stepImages: stepImagesData.length > 0 ? stepImagesData : null,
         servingSize: parseInt(servingSize),
         preparationTime:
-          prepTimeOptions.findIndex((option) => option === prepTime) * 10,
+          prepTimeOptions.findIndex((option) => option === prepTime) * 15 + 15,
         steps: stepsWithTextOnly,
         ingredients: transformedIngredients,
       };
@@ -641,6 +639,7 @@ const CreateRecipe = () => {
   if (loading) {
     return (
       <Box
+        data-testid="create-recipe-loading"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -654,6 +653,7 @@ const CreateRecipe = () => {
   if (error) {
     return (
       <Box
+        data-testid="create-recipe-error"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -665,7 +665,7 @@ const CreateRecipe = () => {
   }
 
   return (
-    <Box sx={{ p: 4, width: "90vmax", overflow: "hidden" }}>
+    <Box data-testid="create-recipe-form" sx={{ p: 4, width: "90vmax", overflow: "hidden" }}>
       <Snackbar
         open={creationSuccess}
         autoHideDuration={6000}
@@ -712,6 +712,8 @@ const CreateRecipe = () => {
           <Box>
             {/* Recipe Name */}
             <TextField
+              data-testid="recipe-name-input"
+              inputProps={{ "data-testid": "recipe-name-input-field" }}  // Add this line
               label="Recipe Name"
               variant="outlined"
               fullWidth
@@ -1077,6 +1079,7 @@ const CreateRecipe = () => {
                 Add Step
               </Button>
               <Button
+                data-testid="create-recipe-button"
                 variant="contained"
                 sx={{ mt: 2 }}
                 color="success"
@@ -1098,8 +1101,10 @@ const CreateRecipe = () => {
           <Box sx={{ height: "80%", display: "flex", flexDirection: "column" }}>
             {/* Search Bar */}
             <TextField
+              data-testid="ingredient-search-input"
               variant="outlined"
               placeholder="Search Ingredients"
+              inputProps={{ "data-testid": "ingredient-search-input-field" }}  // Add this line
               fullWidth
               InputProps={{
                 startAdornment: <SearchIcon sx={{ mr: 1 }} />,
@@ -1117,6 +1122,7 @@ const CreateRecipe = () => {
 
             {/* Ingredient List */}
             <Box
+              data-testid="ingredient-list"
               sx={{
                 overflowY: "auto",
                 maxHeight: "90vh",

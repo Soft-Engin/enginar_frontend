@@ -25,6 +25,7 @@ const UserListItemContainer = styled(Box)(({ theme }) => ({
 
 const UserListItem = ({ user }) => {
   const [profilePic, setProfilePic] = useState(null);
+  const [userInitials, setUserInitials] = React.useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,30 +49,54 @@ const UserListItem = ({ user }) => {
     fetchProfilePic();
   }, [user.userId]);
 
+  const generateInitials = (userName) => {
+    const nameParts = userName.split(" ");
+    return (
+      nameParts.map((part) => part.charAt(0).toUpperCase()).join("") ||
+      userName.charAt(0).toUpperCase()
+    );
+  };
+
+  React.useEffect(() => {
+    if (user && user.userName) {
+      setUserInitials(generateInitials(user.userName));
+    }
+  }, [user]);
+
   const handleUserClick = () => {
     navigate(`/profile?id=${user.userId}`);
   };
 
-  const profilePlaceholder = user?.userName
-    ? user.userName.charAt(0).toUpperCase()
-    : "?";
-
   return (
-    <UserListItemContainer onClick={handleUserClick}>
+    <UserListItemContainer data-testid="user-list-item" onClick={handleUserClick}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Avatar
-          sx={{
-            width: 40,
-            height: 40,
-            bgcolor: profilePic ? "transparent" : "grey",
-          }}
-        >
-          {!profilePic && profilePlaceholder}
-          {profilePic && (
-            <Avatar src={profilePic} sx={{ width: "100%", height: "100%" }} />
-          )}
-        </Avatar>
-        <Typography sx={{ fontWeight: "medium", fontSize: "18px" }}>
+        {profilePic ? (
+          <Avatar
+            data-testid="user-avatar-with-image"
+            src={profilePic}
+            sx={{ width: 40, height: 40 }}
+            onError={() => setProfilePic(null)}
+          />
+        ) : (
+          <Box
+            data-testid="user-avatar-initials"
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              backgroundColor: "#A5E072",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#fff",
+              fontSize: "1rem",
+              fontWeight: "bold",
+            }}
+          >
+            {userInitials}
+          </Box>
+        )}
+        <Typography data-testid="user-username" sx={{ fontWeight: "medium", fontSize: "18px" }}>
           {user.userName}
         </Typography>
       </Box>

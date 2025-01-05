@@ -273,10 +273,10 @@ const RecipeSearch = () => {
                       {letter}
                     </Typography>
                   </Divider>
-                  <div style={{ display: "flex" }}>
+                  <div style={{ display: "flex", flexWrap: "wrap"  }}>
                     {categorizedIngredients[letter].map((ingredient) => (
                       <div
-                        style={{ marginRight: 5, marginLeft: 5 }}
+                        style={{ marginRight: 5, marginLeft: 5, marginBottom: 2.5, marginTop: 2.5 }}
                         key={ingredient.id}
                       >
                         <Card

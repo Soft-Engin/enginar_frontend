@@ -96,49 +96,51 @@ export default function EventPopup(props) {
   }, [requirementPage]);
 
   useEffect(() => {
-    const fetchAllLocationData = async () => {
-      try {
-        const countriesResponse = await axios.get("/api/v1/events/countries");
-        const countries = countriesResponse.data;
+    if (props.open) {
+      const fetchAllLocationData = async () => {
+        try {
+          const countriesResponse = await axios.get("/api/v1/events/countries");
+          const countries = countriesResponse.data;
 
-        const citiesPromises = countries.map((country) =>
-          axios
-            .get(`/api/v1/events/countries/${country.id}/cities`)
-            .then((response) =>
-              response.data.map((city) => ({
-                ...city,
-                countryId: country.id,
-              }))
-            )
-        );
-        const citiesArrays = await Promise.all(citiesPromises);
-        const cities = citiesArrays.flat();
+          const citiesPromises = countries.map((country) =>
+            axios
+              .get(`/api/v1/events/countries/${country.id}/cities`)
+              .then((response) =>
+                response.data.map((city) => ({
+                  ...city,
+                  countryId: country.id,
+                }))
+              )
+          );
+          const citiesArrays = await Promise.all(citiesPromises);
+          const cities = citiesArrays.flat();
 
-        const districtsPromises = cities.map((city) =>
-          axios
-            .get(`/api/v1/events/cities/${city.id}/districts`)
-            .then((response) =>
-              response.data.map((district) => ({
-                ...district,
-                cityId: city.id,
-              }))
-            )
-        );
-        const districtsArrays = await Promise.all(districtsPromises);
-        const districts = districtsArrays.flat();
+          const districtsPromises = cities.map((city) =>
+            axios
+              .get(`/api/v1/events/cities/${city.id}/districts`)
+              .then((response) =>
+                response.data.map((district) => ({
+                  ...district,
+                  cityId: city.id,
+                }))
+              )
+          );
+          const districtsArrays = await Promise.all(districtsPromises);
+          const districts = districtsArrays.flat();
 
-        setLocationData({
-          countries,
-          cities,
-          districts,
-        });
-      } catch (err) {
-        console.error("Error fetching location data:", err);
-        setError(err.message || "Error loading location data");
-      }
-    };
-    fetchAllLocationData();
-  }, []);
+          setLocationData({
+            countries,
+            cities,
+            districts,
+          });
+        } catch (err) {
+          console.error("Error fetching location data:", err);
+          setError(err.message || "Error loading location data");
+        }
+      };
+      fetchAllLocationData();
+    }
+  }, [props.open]);
 
   const handleClose = () => {
     setEventName("");
@@ -235,14 +237,17 @@ export default function EventPopup(props) {
   const handleEventNameChange = (event) => {
     setEventName(event.target.value);
   };
+
   const handleEventDescriptionChange = (event) => {
     setEventDescription(event.target.value);
   };
+
   const handleLoadMoreRequirements = () => {
     if (requirementOptions.length < totalRequirements) {
       setRequirementPage(requirementPage + 1);
     }
   };
+
   return (
     <Dialog
       open={props.open}
@@ -336,6 +341,13 @@ export default function EventPopup(props) {
                   value={selectedCountry}
                   onChange={handleCountryChange}
                   required
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 300,
+                      },
+                    },
+                  }}
                   renderValue={(value) =>
                     value
                       ? locationData.countries.find(
@@ -364,6 +376,13 @@ export default function EventPopup(props) {
                   onChange={handleCityChange}
                   disabled={!selectedCountry}
                   sx={{ backgroundColor: "white" }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 300,
+                      },
+                    },
+                  }}
                 >
                   <MenuItem value="">
                     <em>None</em>
@@ -388,6 +407,13 @@ export default function EventPopup(props) {
                   onChange={handleDistrictChange}
                   disabled={!selectedCity}
                   sx={{ backgroundColor: "white" }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 300,
+                      },
+                    },
+                  }}
                 >
                   <MenuItem value="">
                     <em>None</em>
@@ -432,6 +458,13 @@ export default function EventPopup(props) {
                 value={selectedRequirements}
                 onChange={handleRequirementsChange}
                 label="Requirements"
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      maxHeight: 300,
+                    },
+                  },
+                }}
                 renderValue={(selected) => (
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {selected.map((value) => {

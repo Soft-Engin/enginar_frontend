@@ -84,16 +84,19 @@ function PopularBlogsTab() {
   return (
     <div>
       <LoadingErrorDisplay
+        data-testid="popular-blogs-tab"
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      {blogs.map((blog, index) => (
-        <Box key={index} sx={{ width: 600, mb: 2 }}>
-          <BlogMini blog={blog} />
-        </Box>
-      ))}
+      <div data-testid="blogs-container">
+        {blogs.map((blog, index) => (
+          <Box data-testid="blog-box" key={index} sx={{ width: 600, mb: 2 }}>
+            <BlogMini blog={blog} />
+          </Box>
+        ))}
+      </div>
     </div>
   );
 }

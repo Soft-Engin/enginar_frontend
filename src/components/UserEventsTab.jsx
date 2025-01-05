@@ -88,18 +88,20 @@ function UserEventsTab() {
   }, [userId]);
 
   return (
-    <div>
+    <div data-testid="user-events-tab-container">
       <LoadingErrorDisplay
         loading={loading}
         error={error}
         loadingMore={loadingMore}
         errorMore={errorMore}
       />
-      {events.map((event, index) => (
-        <Box key={index} sx={{ width: 600, mb: 2 }}>
-          <EventMini key={event.id} event={event} />
-        </Box>
-      ))}
+      <div data-testid="events-stack">
+        {events.map((event, index) => (
+          <Box key={index} sx={{ width: 600, mb: 2 }}>
+            <EventMini key={event.id} event={event} />
+          </Box>
+        ))}
+      </div>
     </div>
   );
 }

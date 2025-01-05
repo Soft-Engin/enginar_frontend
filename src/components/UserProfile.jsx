@@ -185,7 +185,7 @@ const UserProfile = () => {
         console.error("Error fetching follow counts: ", error);
       }
     };
-
+  
     fetchUserData();
     fetchFollowCounts();
   }, [userId]);
@@ -279,6 +279,7 @@ const UserProfile = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  
   const handleBanOpen = () => {
     setBanDialogOpen(true);
   };
@@ -354,6 +355,7 @@ const UserProfile = () => {
   if (loading) {
     return (
       <Box
+        data-testid="user-profile-loading"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -367,6 +369,7 @@ const UserProfile = () => {
   if (error) {
     return (
       <Box
+        data-testid="user-profile-error"
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -387,6 +390,7 @@ const UserProfile = () => {
   return (
     <Box>
       <Box
+        data-testid="user-profile-container"
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -448,7 +452,8 @@ const UserProfile = () => {
                     left: 0,
                     bgcolor: profilePic ? "transparent" : "#A5E072",
                     boxShadow: 2,
-                    fontSize: "3rem",
+                    fontSize: "4rem",
+                    fontWeight: "bold",
                   }}
                 >
                   {!profilePic && profilePlaceholder}
@@ -475,6 +480,7 @@ const UserProfile = () => {
                       (userLogged ? (
                         isFollowing ? (
                           <FollowButton
+                            data-testid="unfollow-button"
                             variant="contained"
                             onClick={handleUnfollowUser}
                           >
@@ -482,6 +488,7 @@ const UserProfile = () => {
                           </FollowButton>
                         ) : (
                           <FollowButton
+                            data-testid="follow-button"
                             variant="contained"
                             onClick={handleFollowUser}
                           >
@@ -500,12 +507,14 @@ const UserProfile = () => {
                   <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
                     <Typography
                       variant="body2"
+                      data-testid="following-count"
                       onClick={handleFollowingPopupOpen}
                       sx={{ cursor: "pointer" }}
                     >
                       <strong>{followingCount}</strong> Following
                     </Typography>
                     <Typography
+                      data-testid="followers-count"
                       variant="body2"
                       onClick={handleFollowersPopupOpen}
                       sx={{ cursor: "pointer" }}
@@ -517,6 +526,7 @@ const UserProfile = () => {
                 {(isOwnProfile || isAdmin) && (
                   <Box sx={{ position: "absolute", right: -10, mt: -1 }}>
                     <IconButton
+                      data-testid="profile-menu-button"
                       aria-label="more"
                       id="menuButton"
                       aria-controls={open ? "menu" : undefined}

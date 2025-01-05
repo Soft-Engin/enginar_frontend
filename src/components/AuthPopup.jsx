@@ -7,7 +7,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -80,7 +79,6 @@ export default function AuthPopup(props) {
 
   const handleSwitchToLogin = () => {
     setIsSignup(false);
-    setShowSuccess(true);
     setFormError(null);
     setTimeout(() => {
       setShowSuccess(false);
@@ -98,6 +96,15 @@ export default function AuthPopup(props) {
     const formJson = Object.fromEntries(formData.entries());
     const apiURL = isSignup ? "/api/v1/auth/register" : "/api/v1/auth/login";
 
+    if (isSignup) {
+      const email = formJson.email;
+      const emailRegex = /^[a-zA-Z0-9._-]+@(gmail|hotmail)\.[a-zA-Z]{2,4}$/;
+      if (!emailRegex.test(email)) {
+        setFormError("Invalid email. Please use a Gmail or Hotmail address.");
+        return;
+      }
+    }
+
     try {
       const response = await axios.post(apiURL, formJson);
 
@@ -110,9 +117,7 @@ export default function AuthPopup(props) {
           localStorage.setItem("token", response.data.token);
           localStorage.setItem("userLogged", "true");
           props.setUserLogged(true);
-          axios.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${response.data.token}`;
+          axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
           props.setAnchorElUser(null);
           handleClose();
           navigate("/");
@@ -149,9 +154,7 @@ export default function AuthPopup(props) {
         }
         setFormError(errorMessages.join("\n"));
       } else if (error.request) {
-        setFormError(
-          "Could not connect to the server. Please try again later."
-        );
+        setFormError("Could not connect to the server. Please try again later.");
       } else {
         setFormError("An unexpected error occurred.");
       }
@@ -160,23 +163,29 @@ export default function AuthPopup(props) {
 
   return (
     <React.Fragment>
-      <Stack spacing={2} direction="row" justifyContent={"center"}>
+      <Stack spacing={2} direction="row" justifyContent="center">
         <LoginButton
+          data-testid="open-login-dialog-button"
           variant="contained"
           onClick={() => handleClickOpen(false)}
           id="loginButton"
         >
           Log in
         </LoginButton>
-        <SignupButton variant="contained" onClick={() => handleClickOpen(true)}>
+        <SignupButton
+          data-testid="open-signup-dialog-button"
+          variant="contained"
+          onClick={() => handleClickOpen(true)}
+        >
           Sign up
         </SignupButton>
       </Stack>
 
       <Dialog
+        data-testid="auth-dialog"
         open={open}
         onClose={handleClose}
-        maxWidth={"xs"}
+        maxWidth="xs"
         PaperProps={{
           sx: {
             width: { xs: 300, sm: 400, md: 600, lg: 600, xl: 650 },
@@ -187,12 +196,13 @@ export default function AuthPopup(props) {
           onSubmit: handleSubmit,
         }}
       >
-        <DialogTitle fontSize={52} fontWeight={"bold"}>
+        <DialogTitle data-testid="auth-dialog-title" fontSize={52} fontWeight="bold">
           {isSignup ? "Sign Up" : "Log In"}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent data-testid="auth-dialog-content">
           {showSuccess && !isSignup && (
             <Alert
+              data-testid="success-alert"
               severity="success"
               sx={{
                 mb: 2,
@@ -207,7 +217,7 @@ export default function AuthPopup(props) {
             </Alert>
           )}
           {formError && (
-            <Alert severity="error" sx={{ mb: 2 }} icon={false}>
+            <Alert data-testid="error-alert" severity="error" sx={{ mb: 2 }} icon={false}>
               <Typography variant="body2" style={{ whiteSpace: "pre-line" }}>
                 {formError}
               </Typography>
@@ -217,6 +227,7 @@ export default function AuthPopup(props) {
             <>
               <Stack direction="row" spacing={2} sx={{ marginBottom: "4px" }}>
                 <TextField
+                  data-testid="first-name-input"
                   required
                   margin="dense"
                   id="firstName"
@@ -235,6 +246,7 @@ export default function AuthPopup(props) {
                   }}
                 />
                 <TextField
+                  data-testid="last-name-input"
                   required
                   margin="dense"
                   id="lastName"
@@ -254,6 +266,7 @@ export default function AuthPopup(props) {
                 />
               </Stack>
               <TextField
+                data-testid="username-input"
                 required
                 margin="dense"
                 id="username"
@@ -272,6 +285,7 @@ export default function AuthPopup(props) {
                 }}
               />
               <TextField
+                data-testid="email-input"
                 required
                 margin="dense"
                 id="email"
@@ -292,6 +306,7 @@ export default function AuthPopup(props) {
             </>
           ) : (
             <TextField
+              data-testid="identifier-input"
               required
               margin="dense"
               id="identifier"
@@ -312,6 +327,7 @@ export default function AuthPopup(props) {
           )}
 
           <TextField
+            data-testid="password-input"
             required
             margin="dense"
             id="password"
@@ -332,6 +348,7 @@ export default function AuthPopup(props) {
 
           {isSignup && (
             <TextField
+              data-testid="confirm-password-input"
               required
               margin="dense"
               id="confirmPassword"
@@ -350,35 +367,22 @@ export default function AuthPopup(props) {
               }}
             />
           )}
-
-          {!isSignup && (
-            <Box sx={{ display: "flex", justifyContent: "right" }}>
-              <Typography noWrap component="div" color="#535353">
-                <Link
-                  onClick={() => console.log("Forgot Password")}
-                  color="#4B9023"
-                  underline="hover"
-                  sx={{ cursor: "pointer" }}
-                >
-                  Forgot password?
-                </Link>
-              </Typography>
-            </Box>
-          )}
         </DialogContent>
         <DialogActions
+          data-testid="auth-dialog-actions"
           sx={{
             display: "flex",
             justifyContent: "center",
             flexDirection: "column",
           }}
         >
-          <SubmitButton type="submit">
+          <SubmitButton data-testid="auth-submit-button" type="submit">
             {isSignup ? "Sign Up" : "Log In"}
           </SubmitButton>
           <Typography noWrap component="div" color="#535353" sx={{ my: 1 }}>
             {isSignup ? "Already have an account? " : "Don't have an account? "}
             <Link
+              data-testid="switch-mode-link"
               onClick={isSignup ? handleSwitchToLogin : handleSwitchToSignup}
               color="#4B9023"
               underline="hover"

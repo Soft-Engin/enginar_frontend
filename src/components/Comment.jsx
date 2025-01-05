@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -11,12 +11,15 @@ import {
   MenuItem,
   Dialog,
   DialogTitle,
+  DialogContent,
   DialogActions,
   Button,
+  Modal,
+  Fade,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import axios from "axios";
-import { format, parseISO, formatDistanceToNow } from "date-fns";
+import { parseISO, formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
 
 export default function Comment({ comment, type, onDelete }) {
@@ -32,8 +35,9 @@ export default function Comment({ comment, type, onDelete }) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const userId = JSON.parse(localStorage.getItem("userData"))?.userId;
   const isCommentOwner = userId === comment.userId;
+  const [imageEnlarged, setImageEnlarged] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (comment && comment.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
@@ -83,7 +87,8 @@ export default function Comment({ comment, type, onDelete }) {
       }
     };
   }, [comment]);
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (comment && comment.id && type) {
       const fetchCommentImages = async () => {
         setLoadingImages(true);
@@ -130,6 +135,7 @@ export default function Comment({ comment, type, onDelete }) {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
   const handleDeleteClick = () => {
     setOpenDialog(true);
     handleMenuClose();
@@ -151,8 +157,10 @@ export default function Comment({ comment, type, onDelete }) {
       console.log("Error deleting comment", error);
     }
   };
+
   return (
     <Box
+      data-testid={`comment-${comment.id}`}
       sx={{
         width: "100%",
         backgroundColor: "#EAEAEA",
@@ -170,12 +178,14 @@ export default function Comment({ comment, type, onDelete }) {
         <Box sx={{ display: "flex", pb: 1.2 }}>
           {profilePictureUrl ? (
             <Avatar
+              data-testid={`comment-avatar-${comment.id}`}
               src={profilePictureUrl}
-              sx={{ width: 50, height: 50, mr: 1.3 }}
+              sx={{ width: 50, height: 50, mr: 2 }}
               onError={() => setProfilePictureUrl(null)}
             />
           ) : (
             <Box
+              data-testid={`comment-initials-${comment.id}`}
               sx={{
                 width: 50,
                 height: 50,
@@ -205,30 +215,56 @@ export default function Comment({ comment, type, onDelete }) {
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body1" fontWeight="bold" noWrap>
+                <Typography
+                  data-testid={`comment-username-${comment.id}`}
+                  variant="body1"
+                  fontWeight="bold"
+                  noWrap
+                >
                   {comment.userName}
                 </Typography>
               </Link>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                data-testid={`comment-timestamp-${comment.id}`}
+                variant="body2"
+                color="text.secondary"
+              >
                 {comment.timestamp &&
                   formatDistanceToNow(parseISO(comment.timestamp), {
                     addSuffix: true,
                   })}
               </Typography>
             </Box>
-            <Typography variant="body2">{comment.text}</Typography>
+            <Typography data-testid={`comment-text-${comment.id}`} variant="body2">
+              {comment.text}
+            </Typography>
             {errorProfile && (
-              <Box display="flex" justifyContent="center" my={2}>
+              <Box
+                data-testid={`comment-error-profile-${comment.id}`}
+                display="flex"
+                justifyContent="center"
+                my={2}
+              >
                 <Typography color="error">Error: {errorProfile}</Typography>
               </Box>
             )}
 
             {loadingImages ? (
-              <Box display="flex" justifyContent="center" my={2}>
+              <Box
+                data-testid={`comment-loading-images-${comment.id}`}
+                display="flex"
+                justifyContent="center"
+                my={2}
+              >
                 <CircularProgress size={20} />
               </Box>
             ) : commentImages && commentImages.length > 0 ? (
-              <ImageList cols={3} gap={8} sx={{ mt: 1, width: "400px" }}>
+              <ImageList
+                data-testid={`comment-images-${comment.id}`}
+                cols={3}
+                gap={8}
+                sx={{ mt: 1, width: "400px" }}
+              >
                 {commentImages.map((image, index) => (
                   <ImageListItem key={index}>
                     <img
@@ -241,8 +277,39 @@ export default function Comment({ comment, type, onDelete }) {
                         objectFit: "cover",
                         borderRadius: 10,
                         border: "1px solid #C0C0C0",
+                        cursor: "pointer",
                       }}
+                      data-testid={`comment-image-${comment.id}-${index}`}
+                      onClick={() => setImageEnlarged(true)}
                     />
+                    <Fade in={imageEnlarged}>
+                      <Box>
+                        <Modal
+                          open={imageEnlarged}
+                          onClose={() => setImageEnlarged(false)}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            bgcolor: "rgba(0, 0, 0, 0.5)",
+                          }}
+                        >
+                          <Fade in={imageEnlarged} timeout={300}>
+                            <img
+                              src={image}
+                              alt={"Comment image"}
+                              style={{
+                                maxWidth: "70vw",
+                                maxHeight: "70vh",
+                                aspectRatio: "auto",
+                                objectFit: "contain",
+                                borderRadius: "10px",
+                              }}
+                            />
+                          </Fade>
+                        </Modal>
+                      </Box>
+                    </Fade>
                   </ImageListItem>
                 ))}
               </ImageList>
@@ -259,22 +326,80 @@ export default function Comment({ comment, type, onDelete }) {
               alignItems: "flex-start",
             }}
           >
-            <IconButton onClick={handleMenuOpen} sx={{ padding: 0 }}>
+            <IconButton
+              data-testid={`comment-menu-button-${comment.id}`}
+              onClick={handleMenuOpen}
+              sx={{ padding: 0 }}
+            >
               <MoreHorizIcon sx={{ fontSize: "30px" }} />
             </IconButton>
-            <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
-              <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
+
+            <Menu
+              anchorEl={anchorEl}
+              open={openMenu}
+              onClose={handleMenuClose}
+              data-testid={`comment-menu-${comment.id}`}
+            >
+              <MenuItem data-testid={`comment-delete-menuitem-${comment.id}`} onClick={handleDeleteClick} sx={{ color: "red" }}>
+                Delete Comment
+              </MenuItem>
             </Menu>
           </Box>
         )}
-
-        <Dialog open={openDialog} onClose={handleCancelDelete}>
-          <DialogTitle>
-            {"Are you sure you want to delete this comment?"}
-          </DialogTitle>
+        <Dialog
+          open={openDialog}
+          onClose={handleCancelDelete}
+          PaperProps={{
+            sx: {
+              width: { xs: 250, sm: 400 },
+              borderRadius: 4,
+              backgroundColor: "#C8EFA5",
+              padding: 0.5,
+            },
+          }}
+          data-testid={`comment-delete-dialog-${comment.id}`}
+        >
+          <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete this comment?
+            </Typography>
+          </DialogContent>
           <DialogActions>
-            <Button onClick={handleCancelDelete}>Cancel</Button>
-            <Button onClick={handleConfirmDelete} autoFocus>
+            <Button
+              onClick={handleCancelDelete}
+              sx={{
+                backgroundColor: "#C8EFA5",
+                color: "black",
+                ":hover": {
+                  backgroundColor: "#C8EFA5",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+              }}
+              data-testid={`comment-delete-cancel-${comment.id}`}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              variant="contained"
+              sx={{
+                backgroundColor: "#cc0000",
+                color: "error",
+                ":hover": {
+                  backgroundColor: "#cc0000",
+                },
+                borderRadius: 20,
+                marginTop: 2,
+                display: "block",
+                marginLeft: "auto",
+                fontWeight: "bold",
+              }}
+              data-testid={`comment-delete-confirm-${comment.id}`}
+            >
               Delete
             </Button>
           </DialogActions>
