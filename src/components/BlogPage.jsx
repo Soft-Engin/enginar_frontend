@@ -1,10 +1,8 @@
 import BlogDetailed from "./BlogDetailed";
 import Box from "@mui/material/Box";
 import CommentSection from "./CommentSection";
-import RecommendedUsers from "./RecommendedUsers";
-import UpcomingEvents from "./UpcomingEvents";
-
 import { useSearchParams } from "react-router-dom";
+import RecomEventsBox from "./RecomEventsBox";
 
 export default function BlogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,8 +21,7 @@ export default function BlogPage() {
         <BlogDetailed data-testid="blog-detailed" blogId={searchParams.get("id")} />
         <CommentSection data-testid="comment-section" type="blog" contentId={searchParams.get("id")} />
       </Box>
-      <RecommendedUsers data-testid="recommended-users" />
-      <UpcomingEvents data-testid="upcoming-events" />
+      <RecomEventsBox/>
     </Box>
   );
 }

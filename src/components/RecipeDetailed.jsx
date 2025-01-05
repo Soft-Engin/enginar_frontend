@@ -43,35 +43,35 @@ const StyledCardMedia = styled("img")({
 
 export default function RecipeDetailed({ recipeId }) {
   const navigate = useNavigate();
-  const [recipeData, setRecipeData] = React.useState(null);
-  const [profilePictureUrl, setProfilePictureUrl] = React.useState(null);
+  const [recipeData, setRecipeData] = useState(null);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
   const [userInitials, setUserInitials] = useState("");
-  const [bannerUrl, setBannerUrl] = React.useState(null);
-  const [loadingIsBookmarked, setLoadingIsBookmarked] = React.useState(true);
-  const [loading, setLoading] = React.useState(true);
-  const [loadingProfile, setLoadingProfile] = React.useState(true);
-  const [loadingBanner, setLoadingBanner] = React.useState(true);
-  const [error, setError] = React.useState(null);
-  const [errorProfile, setErrorProfile] = React.useState(null);
-  const [errorBanner, setErrorBanner] = React.useState(null);
-  const [errorIsBookmarked, setErrorIsBookmarked] = React.useState(null);
-  const [errorDelete, setErrorDelete] = React.useState(null);
-  const [stepImages, setStepImages] = React.useState({});
-  const [isLiked, setIsLiked] = React.useState(false);
-  const [likeCount, setLikeCount] = React.useState(0);
-  const [commentCount, setCommentCount] = React.useState(0);
-  const [isBookmarked, setIsBookmarked] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [openSnackbar, setOpenSnackbar] = React.useState(false);
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = React.useState("success");
+  const [bannerUrl, setBannerUrl] = useState(null);
+  const [loadingIsBookmarked, setLoadingIsBookmarked] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [loadingBanner, setLoadingBanner] = useState(true);
+  const [error, setError] = useState(null);
+  const [errorProfile, setErrorProfile] = useState(null);
+  const [errorBanner, setErrorBanner] = useState(null);
+  const [errorIsBookmarked, setErrorIsBookmarked] = useState(null);
+  const [errorDelete, setErrorDelete] = useState(null);
+  const [stepImages, setStepImages] = useState({});
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(0);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [imageEnlarged, setImageEnlarged] = useState(false);
   const [enlargedImageIndex, setEnlargedImageIndex] = useState(null);
   const open = Boolean(anchorEl);
   let authButtonId = "loginButton";
   let userLogged = localStorage.getItem("userLogged") === "true";
-  const [showBanner, setShowBanner] = React.useState(false);
+  const [showBanner, setShowBanner] = useState(false);
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -187,7 +187,7 @@ export default function RecipeDetailed({ recipeId }) {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchRecipe = async () => {
       setLoading(true);
       setError(null);
@@ -204,7 +204,7 @@ export default function RecipeDetailed({ recipeId }) {
     fetchRecipe();
   }, [recipeId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (recipeData && recipeData.userId) {
       const fetchProfilePicture = async () => {
         setLoadingProfile(true);
@@ -250,7 +250,7 @@ export default function RecipeDetailed({ recipeId }) {
     }
   }, [recipeData]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (recipeData && recipeData.id) {
       const fetchBanner = async () => {
         setLoadingBanner(true);
@@ -270,10 +270,9 @@ export default function RecipeDetailed({ recipeId }) {
           }
         } catch (err) {
           console.error("Error fetching banner image:", err);
-          handleImageError(err, (errorMessage) => {
-            setBannerUrl(null);
-            setShowBanner(false);
-          });
+          handleImageError(err, setErrorBanner);
+          setBannerUrl(null);
+          setShowBanner(false);
         } finally {
           setLoadingBanner(false);
         }
@@ -287,7 +286,7 @@ export default function RecipeDetailed({ recipeId }) {
     };
   }, [recipeData]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (recipeData && recipeData.id && recipeData.steps) {
       const fetchStepImages = async () => {
         const images = {};
@@ -306,7 +305,6 @@ export default function RecipeDetailed({ recipeId }) {
           } catch (error) {
             console.error(`Error fetching image for step ${i}:`, error);
             handleImageError(error, (errorMessage) => {
-              //If there was an error, we set the error state for this particular image
               images[i] = null;
             });
           }
@@ -325,25 +323,27 @@ export default function RecipeDetailed({ recipeId }) {
     };
   }, [recipeData]);
 
-  React.useEffect(() => {
-    if (recipeData && recipeData.id && userLogged) {
-      const fetchIsLiked = async () => {
+  useEffect(() => {
+    if (recipeData && recipeData.id) {
+      const fetchLikeData = async () => {
         try {
-          const response = await axios.get(
-            `/api/v1/recipes/${recipeData.id}/is-liked`
-          );
-          setIsLiked(response.data.isLiked || false);
-          setLikeCount(response.data.likeCount || 0);
+          const [isLikedResponse, likeCountResponse] = await Promise.all([
+            axios.get(`/api/v1/recipes/${recipeData.id}/is-liked`),
+            axios.get(`/api/v1/recipes/${recipeData.id}/like-count`),
+          ]);
+
+          setIsLiked(isLikedResponse.data.isLiked || false);
+          setLikeCount(likeCountResponse.data.likeCount || 0);
         } catch (err) {
-          console.error("Error fetching isLiked:", err);
+          console.error("Error fetching like data:", err);
         }
       };
-      fetchIsLiked();
+      fetchLikeData();
     }
   }, [recipeData, userLogged]);
 
-  React.useEffect(() => {
-    if (recipeData && recipeData.id && userLogged) {
+  useEffect(() => {
+    if (recipeData && recipeData.id) {
       const fetchCommentCount = async () => {
         try {
           const response = await axios.get(
@@ -358,7 +358,7 @@ export default function RecipeDetailed({ recipeId }) {
     }
   }, [recipeData, userLogged]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (recipeData && recipeData.id && userLogged) {
       const fetchIsBookmarked = async () => {
         setLoadingIsBookmarked(true);
@@ -472,7 +472,11 @@ export default function RecipeDetailed({ recipeId }) {
 
   if (!recipeData) {
     return (
-      <Typography data-testid="recipe-detailed-nodata" color="error" textAlign={"center"}>
+      <Typography
+        data-testid="recipe-detailed-nodata"
+        color="error"
+        textAlign={"center"}
+      >
         No recipe information available for this ID
       </Typography>
     );
@@ -795,7 +799,14 @@ export default function RecipeDetailed({ recipeId }) {
                 }}
               >
                 <AccessTimeFilledIcon />
-                <p><b>Total Time:</b> {recipeData?.preparationTime > 120 ? "More than 120 mins" : recipeData?.preparationTime ? `${recipeData?.preparationTime} mins` : null}</p>
+                <p>
+                  <b>Total Time:</b>{" "}
+                  {recipeData?.preparationTime > 120
+                    ? "More than 120 mins"
+                    : recipeData?.preparationTime
+                    ? `${recipeData?.preparationTime} mins`
+                    : null}
+                </p>
               </Typography>
             </Box>
           </Box>
@@ -1020,7 +1031,11 @@ export default function RecipeDetailed({ recipeId }) {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton data-testid="like-button" onClick={handleLikeToggle} style={{ padding: 0 }}>
+            <IconButton
+              data-testid="like-button"
+              onClick={handleLikeToggle}
+              style={{ padding: 0 }}
+            >
               {isLiked ? (
                 <FavoriteIcon
                   data-testid="like-icon-filled"
@@ -1033,7 +1048,11 @@ export default function RecipeDetailed({ recipeId }) {
                 />
               )}
             </IconButton>
-            <Typography data-testid="like-count" variant="body1" color="text.secondary">
+            <Typography
+              data-testid="like-count"
+              variant="body1"
+              color="text.secondary"
+            >
               {likeCount}
             </Typography>
           </Box>
@@ -1048,9 +1067,16 @@ export default function RecipeDetailed({ recipeId }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+          <IconButton
+            data-testid="bookmark-button"
+            onClick={handleBookmarkToggle}
+            style={{ padding: 0 }}
+          >
             {isBookmarked ? (
-              <BookmarkIcon data-testid="bookmark-icon-filled" style={{ fontSize: "48px" }} />
+              <BookmarkIcon
+                data-testid="bookmark-icon-filled"
+                style={{ fontSize: "48px" }}
+              />
             ) : (
               <BookmarkBorderOutlinedIcon
                 data-testid="bookmark-icon-border"

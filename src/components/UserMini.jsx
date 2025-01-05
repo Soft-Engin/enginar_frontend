@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import FollowersListPopup from "./FollowersListPopup";
 import FollowingListPopup from "./FollowingListPopup";
+import { useNavigate } from "react-router-dom";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
@@ -41,6 +42,8 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
 }));
 
 export default function UserMini({ user }) {
+  const navigate = useNavigate();
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [banDialogOpen, setBanDialogOpen] = useState(false);
@@ -68,6 +71,7 @@ export default function UserMini({ user }) {
 
       if (response.status === 200) {
         console.log(`User ${user.userId} banned successfully.`);
+        navigate("/");
         // Remove user from UI or provide user feedback on successful ban
       } else {
         console.error(

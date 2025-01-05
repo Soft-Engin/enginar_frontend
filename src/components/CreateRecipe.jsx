@@ -852,6 +852,7 @@ const CreateRecipe = () => {
             {/* Description */}
             <TextField
               label="Description"
+              inputProps={{ "data-testid": "description-input" }}
               variant="outlined"
               fullWidth
               multiline

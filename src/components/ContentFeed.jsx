@@ -8,6 +8,7 @@ import Box from "@mui/material/Box";
 import PopularRecipesTab from "./PopularRecipesTab";
 import PopularBlogsTab from "./PopularBlogsTab";
 import FollowingTab from "./FollowingTab";
+import RecomEventsBox from "./RecomEventsBox";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -19,10 +20,9 @@ function CustomTabPanel(props) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       data-testid={`tabpanel-${index}`}
-      style={{ 
-        display: "flex", 
+      style={{
+        display: value === index ? "flex" : "none",
         justifyContent: "center",
-        visibility: value === index ? 'visible' : 'hidden'
       }}
       {...other}
     >
@@ -45,7 +45,7 @@ function a11yProps(index) {
 }
 
 export default function ContentFeed() {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -54,8 +54,7 @@ export default function ContentFeed() {
   const [userLogged] = useState(localStorage.getItem("userLogged") === "true");
 
   return (
-    <Box data-testid="content-feed" sx={{ margin: "0 auto" }}
-    >
+    <Box data-testid="content-feed" sx={{ margin: "0 auto" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
         <Tabs
           centered
@@ -121,8 +120,7 @@ export default function ContentFeed() {
           </div>
         </CustomTabPanel>
       )}
-      <RecommendedUsers data-testid="recommended-users" />
-      <UpcomingEvents data-testid="upcoming-events" />
+      <RecomEventsBox/>
     </Box>
   );
 }

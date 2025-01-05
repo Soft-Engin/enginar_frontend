@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import SearchedUsers from "./SearchedUsers";
 import SearchedBlogs from "./SearchedBlogs";
 import SearchedRecipes from "./SearchedRecipes";
+import RecomEventsBox from "./RecomEventsBox";
 
 export default function SearchPage() {
   const [searchParams] = useSearchParams();
@@ -24,8 +25,7 @@ export default function SearchPage() {
       {type == "recipe" && <SearchedRecipes query={query} />}
       {!type && <SearchedUsers query={query} />}
 
-      <RecommendedUsers />
-      <UpcomingEvents />
+      <RecomEventsBox/>
     </Box>
   );
 }

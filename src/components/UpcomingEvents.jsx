@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -12,7 +12,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import axios from "axios";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
-
+import { LoadingErrorDisplay } from "./LoadingErrorDisplay";
 export default function UpcomingEvents() {
   const [events, setEvents] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
@@ -37,9 +37,11 @@ export default function UpcomingEvents() {
 
       if (eventsResponse.data && eventsResponse.data.items) {
         setEvents(eventsResponse.data.items);
+      } else {
+        setError("No events found");
       }
     } catch (err) {
-      setError(err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -112,6 +114,10 @@ export default function UpcomingEvents() {
     loadAllParticipants();
   }, [events]);
 
+  const handleEventClick = (eventId) => {
+    navigate(`/event?id=${eventId}`);
+  };
+
   const renderEventItem = (event) => {
     const participantsInfo = eventParticipants[event.eventId] || {
       participants: [],
@@ -124,14 +130,10 @@ export default function UpcomingEvents() {
       loading: participantsLoading,
     } = participantsInfo;
 
-    const handleEventClick = () => {
-      navigate(`/event?id=${event.eventId}`);
-    };
-
     return (
       <ListItem
         key={event.eventId}
-        onClick={handleEventClick}
+        onClick={() => handleEventClick(event.eventId)}
         style={{ cursor: "pointer" }}
       >
         <Box
@@ -271,11 +273,7 @@ export default function UpcomingEvents() {
   return (
     <Box
       sx={{
-        position: "fixed",
-        top: 425,
-        right: { lg: "0.7%", xl: "2.5%" },
         width: 300,
-        scale: { xs: "0%", sm: "0%", md: "0%", lg: "85%", xl: "95%" },
         borderRadius: 3,
         outline: "1.5px solid #959595",
         backgroundColor: "#C8EFA5",
@@ -291,9 +289,7 @@ export default function UpcomingEvents() {
       >
         Upcoming Events
       </Typography>
-
-      {loading && <Typography>Loading...</Typography>}
-      {error && <Typography>Error: {error.message}</Typography>}
+      <LoadingErrorDisplay loading={loading} error={error} />
       <List>{events.map((event) => renderEventItem(event))}</List>
     </Box>
   );

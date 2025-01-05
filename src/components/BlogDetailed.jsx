@@ -335,22 +335,26 @@ export default function BlogDetailed({ blogId }) {
   };
 
   useEffect(() => {
-    if (blogData && blogData.id && userLogged) {
-      const fetchIsLiked = async () => {
+    if (blogData && blogData.id) {
+      const fetchLikeData = async () => {
         try {
-          const response = await axios.get(`/api/v1/blogs/${blogData.id}/is-liked`);
-          setIsLiked(response.data.isLiked || false);
-          setLikeCount(response.data.likeCount || 0);
+          const [isLikedResponse, likeCountResponse] = await Promise.all([
+            axios.get(`/api/v1/blogs/${blogData.id}/is-liked`),
+            axios.get(`/api/v1/blogs/${blogData.id}/like-count`),
+          ]);
+
+          setIsLiked(isLikedResponse.data.isLiked || false);
+          setLikeCount(likeCountResponse.data.likeCount || 0);
         } catch (err) {
-          console.error("Error fetching isLiked:", err);
+          console.error("Error fetching like data:", err);
         }
       };
-      fetchIsLiked();
+      fetchLikeData();
     }
   }, [blogData, userLogged]);
 
   useEffect(() => {
-    if (blogData && blogData.id && userLogged) {
+    if (blogData && blogData.id) {
       const fetchCommentCount = async () => {
         try {
           const response = await axios.get(
@@ -747,7 +751,12 @@ export default function BlogDetailed({ blogId }) {
         </Box>
       )}
       {errorBanner && (
-        <Box data-testid="blog-banner-error" display="flex" justifyContent="center" my={2}>
+        <Box
+          data-testid="blog-banner-error"
+          display="flex"
+          justifyContent="center"
+          my={2}
+        >
           <Typography color="error">Error: {errorBanner}</Typography>
         </Box>
       )}
@@ -836,9 +845,16 @@ export default function BlogDetailed({ blogId }) {
             </Typography>
           </Box>
         </Box>
-        
-        <Box data-testid="right-actions" sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton data-testid="bookmark-button" onClick={handleBookmarkToggle} style={{ padding: 0 }}>
+
+        <Box
+          data-testid="right-actions"
+          sx={{ display: "flex", alignItems: "center" }}
+        >
+          <IconButton
+            data-testid="bookmark-button"
+            onClick={handleBookmarkToggle}
+            style={{ padding: 0 }}
+          >
             {isBookmarked ? (
               <BookmarkIcon
                 data-testid="bookmark-icon-filled"

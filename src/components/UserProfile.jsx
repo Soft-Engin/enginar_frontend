@@ -29,7 +29,8 @@ import FollowersListPopup from "./FollowersListPopup";
 import FollowingListPopup from "./FollowingListPopup";
 import RecommendedUsers from "./RecommendedUsers";
 import UpcomingEvents from "./UpcomingEvents";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import RecomEventsBox from "./RecomEventsBox";
 
 const SharedButton = styled(Button)(({ theme }) => ({
   border: "#888888",
@@ -52,6 +53,7 @@ const FollowButton = styled(SharedButton)(({ theme }) => ({
 }));
 
 function CustomTabPanel(props) {
+  
   const { children, value, index, ...other } = props;
 
   return (
@@ -93,6 +95,7 @@ function a11yProps(index) {
 
 const UserProfile = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const userId = searchParams.get("id");
 
   const [profileData, setProfileData] = useState(null);
@@ -295,6 +298,7 @@ const UserProfile = () => {
 
       if (response.status === 200) {
         console.log(`User ${userId} banned successfully.`);
+        navigate("/");
         // Remove user from UI or provide user feedback on successful ban
       } else {
         console.error(
@@ -554,7 +558,7 @@ const UserProfile = () => {
                       onClose={handleClose}
                     >
                       {isOwnProfile ? (
-                        <MenuItem key="Edit" onClick={handleEditProfile}>
+                        <MenuItem key="Edit" onClick={handleEditProfile} data-testid="edit-bio-button">
                           Edit Profile
                         </MenuItem>
                       ) : isAdmin ? (
@@ -685,8 +689,7 @@ const UserProfile = () => {
         handleClose={handleFollowingPopupClose}
         userId={userId}
       />
-      <RecommendedUsers />
-      <UpcomingEvents />
+      <RecomEventsBox/>
     </Box>
   );
 };
